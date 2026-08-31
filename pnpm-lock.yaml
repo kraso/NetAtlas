@@ -14,9 +14,15 @@ importers:
 
   apps/app:
     dependencies:
+      '@netatlas/data':
+        specifier: workspace:*
+        version: link:../../packages/data
       '@netatlas/domain':
         specifier: workspace:*
         version: link:../../packages/domain
+      '@netatlas/search':
+        specifier: workspace:*
+        version: link:../../packages/search
       '@netatlas/ui':
         specifier: workspace:*
         version: link:../../packages/ui
@@ -231,6 +237,25 @@ importers:
       vitest:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.1)(jsdom@25.0.1)(terser@5.51.2)
+
+  tools/import-cli:
+    dependencies:
+      '@netatlas/data':
+        specifier: workspace:*
+        version: link:../../packages/data
+      '@netatlas/importers':
+        specifier: workspace:*
+        version: link:../../packages/importers
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.1
+      tsx:
+        specifier: ^4.19.2
+        version: 4.23.13
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
 
 packages:
 

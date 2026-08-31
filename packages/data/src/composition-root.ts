@@ -2,7 +2,8 @@ import { NodeSqliteDriver, applyMigrations, loadMigrations, CatalogDao } from '.
 import type { SqliteDriver } from './driver.js'
 import { SqliteDeviceRepository, SqliteCatalogRepository } from './repositories/device-repository.js'
 import { SqliteGraphRepository } from './repositories/graph-repository.js'
-import type { Clock, DeviceRepository, CatalogRepository, GraphRepository, Logger, IdGen } from '@netatlas/domain'
+import { SqliteSourcingRepository } from './repositories/sourcing-repository.js'
+import type { Clock, DeviceRepository, CatalogRepository, GraphRepository, SourcingRepository, Logger, IdGen } from '@netatlas/domain'
 
 /**
  * Composition root (NET-HW-004) — DI manual por runtime.
@@ -18,6 +19,7 @@ export interface RuntimeContext {
     readonly device: DeviceRepository
     readonly catalog: CatalogRepository
     readonly graph: GraphRepository
+    readonly sourcing: SourcingRepository
   }
   readonly dao: CatalogDao
   readonly clock: Clock
@@ -74,6 +76,7 @@ export function composeRuntime(opts: CompositionOptions): RuntimeContext {
       device: new SqliteDeviceRepository(driver),
       catalog: new SqliteCatalogRepository(driver),
       graph: new SqliteGraphRepository(driver),
+      sourcing: new SqliteSourcingRepository(driver),
     },
     dao,
     clock: new SystemClock(),

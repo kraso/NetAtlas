@@ -16,7 +16,9 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@netatlas/data": "workspace:*",
     "@netatlas/domain": "workspace:*",
+    "@netatlas/search": "workspace:*",
     "@netatlas/ui": "workspace:*",
     "@tauri-apps/api": "^2.1.1",
     "react": "18.3.1",

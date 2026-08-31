@@ -83,5 +83,14 @@
     "url": "https://www.wi-fi.org/discover-wi-fi/wi-fi-6",
     "retrievedOn": "2025-02-10",
     "authorityLevel": 1
+  },
+  {
+    "slug": "netatlas-assist",
+    "kind": "editorial",
+    "publisher": "Equipo NetAtlas (importación asistida)",
+    "title": "Ficha generada por importación asistida — datos estructurales de referencia; especificaciones numéricas pendientes de datasheet (validar en F2)",
+    "url": null,
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 4
   }
 ]

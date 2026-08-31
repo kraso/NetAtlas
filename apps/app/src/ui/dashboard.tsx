@@ -13,7 +13,14 @@ export function Dashboard(): React.JSX.Element {
   const navigate = useNavigate()
   const categories = useCatalogStore((s) => s.categories)
   const { query, setQuery, dslPreview } = useSearchStore()
-  const deviceCount = useServices.getState().services.dataset.devices.length
+  const [deviceCount, setDeviceCount] = React.useState(0)
+
+  React.useEffect(() => {
+    void (async () => {
+      const count = await useServices.getState().services.devices.count()
+      setDeviceCount(count)
+    })()
+  }, [])
 
   const submit = (e: React.FormEvent): void => {
     e.preventDefault()

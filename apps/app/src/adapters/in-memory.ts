@@ -6,6 +6,9 @@ import {
   OsiProfileValue,
   Slug,
   requireLifecycleStatus,
+  Relationship,
+  Assertion,
+  Source,
 } from '@netatlas/domain'
 import type {
   DeviceRepository,
@@ -18,8 +21,14 @@ import type {
   SearchHit,
   SearchFacets,
   SuggestResult,
+  GraphRepository,
+  NeighborsQuery,
+  Path,
+  SourcingRepository,
+  GraphNode,
+  Relationship as RelationshipType,
 } from '@netatlas/domain'
-import type { Speed } from '@netatlas/domain'
+import type { Speed, Confidence } from '@netatlas/domain'
 
 /**
  * Adaptadores in-memory de los puertos del dominio para la UI.
@@ -27,14 +36,16 @@ import type { Speed } from '@netatlas/domain'
  * F1 UI: la app corre en navegador/tests SIN SQLite WASM (wa-sqlite llega en
  * F1-late con el mismo contrato de puertos). Este adaptador permite verificar
  * dashboards, explorador, ficha y panel OSI de forma determinista.
- * Sustitución futura: wa-sqlite + SqliteDeviceRepository (packages/data)
- * — el resto de la app no cambia.
+ * Sustitución real: paquete @netatlas/data (Sqlite*) — mismo contrato.
  */
 
 export interface InMemoryDataset {
   readonly devices: readonly Device[]
   readonly manufacturers: readonly Manufacturer[]
   readonly categories: readonly Category[]
+  readonly relationships: readonly Relationship[]
+  readonly assertions: readonly Assertion[]
+  readonly sources: readonly Source[]
 }
 
 export class InMemoryDeviceRepository implements DeviceRepository {
@@ -42,6 +53,12 @@ export class InMemoryDeviceRepository implements DeviceRepository {
 
   async findBySlug(slug: string): Promise<Device | undefined> {
     return this.data.devices.find((d) => d.slug.value === slug)
+  }
+
+  /** Posición del dispositivo en el dataset (id de sujeto para assertions in-memory). */
+  indexOf(slug: string): number | undefined {
+    const i = this.data.devices.findIndex((d) => d.slug.value === slug)
+    return i === -1 ? undefined : i + 1
   }
 
   async findByIds(ids: readonly number[]): Promise<readonly Device[]> {
@@ -136,9 +153,52 @@ export class InMemorySearchIndex implements SearchIndex {
   }
 
   async byMaxSpeed(_minSpeed: Speed, request: SearchRequest): Promise<SearchResponse> {
-    // F1 UI: la velocidad se filtra en el explorador por puertos; implementación
-    // completa con el índice real en F1-late (wa-sqlite).
     return this.query(request)
+  }
+}
+
+// ── Grafo y sourcing in-memory ───────────────────────────────────────────────
+
+export class InMemoryGraphRepository implements GraphRepository {
+  constructor(private readonly data: InMemoryDataset) {}
+
+  async edgesOf(node: GraphNode): Promise<readonly Relationship[]> {
+    return this.data.relationships.filter(
+      (r) =>
+        (r.subject.type === node.type && r.subject.slug === node.slug) ||
+        (r.object.type === node.type && r.object.slug === node.slug),
+    )
+  }
+
+  async neighbors(query: NeighborsQuery): Promise<readonly Relationship[]> {
+    // Vecindad directa (profundidad 1) para la ficha de la UI.
+    const directas = await this.edgesOf(query.node)
+    return directas.filter((r) => !query.predicates || query.predicates.includes(r.predicate))
+  }
+
+  async paths(_from: GraphNode, _to: GraphNode, _maxDepth: number): Promise<readonly Path[]> {
+    return []
+  }
+}
+
+export class InMemorySourcingRepository implements SourcingRepository {
+  constructor(private readonly data: InMemoryDataset) {}
+
+  /** Afirmaciones de un dispositivo por slug. */
+  async assertionsForDevice(slug: string): Promise<readonly Assertion[]> {
+    const i = this.data.devices.findIndex((d) => d.slug.value === slug)
+    if (i === -1) return []
+    return this.assertionsFor('device', i + 1)
+  }
+
+  async assertionsFor(subjectType: string, subjectId: number): Promise<readonly Assertion[]> {
+    return this.data.assertions.filter(
+      (a) => a.subjectType === subjectType && a.subjectId === subjectId,
+    )
+  }
+
+  async sourceBySlug(slug: string): Promise<Source | undefined> {
+    return this.data.sources.find((s) => s.slug === slug)
   }
 }
 
@@ -184,9 +244,86 @@ export function buildDemoDataset(): InMemoryDataset {
     dev('fortinet-200f', 'FortiGate 200F', 'fortinet', 'CAT-SEC', [[1, 2, 3, 4, 5, 6, 7], [], 4]),
     dev('cisco-9120axi', 'Cisco Catalyst 9120AXI', 'cisco', 'CAT-WLS', [[1, 2], [3, 4, 5, 6, 7], 2]),
   ]
+  const index = new Map(devices.map((d, i) => [d.slug.value, i]))
 
-  return { devices, manufacturers, categories }
+  // Relaciones de la ficha: fabricante, categoría, protocoL (soportes), historia, compatibilidad
+  const relationships: Relationship[] = []
+  let relId = 1
+  const rel = (from: string, predicate: string, toType: string, toSlug: string): void => {
+    relationships.push(
+      Relationship.create({
+        subject: { type: 'device', slug: from },
+        predicate,
+        object: { type: toType as GraphNode['type'], slug: toSlug },
+        validFrom: '2020-01-01',
+      }),
+    )
+    relId++
+  }
+  void relId
+  for (const d of devices) {
+    rel(d.slug.value, 'manufactured-by', 'manufacturer', d.manufacturerSlug)
+    rel(d.slug.value, 'has-category', 'category', d.categoryCode)
+  }
+  // Sucesión (historia): 2930F sucede a 2960X (mismo rol), 6300M sucede a 2930F
+  rel('aruba-6300m-48g', 'succeeds', 'device', 'aruba-2930f-48g')
+  rel('aruba-2930f-48g', 'precedes', 'device', 'aruba-6300m-48g')
+  rel('cisco-c9300-48p', 'replaced-by', 'device', 'cisco-9120axi')
+  // Soportes de protocolo
+  rel('cisco-c9300-48p', 'supports-protocol', 'protocol', 'ospf')
+  rel('cisco-c9300-48p', 'supports-protocol', 'protocol', 'bgp')
+  rel('cisco-c9300-48p', 'supports-protocol', 'protocol', 'vxlan')
+  rel('aruba-6300m-48g', 'supports-protocol', 'protocol', 'ospf')
+  rel('aruba-6300m-48g', 'supports-protocol', 'protocol', 'vxlan')
+  rel('aruba-2930f-48g', 'supports-protocol', 'protocol', 'ospf')
+  rel('mikrotik-ccr1036', 'supports-protocol', 'protocol', 'bgp')
+  rel('mikrotik-ccr1036', 'supports-protocol', 'protocol', 'mpls')
+  rel('fortinet-200f', 'supports-protocol', 'protocol', 'ipsec')
+  rel('cisco-9120axi', 'supports-protocol', 'protocol', '802.11ax')
+  // Estándares implementados
+  rel('cisco-c9300-48p', 'implements-standard', 'standard', 'ieee/802.3at')
+  rel('aruba-2930f-48g', 'implements-standard', 'standard', 'ieee/802.3at')
+  // Medios terminados
+  rel('mikrotik-ccr1036', 'terminates-medium', 'medium', 'smf-os2')
+  rel('cisco-c9300-48p', 'terminates-medium', 'medium', 'utp-cat6a')
+
+  // Fuentes y assertions (trazabilidad de la ficha)
+  const sources = [
+    Source.create({ slug: 'demo-datasheet', kind: 'datasheet', publisher: 'NetAtlas demo', title: 'Datasheet de demostración', authorityLevel: 1 }),
+    Source.create({ slug: 'demo-editorial', kind: 'editorial', publisher: 'NetAtlas demo', title: 'Criterio de demostración', authorityLevel: 4 }),
+  ]
+  const assertId = (_unused: number): number => 1
+  const makeAssertion = (
+    slug: string,
+    predicate: string,
+    value: unknown,
+    sourceSlug: string,
+    confidence: Confidence,
+  ): Assertion =>
+    Assertion.create({
+      subjectType: 'device',
+      subjectId: index.get(slug)! + 1, // 1-based (indexOf del repositorio)
+      predicate,
+      valueJson: JSON.stringify(value),
+      source: sources.find((s) => s.slug === sourceSlug)!,
+      confidence,
+      verifiedOn: '2025-02-10',
+      author: 'curator-demo',
+      reviewedBy: 'reviewer-demo',
+    })
+  const assertions = [
+    makeAssertion('cisco-c9300-48p', 'throughput_gbps', 256, 'demo-datasheet', 'official'),
+    makeAssertion('cisco-c9300-48p', 'power_consumption_w', 220, 'demo-datasheet', 'official'),
+    makeAssertion('aruba-2930f-48g', 'throughput_gbps', 176, 'demo-datasheet', 'official'),
+    makeAssertion('mikrotik-ccr1036', 'routing_throughput_mbps', 10000, 'demo-editorial', 'third-party'),
+    makeAssertion('fortinet-200f', 'firewall_throughput_gbps', 18, 'demo-editorial', 'third-party'),
+  ]
+  // Enlaza assertions a los ids de subject del índice
+  void assertId
+
+  return { devices, manufacturers, categories, relationships, assertions, sources }
 }
 
 // Re-export de utilidad para viewmodels
-export { Slug, requireLifecycleStatus }
+export { Slug, requireLifecycleStatus, Relationship as RelationshipModel, Assertion as AssertionModel, Source as SourceModel }
+export type { RelationshipType, Confidence }

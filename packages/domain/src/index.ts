@@ -53,6 +53,7 @@ export type { ParseResult, ParseError } from './search/parser.js'
 // Puertos (sección 6.6)
 export type { DeviceRepository, CatalogRepository, DeviceQuery, Page } from './ports/device-repository.js'
 export type { GraphRepository, NeighborsQuery, Path } from './ports/graph-repository.js'
+export type { SourcingRepository } from './ports/sourcing-repository.js'
 export type {
   SearchIndex,
   SearchHit,

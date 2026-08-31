@@ -26,7 +26,7 @@ describe('dataset:build', () => {
   })
 
   it('construye el SQLite con dispositivos, aristas y assertions', () => {
-    expect(result.deviceCount).toBe(31)
+    expect(result.deviceCount).toBeGreaterThanOrEqual(300) // seed hacia 300–500
     expect(result.assertionCount).toBeGreaterThan(0)
     expect(result.relationshipCount).toBeGreaterThan(0)
     expect(result.schemaVersion).toBe(1)
@@ -38,7 +38,7 @@ describe('dataset:build', () => {
     const layers = driver.prepare('SELECT COUNT(*) AS c FROM osi_layer').get()
     expect(Number(layers?.c)).toBe(7)
     const fts = driver.prepare('SELECT COUNT(*) AS c FROM fts_device').get()
-    expect(Number(fts?.c)).toBe(31)
+    expect(Number(fts?.c)).toBeGreaterThanOrEqual(300)
   })
 
   it('los dispositivos del seed son consultables por FTS5', () => {

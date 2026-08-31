@@ -12,7 +12,8 @@
     "test": "vitest run",
     "lint": "tsc --noEmit",
     "data:lint": "tsx src/lint-cli.ts",
-    "dataset:build": "tsx src/build-cli.ts"
+    "dataset:build": "tsx src/build-cli.ts",
+    "gen-assist": "tsx src/assisted-gen.ts"
   },
   "dependencies": {
     "@netatlas/data": "workspace:*",

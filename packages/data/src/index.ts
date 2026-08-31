@@ -14,6 +14,7 @@ export type {
 } from './daos/catalog-dao.js'
 export { SqliteDeviceRepository, SqliteCatalogRepository } from './repositories/device-repository.js'
 export { SqliteGraphRepository } from './repositories/graph-repository.js'
+export { SqliteSourcingRepository } from './repositories/sourcing-repository.js'
 export { composeRuntime, disposeRuntime } from './composition-root.js'
 export type { RuntimeContext, CompositionOptions } from './composition-root.js'
 

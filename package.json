@@ -16,7 +16,8 @@
     "lint": "pnpm -r run lint",
     "data:lint": "pnpm --filter @netatlas/dataset-tools data:lint",
     "bench": "pnpm --filter @netatlas/datagen bench",
-    "migrate": "pnpm --filter @netatlas/data migrate"
+    "migrate": "pnpm --filter @netatlas/data migrate",
+    "import": "pnpm --filter @netatlas/import-cli import"
   },
   "devDependencies": {
     "typescript": "^5.6.3"

@@ -17,7 +17,7 @@ import type { GraphNode, GraphRepository, NeighborsQuery, Path } from '@netatlas
  *    la consulta bidireccional los devuelve con su mismo código.
  */
 
-const RESOLVE_SQL: Record<string, { table: string; slugCol: string }> = {
+const RESOLVE_SQL: Record<string, { table: string; slugCol: string; idCol?: string }> = {
   device: { table: 'device', slugCol: 'slug' },
   manufacturer: { table: 'manufacturer', slugCol: 'slug' },
   'product-family': { table: 'product_family', slugCol: 'slug' },
@@ -28,8 +28,8 @@ const RESOLVE_SQL: Record<string, { table: string; slugCol: string }> = {
   technology: { table: 'technology', slugCol: 'slug' },
   medium: { table: 'medium', slugCol: 'code' },
   component: { table: 'component', slugCol: 'model' },
-  layer: { table: 'osi_layer', slugCol: 'number' },
-  firmware: { table: 'firmware', slugCol: 'version' },
+  layer: { table: 'osi_layer', slugCol: 'number', idCol: 'number' },
+  firmware: { table: 'firmware', slugCol: 'version', idCol: 'id' },
   topology: { table: 'topology', slugCol: 'slug' },
   'speed-grade': { table: 'speed_grade', slugCol: 'code' },
 }
@@ -41,7 +41,7 @@ export class SqliteGraphRepository implements GraphRepository {
     const def = RESOLVE_SQL[node.type]
     if (!def) return undefined
     const row = this.db
-      .prepare(`SELECT id FROM ${def.table} WHERE ${def.slugCol} = ?`)
+      .prepare(`SELECT ${def.idCol ?? 'id'} AS id FROM ${def.table} WHERE ${def.slugCol} = ?`)
       .get(node.slug) as { id: number } | undefined
     return row ? Number(row.id) : undefined
   }
@@ -50,7 +50,7 @@ export class SqliteGraphRepository implements GraphRepository {
     const def = RESOLVE_SQL[type]
     if (!def) return undefined
     const row = this.db
-      .prepare(`SELECT ${def.slugCol} AS slug FROM ${def.table} WHERE id = ?`)
+      .prepare(`SELECT ${def.slugCol} AS slug FROM ${def.table} WHERE ${def.idCol ?? 'id'} = ?`)
       .get(id) as { slug: string | number } | undefined
     return row ? String(row.slug) : undefined
   }

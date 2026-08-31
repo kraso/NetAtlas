@@ -1,0 +1,20 @@
+{
+  "name": "@netatlas/import-cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "NetAtlas — CLI de importación: CSV/JSON → pipeline packages/importers → informe de lote (NET-HW-043)",
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "import": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "@netatlas/data": "workspace:*",
+    "@netatlas/importers": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

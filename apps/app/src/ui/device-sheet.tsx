@@ -1,31 +1,49 @@
 import React from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { OsiPanel, ConfidenceBadge } from '@netatlas/ui'
+import { OsiPanel, ConfidenceBadge, confidenceLabel } from '@netatlas/ui'
 import { useCatalogStore } from '../viewmodels/catalog-store.js'
 import { useServices } from '../composition-root.js'
 import type { Device } from '@netatlas/domain'
+import type { Assertion, Relationship } from '@netatlas/domain'
 
 /**
- * Ficha de dispositivo (§10.5) — pestañas. En F1 UI se implementan las 4
- * pestañas núcleo: Resumen, Especificaciones, Interfaces y Capas OSI.
- * Las 13 pestañas completas del plan llegan en el refinamiento F1 (Documentación,
- * Protocolos con insignia de fuente, Estándares, Compatibilidad, Historia…).
+ * Ficha de dispositivo (§10.5) — las 13 pestañas del plan:
+ * Resumen · Especificaciones · Interfaces · Protocolos · Capacidades ·
+ * Arquitectura · Capas OSI · Estándares · Compatibilidad · Diagramas ·
+ * Historia · Documentación · Referencias.
+ *
+ * Cada pestaña se alimenta de los puertos del dominio (device, graph, sourcing);
+ * donde el modelo aún no tiene datos se muestra un empty-state curado, nunca
+ * datos inventados.
  */
 
-type Pestaña = 'resumen' | 'especificaciones' | 'interfaces' | 'capas'
+interface PestañaDef {
+  id: string
+  label: string
+  required?: boolean
+}
 
-const PESTAÑAS: readonly { id: Pestaña; label: string }[] = [
-  { id: 'resumen', label: 'Resumen' },
+const PESTAÑAS: readonly PestañaDef[] = [
+  { id: 'resumen', label: 'Resumen', required: true },
   { id: 'especificaciones', label: 'Especificaciones' },
   { id: 'interfaces', label: 'Interfaces' },
-  { id: 'capas', label: 'Capas OSI' },
+  { id: 'protocolos', label: 'Protocolos' },
+  { id: 'capacidades', label: 'Capacidades' },
+  { id: 'arquitectura', label: 'Arquitectura' },
+  { id: 'capas', label: 'Capas OSI', required: true },
+  { id: 'estandares', label: 'Estándares' },
+  { id: 'compatibilidad', label: 'Compatibilidad' },
+  { id: 'diagramas', label: 'Diagramas' },
+  { id: 'historia', label: 'Historia' },
+  { id: 'documentacion', label: 'Documentación' },
+  { id: 'referencias', label: 'Referencias' },
 ]
 
 export function DeviceSheet(): React.JSX.Element {
   const { slug = '' } = useParams<{ slug: string }>()
   const categories = useCatalogStore((s) => s.categories)
   const [device, setDevice] = React.useState<Device | undefined>()
-  const [pestaña, setPestaña] = React.useState<Pestaña>('resumen')
+  const [pestaña, setPestaña] = React.useState<string>('resumen')
   const [notFound, setNotFound] = React.useState(false)
 
   React.useEffect(() => {
@@ -75,78 +93,251 @@ export function DeviceSheet(): React.JSX.Element {
       </div>
 
       <div id={`panel-${pestaña}`} role="tabpanel" aria-labelledby={`tab-${pestaña}`}>
-        {pestaña === 'resumen' ? (
-          <div className="stack">
-            <p>{device.summary ?? 'Sin resumen curado.'}</p>
-            <p>
-              Ciclo de vida: <span className="mono">{device.lifecycleStatus}</span>{' '}
-              <ConfidenceBadge confidence="official" size="sm" />
-            </p>
-          </div>
-        ) : null}
-
-        {pestaña === 'especificaciones' ? (
-          <table className="tabla-specs">
-            <tbody>
-              <tr>
-                <th scope="row">Modelo / SKU</th>
-                <td className="mono">{device.model ?? '—'} {device.sku ? `(${device.sku})` : ''}</td>
-              </tr>
-              <tr>
-                <th scope="row">Fabricante</th>
-                <td>{device.manufacturerSlug}</td>
-              </tr>
-              <tr>
-                <th scope="row">Capa principal</th>
-                <td className="mono">{device.osiProfile?.profile.primary ?? '—'}</td>
-              </tr>
-              <tr>
-                <th scope="row">Puertos totales</th>
-                <td className="mono">{device.portCount()}</td>
-              </tr>
-              <tr>
-                <th scope="row">Presentación</th>
-                <td className="mono">{device.releasedOn ?? '—'}</td>
-              </tr>
-            </tbody>
-          </table>
-        ) : null}
-
-        {pestaña === 'interfaces' ? (
-          <table className="tabla-specs">
-            <thead>
-              <tr>
-                <th scope="col">Etiqueta</th>
-                <th scope="col">Interfaz</th>
-                <th scope="col">Cantidad</th>
-                <th scope="col">Velocidades</th>
-                <th scope="col">PoE</th>
-              </tr>
-            </thead>
-            <tbody>
-              {device.ports.map((p) => (
-                <tr key={p.label}>
-                  <td>{p.label}</td>
-                  <td className="mono">{p.interfaceCode}</td>
-                  <td className="mono">{p.quantity}</td>
-                  <td className="mono">{p.speedsMbps.map((s) => (s >= 1000 ? `${s / 1000}G` : `${s}M`)).join(' / ')}</td>
-                  <td className="mono">{p.poeStandard ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : null}
-
-        {pestaña === 'capas' ? <OsiTab device={device} /> : null}
+        <PestanaContent device={device} pestaña={pestaña} />
       </div>
     </section>
   )
 }
 
+/** Carga datos relacionales y de trazabilidad del dispositivo. */
+function useDeviceRelations(device: Device | undefined): {
+  relaciones: readonly Relationship[]
+  assertions: readonly Assertion[]
+  loading: boolean
+} {
+  const [relaciones, setRelaciones] = React.useState<readonly Relationship[]>([])
+  const [assertions, setAssertions] = React.useState<readonly Assertion[]>([])
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    if (!device) {
+      setLoading(false)
+      return
+    }
+    void (async () => {
+      const { graph, sourcing } = useServices.getState().services
+      const edges = await graph.edgesOf({ type: 'device', slug: device.slug.value })
+      setRelaciones(edges)
+      const asr = await sourcing.assertionsForDevice(device.slug.value)
+      setAssertions(asr)
+      setLoading(false)
+    })()
+  }, [device])
+
+  return { relaciones, assertions, loading }
+}
+
+const Empty = ({ message }: { message: string }): React.JSX.Element => (
+  <p className="empty-state">{message}</p>
+)
+
+function PestanaContent({ device, pestaña }: { device: Device; pestaña: string }): React.JSX.Element {
+  const { relaciones, assertions, loading } = useDeviceRelations(device)
+  if (loading) return <p role="status">Cargando…</p>
+
+  const porPredicado = (pred: string): readonly Relationship[] =>
+    relaciones.filter((r) => r.predicate === pred)
+  const soportes = porPredicado('supports-protocol')
+  const estandares = porPredicado('implements-standard')
+  const medios = porPredicado('terminates-medium')
+  const sucesores = porPredicado('succeeds')
+  const reemplaza = porPredicado('replaced-by')
+  const compatibles = porPredicado('compatible-with')
+
+  const assertionDe = (pred: string): Assertion | undefined => assertions.find((a) => a.predicate === pred)
+
+  switch (pestaña) {
+    case 'resumen':
+      return (
+        <div className="stack">
+          <p>{device.summary ?? 'Sin resumen curado.'}</p>
+          <p>
+            Ciclo de vida: <span className="mono">{device.lifecycleStatus}</span>{' '}
+            {assertionDe('throughput_gbps') ? (
+              <>
+                {' '}
+                · Throughput: <span className="mono">{JSON.parse(assertionDe('throughput_gbps')!.valueJson).gbps} Gbps</span>{' '}
+                <ConfidenceBadge confidence={assertionDe('throughput_gbps')!.confidence} size="sm" />
+              </>
+            ) : null}
+          </p>
+        </div>
+      )
+
+    case 'especificaciones':
+      return (
+        <table className="tabla-specs">
+          <tbody>
+            <tr><th scope="row">Modelo / SKU</th><td className="mono">{device.model ?? '—'} {device.sku ? `(${device.sku})` : ''}</td></tr>
+            <tr><th scope="row">Fabricante</th><td>{device.manufacturerSlug}</td></tr>
+            <tr><th scope="row">Capa principal</th><td className="mono">{device.osiProfile?.profile.primary ?? '—'}</td></tr>
+            <tr><th scope="row">Puertos totales</th><td className="mono">{device.portCount()}</td></tr>
+            <tr><th scope="row">Presentación</th><td className="mono">{device.releasedOn ?? '—'}</td></tr>
+            <tr><th scope="row">Fecha EoL / EoS</th><td className="mono">{device.eolOn ?? '—'} / {device.eosOn ?? '—'}</td></tr>
+          </tbody>
+        </table>
+      )
+
+    case 'interfaces':
+      return device.ports.length === 0 ? (
+        <Empty message="Sin inventario de puertos curado." />
+      ) : (
+        <table className="tabla-specs">
+          <thead>
+            <tr>
+              <th scope="col">Etiqueta</th>
+              <th scope="col">Interfaz</th>
+              <th scope="col">Cantidad</th>
+              <th scope="col">Velocidades</th>
+              <th scope="col">PoE</th>
+            </tr>
+          </thead>
+          <tbody>
+            {device.ports.map((p) => (
+              <tr key={p.label}>
+                <td>{p.label}</td>
+                <td className="mono">{p.interfaceCode}</td>
+                <td className="mono">{p.quantity}</td>
+                <td className="mono">{p.speedsMbps.map((s) => (s >= 1000 ? `${s / 1000}G` : `${s}M`)).join(' / ')}</td>
+                <td className="mono">{p.poeStandard ?? '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )
+
+    case 'protocolos':
+      return soportes.length === 0 ? (
+        <Empty message="Sin protocolos curados (se alimenta de la arista supports-protocol)." />
+      ) : (
+        <ul>
+          {soportes.map((r) => (
+            <li key={r.object.slug}>
+              <Link to={`/protocolo/${r.object.slug}`} className="mono">{r.object.slug}</Link>
+            </li>
+          ))}
+        </ul>
+      )
+
+    case 'capacidades':
+      return (
+        <div className="stack">
+          <p>
+            Capacidad total de conmutación:{' '}
+            <span className="mono">
+              {assertionDe('throughput_gbps') ? `${JSON.parse(assertionDe('throughput_gbps')!.valueJson).gbps} Gbps` : '—'}
+            </span>{' '}
+            {assertionDe('throughput_gbps') ? <ConfidenceBadge confidence={assertionDe('throughput_gbps')!.confidence} size="sm" /> : null}
+          </p>
+          <p>
+            Consumo:{' '}
+            <span className="mono">{assertionDe('power_consumption_w') ? `${JSON.parse(assertionDe('power_consumption_w')!.valueJson)} W` : '—'}</span>{' '}
+            {assertionDe('power_consumption_w') ? <ConfidenceBadge confidence={assertionDe('power_consumption_w')!.confidence} size="sm" /> : null}
+          </p>
+          <p className="guia-tecnica">Capacidades por atributo de categoría (EAV) llegan en F2.</p>
+        </div>
+      )
+
+    case 'arquitectura':
+      return <Empty message="Arquitectura interna (ASIC, CPU, memoria) pendiente de curación (F2)." />
+
+    case 'capas':
+      return <OsiTab device={device} />
+
+    case 'estandares':
+      return estandares.length === 0 ? (
+        <Empty message="Sin estándares implementados curados." />
+      ) : (
+        <ul>
+          {estandares.map((r) => (
+            <li key={r.object.slug}><span className="mono">{r.object.slug}</span></li>
+          ))}
+        </ul>
+      )
+
+    case 'compatibilidad':
+      return (
+        <div className="stack">
+          {medios.length > 0 ? (
+            <p>
+              Medios que termina:{' '}
+              {medios.map((r) => <span key={r.object.slug} className="mono" style={{ marginRight: 8 }}>{r.object.slug}</span>)}
+            </p>
+          ) : null}
+          {compatibles.length > 0 ? (
+            <p>Compatible con: {compatibles.map((r) => r.object.slug).join(', ')}</p>
+          ) : (
+            <Empty message="Compatibilidades curadas pendientes (aristas compatible-with / requires)." />
+          )}
+        </div>
+      )
+
+    case 'diagramas':
+      return <Empty message="Panel frontal generado e imágenes llegan en F4 (diagramas interactivos)." />
+
+    case 'historia':
+      return (
+        <div className="stack">
+          {sucesores.length > 0 ? (
+            <p>
+              Sucede a:{' '}
+              {sucesores.map((r) => (
+                <Link key={r.object.slug} to={`/device/${r.object.slug}`}>{r.object.slug}</Link>
+              ))}
+            </p>
+          ) : null}
+          {reemplaza.length > 0 ? (
+            <p>Reemplaza a: {reemplaza.map((r) => r.object.slug).join(', ')}</p>
+          ) : null}
+          {sucesores.length === 0 && reemplaza.length === 0 ? (
+            <Empty message="Genealogía (succeeds/precedes/replaced-by) pendiente de curación (F3)." />
+          ) : null}
+        </div>
+      )
+
+    case 'documentacion':
+      return <Empty message="Datasheets y documentación de la ficha pendientes (F2)." />
+
+    case 'referencias':
+      return assertions.length === 0 ? (
+        <Empty message="Sin afirmaciones curadas con fuente." />
+      ) : (
+        <table className="tabla-specs">
+          <thead>
+            <tr>
+              <th scope="col">Predicado</th>
+              <th scope="col">Valor</th>
+              <th scope="col">Fuente</th>
+              <th scope="col">Confianza</th>
+              <th scope="col">Verificado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {assertions.map((a, i) => (
+              <tr key={`${a.predicate}-${i}`}>
+                <td className="mono">{a.predicate}</td>
+                <td className="mono">{a.valueJson}</td>
+                <td>
+                  {confidenceLabel(a.confidence)}
+                  <ConfidenceBadge confidence={a.confidence} size="sm" />
+                  {a.reviewedBy ? null : <span className="guia-tecnica"> · pendiente revisión</span>}
+                </td>
+                <td className="mono">{a.source.title}</td>
+                <td className="mono">{a.verifiedOn}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )
+
+    default:
+      return <Empty message="Pestaña no disponible." />
+  }
+}
+
 /**
- * Pestaña Capas OSI (NET-HW-021 §8.4.2):
- * panel vertical + panel TCP/IP derivado + consulta inversa "qué dispositivos
- * operan en estas capas" (lista de la misma categoría que termina la selección).
+ * Pestaña Capas OSI (NET-HW-021 §8.4.2): panel vertical + TCP/IP derivado
+ * + consulta inversa "qué dispositivos operan en estas capas".
  */
 function OsiTab({ device }: { device: Device }): React.JSX.Element {
   const categories = useCatalogStore((s) => s.categories)
@@ -212,9 +403,7 @@ function OsiTab({ device }: { device: Device }): React.JSX.Element {
             {similares.map((d) => (
               <li key={d.slug.value}>
                 <Link to={`/device/${d.slug.value}`}>{d.name}</Link>{' '}
-                <span className="mono guia-tecnica">
-                  capa {d.osiProfile?.profile.primary}
-                </span>
+                <span className="mono guia-tecnica">capa {d.osiProfile?.profile.primary}</span>
               </li>
             ))}
           </ul>
@@ -222,7 +411,7 @@ function OsiTab({ device }: { device: Device }): React.JSX.Element {
       </section>
 
       <p className="guia-tecnica" role="note">
-        Los perfiles sin curación concreta heredan el de su categoría y se marcan como derivados (NET-HW-009).
+        Los perfiles sin curación concreta heredan el de su categoría y se marcan como derivados.
       </p>
       <ConfidenceBadge confidence="derived" size="sm" />
     </div>

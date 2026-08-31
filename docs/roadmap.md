@@ -57,11 +57,18 @@
 - [x] **E2E Playwright** (NET-HW-053): flujo crítico 28.1.6#3 (buscar→explorar→ficha→capas→dispositivos relacionados) + 404 contextual, en **chromium y firefox**; CI con job `e2e`
 - [x] CI ampliado: jobs `verify` (núcleo), `ui` (PWA build+SW verificado), `e2e`, `tauri` (Windows + Rust toolchain)
 
-### Pendiente para cerrar F1 (contenido y refuerzos)
+### Contenido y motor real (✅ cerradas — F1 completa)
 
-- [ ] Seed hacia 300–500 vía importación asistida (mecanismo listo: `packages/importers`)
-- [ ] 13 pestañas completas de la ficha (Protocolos con insignia, Estándares, Compatibilidad, Historia…)
-- [ ] Conexión de la UI al dataset real vía wa-sqlite (F1-late; hoy adaptador in-memory)
+- [x] **Seed 330 dispositivos** (NET-HW-007): 31 curados + 299 generados por **importación asistida** (`tools/dataset-tools/src/assisted-gen.ts`) — solo datos estructurales reales (fabricante, categoría, puertos típicos por familia, protocolos/medios de familia, perfil OSI); **sin especificaciones numéricas inventadas** (throughput/mpps omitidos, pendientes de datasheet en F2); assertions `third-party` con fuente `netatlas-assist` + nota "validar en F2"; `data:lint` verde con cobertura de fuentes 100%
+- [x] **import-cli** (NET-HW-043 como herramienta): `tools/import-cli` — CSV/JSON → pipeline del dominio → informe de lote (altas/actualizaciones/rechazos con razón) sobre el driver real
+- [x] **Ficha de 13 pestañas** (§10.5): Resumen · Especificaciones · Interfaces · Protocolos · Capacidades · Arquitectura · Capas OSI · Estándares · Compatibilidad · Diagramas · Historia · Documentación · Referencias — alimentadas por GraphRepository/edgesOf + SourcingRepository/assertions; empty-states curados donde el modelo aún no tiene datos
+- [x] **Bidireccionalidad** (§10.7): ficha de protocolo `/protocolo/:code` lista los dispositivos que lo soportan
+- [x] **Motor SQLite real en la UI** (Fase C): `composition-root-sqlite.ts` (NodeSqliteDriver + SqliteDeviceRepository/GraphRepository/SourcingRepository + Fts5SearchIndex sobre `netatlas-seed.sqlite` de 330 dispositivos) — mismo contrato de puertos que el in-memory; wa-sqlite es el mismo contrato para el navegador (F1-late); tests de integración UI-SQLite verdes
+- [x] Nuevo puerto `SourcingRepository` (dominio) + `SqliteSourcingRepository` (data) — trazabilidad de assertions por slug
+
+### F1 — MVP completo ✅
+
+- [x] Criterios 28.1.6 #1 (7 canónicas <500 ms), #2 (cobertura ≥80%), #3 (E2E flujo crítico), #4 (offline PWA), #5 (lote con rechazo razonado), #6 (data:lint verde)
 
 ## Esfuerzo orientativo (1–2 personas)
 
@@ -73,12 +80,13 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     8 paquetes verdes (tsc --noEmit estricto)
-tests:         132 (domain 55 · data 17 · importers 11 · search 20 · ui 6 · app 11 · dataset-tools 8 · datagen 4)
-data:lint:     0 avisos / 0 errores sobre 31 dispositivos
-dataset:build: 31 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 60 aristas · 51 assertions
+tests:         158+ (domain 55 · data 20 · importers 11 · search 20 · ui 6 · app 21 · dataset-tools 9 · datagen 4)
+data:lint:     0 avisos / 0 errores sobre 330 dispositivos
+dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
 app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512
+UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
 E2E:           ✅ 5/5 (flujo crítico 28.1.6#3 + 404 + offline PWA) en chromium y firefox
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri

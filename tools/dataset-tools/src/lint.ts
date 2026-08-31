@@ -257,6 +257,14 @@ export function loadSeed(dir: string): {
       throw new Error(`No se pudo leer ${file}: ${(err as Error).message}`)
     }
   }
+  // Fichas curadas manualmente + fichas asistidas (devices-generated.json), si existen.
+  const manuales = read<SeedDevice[]>('devices.json')
+  let asistidas: SeedDevice[] = []
+  try {
+    asistidas = read<SeedDevice[]>('devices-generated.json')
+  } catch {
+    asistidas = []
+  }
   return {
     categories: read('categories.json'),
     manufacturers: read('manufacturers.json'),
@@ -264,6 +272,6 @@ export function loadSeed(dir: string): {
     protocols: read('protocols.json'),
     standards: read('standards.json'),
     media: read('media.json'),
-    devices: read('devices.json'),
+    devices: [...manuales, ...asistidas],
   }
 }

@@ -3,20 +3,52 @@ import {
   InMemoryDeviceRepository,
   InMemoryCatalogRepository,
   InMemorySearchIndex,
+  InMemoryGraphRepository,
+  InMemorySourcingRepository,
   buildDemoDataset,
 } from './adapters/in-memory.js'
 import type { InMemoryDataset } from './adapters/in-memory.js'
+import type { Device, Category, Manufacturer, Assertion, Relationship, SearchResponse, SearchHit, SuggestResult } from '@netatlas/domain'
+import type { Page, DeviceQuery } from '@netatlas/domain'
 
 /**
- * Composition root de la UI (F1).
- * Cablea los adaptadores in-memory (navegador/tests). En F1-late,
- * wa-sqlite + repositorios SQLite sustituyen estos adaptadores sin tocar
- * viewmodels ni vistas (mismo contrato de puertos).
+ * Interfaz común que las vistas consumen.
+ * Tanto los adaptadores in-memory (navegador/tests) como los repositorios
+ * SQLite reales (packages/data + packages/search) la satisfacen: sustituir
+ * el motor NO toca viewmodels ni vistas (hexagonal, §6).
  */
+export interface UiDeviceRepo {
+  findBySlug(slug: string): Promise<Device | undefined>
+  listByCategory(categoryCode: string, query: DeviceQuery): Promise<Page<Device>>
+  findByManufacturer(manufacturerSlug: string, query: DeviceQuery): Promise<Page<Device>>
+  count(): Promise<number>
+}
+
+export interface UiCatalogRepo {
+  listCategories(): Promise<readonly Category[]>
+  manufacturerBySlug(slug: string): Promise<Manufacturer | undefined>
+  categoryByCode(code: string): Promise<Category | undefined>
+}
+
+export interface UiSearchRepo {
+  query(request: { rawQuery: string; limit: number; offset?: number; facetFilters?: Record<string, string[]> }): Promise<SearchResponse>
+  suggest(prefix: string, limit: number): Promise<readonly SuggestResult[]>
+}
+
+export interface UiGraphRepo {
+  edgesOf(node: { type: string; slug: string }): Promise<readonly Relationship[]>
+}
+
+export interface UiSourcingRepo {
+  assertionsForDevice(slug: string): Promise<readonly Assertion[]>
+}
+
 export interface AppServices {
-  readonly devices: InMemoryDeviceRepository
-  readonly catalog: InMemoryCatalogRepository
-  readonly search: InMemorySearchIndex
+  readonly devices: UiDeviceRepo
+  readonly catalog: UiCatalogRepo
+  readonly search: UiSearchRepo
+  readonly graph: UiGraphRepo
+  readonly sourcing: UiSourcingRepo
   readonly dataset: InMemoryDataset
 }
 
@@ -26,6 +58,8 @@ export function buildServices(dataset?: InMemoryDataset): AppServices {
     devices: new InMemoryDeviceRepository(data),
     catalog: new InMemoryCatalogRepository(data),
     search: new InMemorySearchIndex(data),
+    graph: new InMemoryGraphRepository(data),
+    sourcing: new InMemorySourcingRepository(data),
     dataset: data,
   }
 }
@@ -38,7 +72,7 @@ export const useServices = create<ServiceStore>(() => ({
   services: buildServices(),
 }))
 
-/** Permite a los tests inyectar un dataset controlado antes de renderizar. */
+/** Permite a los tests inyectar un dataset controlado o el motor SQLite real. */
 export function setServices(services: AppServices): void {
   useServices.setState({ services })
 }

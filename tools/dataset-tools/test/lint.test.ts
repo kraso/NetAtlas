@@ -13,6 +13,10 @@ describe('data:lint — dataset seed', () => {
     seed = loadSeed(seedDir)
   })
 
+  it('alcanza el objetivo de seed 300+ dispositivos (28.1.5)', () => {
+    expect(seed.devices.length).toBeGreaterThanOrEqual(300)
+  })
+
   it('carga los catálogos master del MVP (28.1.5)', () => {
     expect(seed.protocols.length).toBeGreaterThanOrEqual(100)
     expect(seed.standards.length).toBeGreaterThanOrEqual(80)

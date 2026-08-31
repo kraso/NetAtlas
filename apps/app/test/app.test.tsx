@@ -56,7 +56,7 @@ describe('Ficha de dispositivo (NET-HW-020)', () => {
     renderApp('/device/cisco-c9300-48p')
     expect(await screen.findByRole('heading', { name: 'Cisco Catalyst 9300-48P' })).toBeDefined()
     const tablist = screen.getByRole('tablist')
-    expect(within(tablist).getAllByRole('tab').length).toBe(4)
+    expect(within(tablist).getAllByRole('tab').length).toBe(13)
     // Abrir pestaña de especificaciones
     fireEvent.click(screen.getByRole('tab', { name: 'Especificaciones' }))
     expect(screen.getByText(/Capa principal/i)).toBeDefined()
