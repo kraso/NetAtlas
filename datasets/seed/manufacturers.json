@@ -1,0 +1,16 @@
+[
+  { "slug": "cisco", "name": "Cisco Systems", "country": "EE. UU.", "foundedYear": 1984, "website": "https://www.cisco.com", "status": "active" },
+  { "slug": "aruba", "name": "Aruba Networks (HPE)", "country": "EE. UU.", "foundedYear": 2002, "website": "https://www.arubanetworks.com", "status": "active" },
+  { "slug": "hpe", "name": "Hewlett Packard Enterprise", "country": "EE. UU.", "foundedYear": 2015, "website": "https://www.hpe.com", "status": "active" },
+  { "slug": "juniper", "name": "Juniper Networks", "country": "EE. UU.", "foundedYear": 1996, "website": "https://www.juniper.net", "status": "active" },
+  { "slug": "ubiquiti", "name": "Ubiquiti Networks", "country": "EE. UU.", "foundedYear": 2005, "website": "https://www.ui.com", "status": "active" },
+  { "slug": "tplink", "name": "TP-Link", "country": "China", "foundedYear": 1996, "website": "https://www.tp-link.com", "status": "active" },
+  { "slug": "netgear", "name": "Netgear", "country": "EE. UU.", "foundedYear": 1996, "website": "https://www.netgear.com", "status": "active" },
+  { "slug": "mikrotik", "name": "MikroTik", "country": "Letonia", "foundedYear": 1996, "website": "https://mikrotik.com", "status": "active" },
+  { "slug": "huawei", "name": "Huawei", "country": "China", "foundedYear": 1987, "website": "https://www.huawei.com", "status": "active" },
+  { "slug": "dell", "name": "Dell Technologies", "country": "EE. UU.", "foundedYear": 1984, "website": "https://www.dell.com", "status": "active" },
+  { "slug": "arista", "name": "Arista Networks", "country": "EE. UU.", "foundedYear": 2004, "website": "https://www.arista.com", "status": "active" },
+  { "slug": "fortinet", "name": "Fortinet", "country": "EE. UU.", "foundedYear": 2000, "website": "https://www.fortinet.com", "status": "active" },
+  { "slug": "3com", "name": "3Com", "country": "EE. UU.", "foundedYear": 1979, "website": null, "status": "defunct" },
+  { "slug": "usrobotics", "name": "U.S. Robotics", "country": "EE. UU.", "foundedYear": 1976, "website": null, "status": "defunct" }
+]

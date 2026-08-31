@@ -1,0 +1,1 @@
+export { Fts5SearchIndex } from './fts5-search.js'

@@ -1,0 +1,28 @@
+# Node
+node_modules/
+*.tsbuildinfo
+.pnpm-store/
+
+# Builds
+dist/
+build/
+out/
+coverage/
+
+# SQLite datasets generados
+datasets/**/*.sqlite
+datasets/**/*.sqlite-wal
+datasets/**/*.sqlite-shm
+
+# Entorno
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# SO
+.DS_Store
+Thumbs.db

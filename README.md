@@ -1,0 +1,56 @@
+# NetAtlas
+
+> **Enciclopedia técnica interactiva y sistema de conocimiento sobre hardware de redes de comunicaciones.**
+> Estado: **Fase 0 — Investigación y arquitectura** (ver `docs/roadmap.md`).
+
+NetAtlas no es una wiki ni un catálogo CRUD: es un **grafo de conocimiento técnico navegable** en el que dispositivos, fabricantes, familias, componentes, interfaces, protocolos, estándares, medios de transmisión, capas OSI/TCP-IP, tecnologías, topologías y evolución histórica son entidades de primera clase conectadas por relaciones tipadas, versionadas y respaldadas por fuentes.
+
+## Documento maestro
+
+El documento de referencia normativo es [`PLAN MAESTRO — APLICACIÓN ENCICLOPÉDICA DE HARDWARE DE REDES.md`](PLAN%20MAESTRO%20%E2%80%94%20APLICACI%C3%93N%20ENCICLOP%C3%89DICA%20DE%20HARDWARE%20DE%20REDES.md). Cualquier divergencia respecto a él se resuelve mediante ADR (`docs/adr/`).
+
+## Decisiones vertebrales (resumen)
+
+| Eje | Decisión |
+|---|---|
+| Plataforma | Híbrida: núcleo web local-first (PWA offline) + empaquetado de escritorio con Tauri |
+| Stack | TypeScript + React + Vite, SQLite embebido, monorepo pnpm |
+| Persistencia | SQLite relacional + tabla de aristas (grafo materializado) |
+| Búsqueda | SQLite FTS5 + filtros estructurados + mini-DSL |
+| Arquitectura | Monolito modular hexagonal (dominio puro, puertos/adaptadores, MVVM en presentación) |
+| Diagramas | SVG con Cytoscape.js y layouts automáticos |
+| Datos | Cada dato técnico relevante es una afirmación con fuente, nivel de confianza y fecha de verificación |
+| IA | Fase posterior: RAG sobre la base validada; nunca requisito de la v1 |
+
+## Estructura (Fase 0)
+
+```text
+packages/
+  domain/       # Entidades, value objects, puertos (TypeScript puro, sin deps)
+  data/         # Adaptadores SQLite: migraciones (0001_init.sql), DAOs
+  search/       # Índice FTS5, DSL→AST (base), facetas
+  dataset-tools/ # data:lint — validador de invariantes del dataset seed
+tools/
+  datagen/      # Generador sintético de escala (10k dispositivos) + benchmark FTS5
+datasets/
+  seed/         # Fuente curada: taxonomía + fichas piloto (YAML con assertions)
+docs/           # Documentación viva + ADRs
+```
+
+## Comandos
+
+```bash
+pnpm install          # instalar dependencias del monorepo
+pnpm typecheck        # tsc --noEmit en todos los paquetes
+pnpm test             # tests unitarios (Vitest)
+pnpm data:lint        # validación de invariantes del dataset seed
+pnpm bench            # benchmark FTS5 sobre 10k dispositivos sintéticos (criterio de salida F0)
+```
+
+## Criterio de salida de la Fase 0
+
+1. ADRs firmados en `docs/adr/` (ADR-0001 … ADR-0008).
+2. Spike SQLite+FTS5 demuestra búsqueda **< 50 ms p95 sobre 10k dispositivos sintéticos** (`pnpm bench`).
+3. Esquema inicial `0001_init.sql` con las entidades núcleo del modelo (sección 9 del plan maestro).
+4. Entidades de dominio + value objects con typecheck estricto y tests.
+5. Dataset seed: 15 macrocategorías + 20 fichas piloto con assertions y fuentes.

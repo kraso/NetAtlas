@@ -1,0 +1,336 @@
+import type { SqliteDriver } from '../driver.js'
+
+/**
+ * DAO de catálogo básico para la Fase 0: siembra y consulta de entidades núcleo.
+ * Uso: dataset seed (20 fichas piloto) y tools/datagen (10k sintéticos).
+ * En F1 se completa con los repositorios que implementan los puertos del dominio.
+ */
+
+export interface ManufacturerRow {
+  readonly slug: string
+  readonly name: string
+  readonly country?: string
+  readonly website?: string
+}
+
+export interface CategoryRow {
+  readonly code: string
+  readonly parentCode?: string
+  readonly nameEs: string
+  readonly aliases: readonly string[]
+  readonly sortOrder?: number
+  readonly osiProfileJson?: string
+}
+
+export interface DeviceRow {
+  readonly slug: string
+  readonly name: string
+  readonly manufacturerSlug: string
+  readonly categoryCode: string
+  readonly lifecycleStatus: string
+  readonly osiProfileJson?: string
+  readonly summary?: string
+}
+
+export interface PortRow {
+  readonly deviceSlug: string
+  readonly interfaceCode: string
+  readonly label: string
+  readonly quantity: number
+  readonly speedsMbps: readonly number[]
+  readonly poeStandard?: string
+  readonly role?: string
+}
+
+export interface SourceRow {
+  readonly slug: string
+  readonly kind: string
+  readonly publisher?: string
+  readonly title: string
+  readonly url?: string
+  readonly retrievedOn?: string
+  readonly authorityLevel: number
+}
+
+export interface AssertionRow {
+  readonly subjectType: string
+  readonly subjectId: number
+  readonly predicate: string
+  readonly valueJson: string
+  readonly sourceSlug: string
+  readonly confidence: string
+  readonly verifiedOn: string
+  readonly author: string
+  readonly reviewedBy?: string
+}
+
+export interface RelationshipRow {
+  readonly subjectType: string
+  readonly subjectId: number
+  readonly predicate: string
+  readonly objectType: string
+  readonly objectId: number
+  readonly validFrom?: string
+  readonly assertionId?: number
+}
+
+/** Resuelve el id interno de una entidad por (tipo, slug) — helpers del DAO. */
+export class CatalogDao {
+  constructor(private readonly db: SqliteDriver) {}
+
+  // ── Fabricantes ────────────────────────────────────────────────
+  upsertManufacturer(row: ManufacturerRow): number {
+    const existing = this.db
+      .prepare('SELECT id FROM manufacturer WHERE slug = ?')
+      .get(row.slug)
+    if (existing) return Number(existing.id)
+    const res = this.db
+      .prepare(
+        'INSERT INTO manufacturer (slug, name, country, website) VALUES (?, ?, ?, ?)',
+      )
+      .run(row.slug, row.name, row.country ?? null, row.website ?? null)
+    return Number(res.lastInsertRowid)
+  }
+
+  manufacturerId(slug: string): number | undefined {
+    const row = this.db.prepare('SELECT id FROM manufacturer WHERE slug = ?').get(slug)
+    return row ? Number(row.id) : undefined
+  }
+
+  // ── Categorías (jerárquicas por parent_id) ─────────────────────
+  upsertCategory(row: CategoryRow): number {
+    const existing = this.db.prepare('SELECT id FROM category WHERE code = ?').get(row.code)
+    if (existing) return Number(existing.id)
+    let parentId: number | null = null
+    if (row.parentCode) {
+      parentId = this.categoryId(row.parentCode) ?? null
+    }
+    const res = this.db
+      .prepare(
+        `INSERT INTO category (code, parent_id, name_es, aliases_json, sort_order, osi_profile_json)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        row.code,
+        parentId,
+        row.nameEs,
+        JSON.stringify(row.aliases),
+        row.sortOrder ?? 0,
+        row.osiProfileJson ?? null,
+      )
+    return Number(res.lastInsertRowid)
+  }
+
+  categoryId(code: string): number | undefined {
+    const row = this.db.prepare('SELECT id FROM category WHERE code = ?').get(code)
+    return row ? Number(row.id) : undefined
+  }
+
+  // ── Dispositivos ───────────────────────────────────────────────
+  upsertDevice(row: DeviceRow): number {
+    const existing = this.db.prepare('SELECT id FROM device WHERE slug = ?').get(row.slug)
+    if (existing) return Number(existing.id)
+    const manufacturerId = this.manufacturerId(row.manufacturerSlug)
+    if (manufacturerId === undefined) {
+      throw new Error(`Device "${row.slug}": fabricante desconocido "${row.manufacturerSlug}".`)
+    }
+    const categoryId = this.categoryId(row.categoryCode)
+    if (categoryId === undefined) {
+      throw new Error(`Device "${row.slug}": categoría desconocida "${row.categoryCode}".`)
+    }
+    const now = new Date().toISOString()
+    const res = this.db
+      .prepare(
+        `INSERT INTO device (slug, name, manufacturer_id, category_id, lifecycle_status,
+                             osi_profile_json, summary, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        row.slug,
+        row.name,
+        manufacturerId,
+        categoryId,
+        row.lifecycleStatus,
+        row.osiProfileJson ?? null,
+        row.summary ?? null,
+        now,
+        now,
+      )
+    return Number(res.lastInsertRowid)
+  }
+
+  deviceId(slug: string): number | undefined {
+    const row = this.db.prepare('SELECT id FROM device WHERE slug = ?').get(slug)
+    return row ? Number(row.id) : undefined
+  }
+
+  /** Convierte una lista de dispositivos en masa (p. ej. sintéticos). */
+  bulkInsertDevices(rows: readonly DeviceRow[]): void {
+    this.db.transaction(() => {
+      for (const row of rows) this.upsertDevice(row)
+    })
+  }
+
+  // ── Puertos ────────────────────────────────────────────────────
+  addPort(row: PortRow): void {
+    const deviceId = this.deviceId(row.deviceSlug)
+    if (deviceId === undefined) throw new Error(`addPort: dispositivo desconocido "${row.deviceSlug}".`)
+    let interfaceId = this.db
+      .prepare('SELECT id FROM interface WHERE code = ?')
+      .get(row.interfaceCode) as { id: number } | undefined
+    if (!interfaceId) {
+      const res = this.db
+        .prepare('INSERT INTO interface (code, kind) VALUES (?, ?)')
+        .run(row.interfaceCode, row.interfaceCode.startsWith('sfp') || row.interfaceCode.includes('10g') ? 'fibra' : 'ethernet')
+      interfaceId = { id: Number(res.lastInsertRowid) }
+    }
+    this.db
+      .prepare(
+        `INSERT INTO port (device_id, interface_id, label, quantity, speeds_json, poe_standard, role)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        deviceId,
+        interfaceId.id,
+        row.label,
+        row.quantity,
+        JSON.stringify(row.speedsMbps),
+        row.poeStandard ?? null,
+        row.role ?? null,
+      )
+  }
+
+  // ── Fuentes y afirmaciones ─────────────────────────────────────
+  upsertSource(row: SourceRow): number {
+    const existing = this.db.prepare('SELECT id FROM source WHERE slug = ?').get(row.slug)
+    if (existing) return Number(existing.id)
+    const res = this.db
+      .prepare(
+        `INSERT INTO source (slug, kind, publisher, title, url, retrieved_on, authority_level)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(row.slug, row.kind, row.publisher ?? null, row.title, row.url ?? null, row.retrievedOn ?? null, row.authorityLevel)
+    return Number(res.lastInsertRowid)
+  }
+
+  sourceId(slug: string): number | undefined {
+    const row = this.db.prepare('SELECT id FROM source WHERE slug = ?').get(slug)
+    return row ? Number(row.id) : undefined
+  }
+
+  addAssertion(row: AssertionRow): number {
+    const sourceId = this.sourceId(row.sourceSlug)
+    if (sourceId === undefined) {
+      throw new Error(`addAssertion: fuente desconocida "${row.sourceSlug}".`)
+    }
+    const res = this.db
+      .prepare(
+        `INSERT INTO assertion (subject_type, subject_id, predicate, value_json,
+                                source_id, confidence, verified_on, author, reviewed_by)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        row.subjectType,
+        row.subjectId,
+        row.predicate,
+        row.valueJson,
+        sourceId,
+        row.confidence,
+        row.verifiedOn,
+        row.author,
+        row.reviewedBy ?? null,
+      )
+    return Number(res.lastInsertRowid)
+  }
+
+  // ── Predicados y aristas ───────────────────────────────────────
+  seedPredicates(rows: readonly { code: string; domain: readonly string[]; range: readonly string[]; cardinality?: string; symmetric?: boolean; acyclic?: boolean; inverse?: string }[]): void {
+    this.db.transaction(() => {
+      for (const row of rows) {
+        this.db
+          .prepare(
+            `INSERT OR IGNORE INTO predicate (code, domain_types, range_types, cardinality, symmetric, acyclic, inverse_code)
+             VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          )
+          .run(
+            row.code,
+            JSON.stringify(row.domain),
+            JSON.stringify(row.range),
+            row.cardinality ?? 'many',
+            row.symmetric ? 1 : 0,
+            row.acyclic ? 1 : 0,
+            row.inverse ?? null,
+          )
+      }
+    })
+  }
+
+  addRelationship(row: RelationshipRow): void {
+    this.db
+      .prepare(
+        `INSERT INTO relationship (subject_type, subject_id, predicate, object_type, object_id,
+                                   weight, assertion_id, valid_from, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        row.subjectType,
+        row.subjectId,
+        row.predicate,
+        row.objectType,
+        row.objectId,
+        null,
+        row.assertionId ?? null,
+        row.validFrom ?? '1970-01-01',
+        new Date().toISOString(),
+      )
+  }
+
+  // ── Catálogos auxiliares (protocolos, estándares, medios, capas) ──
+
+  /** Inserta si falta y devuelve el id del protocolo (catálogo abierto de datos). */
+  protocolId(code: string, name?: string, family = 'internet', osiLayer = 3): number {
+    const existing = this.db.prepare('SELECT id FROM protocol WHERE code = ?').get(code)
+    if (existing) return Number(existing.id)
+    const res = this.db
+      .prepare('INSERT INTO protocol (code, name, family, osi_layer) VALUES (?, ?, ?, ?)')
+      .run(code, name ?? code, family, osiLayer)
+    return Number(res.lastInsertRowid)
+  }
+
+  /** Inserta si falta y devuelve el id del estándar ("ieee/802.3at" → org, identifier). */
+  standardId(ref: string, title?: string): number {
+    const [org, identifier] = ref.split('/')
+    if (!org || !identifier) throw new Error(`Ref de estándar inválida: "${ref}" (formato org/identifier).`)
+    const existing = this.db
+      .prepare('SELECT id FROM standard WHERE org = ? AND identifier = ?')
+      .get(org, identifier)
+    if (existing) return Number(existing.id)
+    const res = this.db
+      .prepare('INSERT INTO standard (org, identifier, title) VALUES (?, ?, ?)')
+      .run(org, identifier, title ?? ref)
+    return Number(res.lastInsertRowid)
+  }
+
+  /** Inserta si falta y devuelve el id del medio de transmisión. */
+  mediumId(code: string, kind: 'cobre' | 'fibra' | 'inalambrico' | 'coaxial', name?: string): number {
+    const existing = this.db.prepare('SELECT id FROM medium WHERE code = ?').get(code)
+    if (existing) return Number(existing.id)
+    const res = this.db
+      .prepare('INSERT INTO medium (code, kind, name) VALUES (?, ?, ?)')
+      .run(code, kind, name ?? code)
+    return Number(res.lastInsertRowid)
+  }
+
+  /** Añade una capa OSI / TCP-IP (catálogo semilla). */
+  seedLayer(number: number, nameEs: string, nameEn: string, table: 'osi_layer' | 'tcpip_layer'): void {
+    this.db
+      .prepare(`INSERT OR IGNORE INTO ${table} (number, name_es, name_en) VALUES (?, ?, ?)`)
+      .run(number, nameEs, nameEn)
+  }
+
+  /** Id de una capa por su número (tabla osi_layer). */
+  seedLayerId(number: string): number | undefined {
+    const row = this.db.prepare('SELECT number FROM osi_layer WHERE number = ?').get(Number(number))
+    return row ? Number(row.number) : undefined
+  }
+}

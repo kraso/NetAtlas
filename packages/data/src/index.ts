@@ -1,0 +1,17 @@
+export { NodeSqliteDriver } from './driver.js'
+export type { SqliteDriver, SqlValue, SqlRow, PreparedStatement } from './driver.js'
+export { loadMigrations, applyMigrations } from './migrator.js'
+export type { Migration, MigrationResult } from './migrator.js'
+export { CatalogDao } from './daos/catalog-dao.js'
+export type {
+  ManufacturerRow,
+  CategoryRow,
+  DeviceRow,
+  PortRow,
+  SourceRow,
+  AssertionRow,
+  RelationshipRow,
+} from './daos/catalog-dao.js'
+
+/** Versión de esquema del dataset que esta app soporta (sección 19.4). */
+export const DATASET_SCHEMA_VERSION = 1

@@ -1,0 +1,21 @@
+{
+  "name": "@netatlas/domain",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Dominio puro de NetAtlas: entidades, value objects y puertos (sin dependencias de framework)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./*": "./src/*.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "lint": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

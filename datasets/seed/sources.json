@@ -1,0 +1,87 @@
+[
+  {
+    "slug": "cisco-cat2960x-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco Catalyst 2960-X Series Switches Data Sheet",
+    "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-2960-x-series-switches/datasheet-c78-728091.html",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "aruba-2930f-datasheet",
+    "kind": "datasheet",
+    "publisher": "Aruba Networks (HPE)",
+    "title": "Aruba 2930F Switch Series Data Sheet",
+    "url": "https://www.arubanetworks.com/assets/ds/DS_2930F.pdf",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "cisco-isr4321-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco 4000 Series ISR Data Sheet",
+    "url": "https://www.cisco.com/c/en/us/products/collateral/routers/4000-series-integrated-services-routers-isr/datasheet-c78-732543.html",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "ieee-8023at",
+    "kind": "ieee",
+    "publisher": "IEEE",
+    "title": "IEEE 802.3at-2009 — Power over Ethernet Plus",
+    "url": "https://standards.ieee.org/ieee/802.3at/3974/",
+    "publishedOn": "2009-09-11",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "ieee-8023-2018",
+    "kind": "ieee",
+    "publisher": "IEEE",
+    "title": "IEEE 802.3-2018 — Standard for Ethernet",
+    "url": "https://standards.ieee.org/ieee/802.3/10422/",
+    "publishedOn": "2018-08-31",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "rfc2328-ospf",
+    "kind": "rfc",
+    "publisher": "IETF",
+    "title": "RFC 2328 — OSPF Version 2",
+    "url": "https://www.rfc-editor.org/rfc/rfc2328",
+    "publishedOn": "1998-04-01",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "usrobotics-56k-manual",
+    "kind": "manual",
+    "publisher": "U.S. Robotics",
+    "title": "Sportster 56K Faxmodem User Manual",
+    "url": null,
+    "publishedOn": "1997-01-01",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "3com-hub-editorial",
+    "kind": "editorial",
+    "publisher": "Equipo NetAtlas",
+    "title": "Criterio editorial: hubs y dominios de colisión",
+    "url": null,
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 4
+  },
+  {
+    "slug": "wi-fi-6-alliance",
+    "kind": "web-oficial",
+    "publisher": "Wi-Fi Alliance",
+    "title": "Wi-Fi 6 (802.11ax) certification",
+    "url": "https://www.wi-fi.org/discover-wi-fi/wi-fi-6",
+    "retrievedOn": "2025-02-10",
+    "authorityLevel": 1
+  }
+]

@@ -1,0 +1,26 @@
+{
+  "name": "@netatlas/datagen",
+  "version": "0.0.0",
+  "private": true,
+  "description": "NetAtlas — generador sintético de datasets de escala y benchmark FTS5 (criterio de salida F0)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "bench": "tsx src/bench.ts"
+  },
+  "dependencies": {
+    "@netatlas/domain": "workspace:*",
+    "@netatlas/data": "workspace:*",
+    "@netatlas/search": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

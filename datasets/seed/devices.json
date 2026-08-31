@@ -1,0 +1,416 @@
+[
+
+  {
+    "slug": "cisco-catalyst-2960x-48lpd-l",
+    "name": "Cisco Catalyst 2960-X 48 Gigabit PoE+",
+    "commercialName": "WS-C2960X-48LPD-L",
+    "manufacturerSlug": "cisco",
+    "familySlug": "catalyst-2960-x",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "WS-C2960X-48LPD-L",
+    "sku": "WS-C2960X-48LPD-L",
+    "aliases": ["2960-X", "2960X"],
+    "releasedOn": "2014-06-01",
+    "eolOn": "2020-11-30",
+    "lifecycleStatus": "eol",
+    "summary": "Switch de acceso L2 de 48 puertos Gigabit Ethernet con PoE+ y 4 uplinks SFP+.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "48x 10/100/1000", "interfaceCode": "rj45", "quantity": 48, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "4x SFP+", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "throughput_gbps", "value": 176, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official", "note": "Switching capacity 176 Gbps" },
+      { "predicate": "poe_budget_w", "value": 370, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" },
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" },
+      { "predicate": "implements-standard", "objectType": "standard", "objectSlug": "ieee/802.3at" }
+    ]
+  },
+  {
+    "slug": "aruba-2930f-48g-poeplus",
+    "name": "Aruba 2930F 48G PoE+ 4SFP+",
+    "commercialName": "JL260A",
+    "manufacturerSlug": "aruba",
+    "familySlug": "aruba-2930f",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "JL260A",
+    "sku": "JL260A",
+    "aliases": ["2930F", "Aruba 2930F 48G"],
+    "releasedOn": "2017-08-01",
+    "lifecycleStatus": "mature",
+    "summary": "Switch de acceso/apilable L2-L3 Lite de 48 puertos 1G con PoE+ y 4 uplinks SFP+.",
+    "osiProfile": { "terminate": [1, 2, 3], "transparent": [4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "48x 10/100/1000", "interfaceCode": "rj45", "quantity": 48, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "4x SFP+", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "throughput_gbps", "value": 176, "sourceSlug": "aruba-2930f-datasheet", "confidence": "official" },
+      { "predicate": "poe_budget_w", "value": 370, "sourceSlug": "aruba-2930f-datasheet", "confidence": "official" },
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "aruba-2930f-datasheet", "confidence": "official" },
+      { "predicate": "supports-protocol", "value": "vxlan", "sourceSlug": "aruba-2930f-datasheet", "confidence": "official", "note": "VXLAN en variantes posteriores de firmware" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" },
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" },
+      { "predicate": "succeeds", "objectType": "device", "objectSlug": "aruba-2920-48g" }
+    ]
+  },
+  {
+    "slug": "aruba-2920-48g",
+    "name": "Aruba (HPE) 2920 48G PoE+",
+    "commercialName": "J9726A",
+    "manufacturerSlug": "aruba",
+    "familySlug": "aruba-2920",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "J9726A",
+    "releasedOn": "2010-01-01",
+    "eolOn": "2019-01-01",
+    "lifecycleStatus": "eos",
+    "summary": "Predecesor del 2930F: switch L2 de 48 puertos 1G con PoE+.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "48x 10/100/1000", "interfaceCode": "rj45", "quantity": 48, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "2x SFP+", "interfaceCode": "sfp-plus", "quantity": 2, "speedsMbps": [10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "throughput_gbps", "value": 144, "sourceSlug": "aruba-2930f-datasheet", "confidence": "derived" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+
+  {
+    "slug": "cisco-isr-4321",
+    "name": "Cisco ISR 4321",
+    "commercialName": "Cisco 4321 ISR",
+    "manufacturerSlug": "cisco",
+    "familySlug": "cisco-4000-isr",
+    "categoryCode": "CAT-RTR-ENT",
+    "model": "ISR4321",
+    "sku": "ISR4321/K9",
+    "releasedOn": "2014-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Router de sucursal integrado con 2 puertos 1G GE/SFP, hasta 100 Mbps ruteados.",
+    "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 3 },
+    "ports": [
+      { "label": "2x GE", "interfaceCode": "rj45", "quantity": 2, "speedsMbps": [1000], "role": "uplink" },
+      { "label": "2x SFP", "interfaceCode": "sfp", "quantity": 2, "speedsMbps": [1000], "role": "uplink" },
+      { "label": "1x consola", "interfaceCode": "console", "quantity": 1, "speedsMbps": [], "role": "console" }
+    ],
+    "assertions": [
+      { "predicate": "routing_throughput_mbps", "value": 100, "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
+      { "predicate": "supports-protocol", "value": "bgp", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
+    ]
+  },
+  {
+    "slug": "mikrotik-hex-s",
+    "name": "MikroTik hEX S (RB760iGS)",
+    "manufacturerSlug": "mikrotik",
+    "familySlug": "hex",
+    "categoryCode": "CAT-RTR-SOHO",
+    "model": "RB760iGS",
+    "sku": "RB760iGS",
+    "releasedOn": "2017-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Router SOHO de 5 puertos Gigabit con 1 SFP, RouterOS.",
+    "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 3 },
+    "ports": [
+      { "label": "5x 10/100/1000", "interfaceCode": "rj45", "quantity": 5, "speedsMbps": [1000], "role": "access" },
+      { "label": "1x SFP", "interfaceCode": "sfp", "quantity": 1, "speedsMbps": [1000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "routing_throughput_mbps", "value": 1000, "sourceSlug": "wi-fi-6-alliance", "confidence": "third-party", "note": "Rendimiento medido por comunidad, no oficial" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
+    ]
+  },
+
+  {
+    "slug": "aruba-ap-515",
+    "name": "Aruba AP-515 (Wi-Fi 6)",
+    "manufacturerSlug": "aruba",
+    "familySlug": "aruba-ap-510",
+    "categoryCode": "CAT-WLS-AP",
+    "model": "AP-515",
+    "releasedOn": "2020-04-01",
+    "lifecycleStatus": "current",
+    "summary": "Punto de acceso indoor Wi-Fi 6 (802.11ax) 4x4:4, dual banda, PoE+.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "1x 10/100/1000", "interfaceCode": "rj45", "quantity": 1, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "wifi_standard", "value": "802.11ax", "sourceSlug": "wi-fi-6-alliance", "confidence": "official" },
+      { "predicate": "max_clients", "value": 512, "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" },
+      { "predicate": "terminates-medium", "objectType": "medium", "objectSlug": "wifi-6e" }
+    ]
+  },
+
+  {
+    "slug": "huawei-echolife-hg8245h",
+    "name": "Huawei EchoLife HG8245H (ONT GPON)",
+    "manufacturerSlug": "huawei",
+    "familySlug": "echolife",
+    "categoryCode": "CAT-ACC-ONT",
+    "model": "HG8245H",
+    "releasedOn": "2015-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Terminal óptico de red GPON con 4 puertos Gigabit y 2 POTS, Wi-Fi 802.11n.",
+    "osiProfile": { "terminate": [1, 2, 3], "transparent": [4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "1x GPON SC/PC", "interfaceCode": "gpon", "quantity": 1, "speedsMbps": [1000], "role": "uplink" },
+      { "label": "4x 10/100/1000", "interfaceCode": "rj45", "quantity": 4, "speedsMbps": [1000], "role": "access" },
+      { "label": "2x FXS (POTS)", "interfaceCode": "fxs", "quantity": 2, "speedsMbps": [], "role": "access" }
+    ],
+    "assertions": [
+      { "predicate": "standard_acceso", "value": "gpon", "sourceSlug": "ieee-8023-2018", "confidence": "derived" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+  {
+    "slug": "motorola-sb6121",
+    "name": "Motorola (ARRIS) SurfBoard SB6121",
+    "manufacturerSlug": "netgear",
+    "familySlug": "surfboard",
+    "categoryCode": "CAT-ACC-CABLE",
+    "model": "SB6121",
+    "releasedOn": "2010-01-01",
+    "eolOn": "2018-01-01",
+    "lifecycleStatus": "eol",
+    "summary": "Módem DOCSIS 3.0 de 4x4 con 1 puerto Gigabit.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "1x 10/100/1000", "interfaceCode": "rj45", "quantity": 1, "speedsMbps": [1000], "role": "uplink" },
+      { "label": "1x F-connector", "interfaceCode": "coaxial", "quantity": 1, "speedsMbps": [], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "docsis_version", "value": "3.0", "sourceSlug": "usrobotics-56k-manual", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+  {
+    "slug": "usrobotics-sportster-56k",
+    "name": "U.S. Robotics Sportster 56K",
+    "manufacturerSlug": "usrobotics",
+    "familySlug": "sportster",
+    "categoryCode": "CAT-ACC-DIAL",
+    "model": "USR5630",
+    "releasedOn": "1997-01-01",
+    "eosOn": "2005-01-01",
+    "lifecycleStatus": "legacy",
+    "summary": "Módem dial-up V.90/V.92 externo — hito de la era del acceso telefónico.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "1x RS-232", "interfaceCode": "serial", "quantity": 1, "speedsMbps": [], "role": "console" },
+      { "label": "1x línea telefónica RJ-11", "interfaceCode": "rj11", "quantity": 1, "speedsMbps": [], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "max_speed_mbps", "value": 0.056, "sourceSlug": "usrobotics-56k-manual", "confidence": "official", "note": "56 kbit/s (V.90)" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+
+  {
+    "slug": "fortinet-fortigate-100f",
+    "name": "FortiGate 100F",
+    "manufacturerSlug": "fortinet",
+    "familySlug": "fortigate",
+    "categoryCode": "CAT-SEC-NGFW",
+    "model": "FG-100F",
+    "releasedOn": "2020-06-01",
+    "lifecycleStatus": "current",
+    "summary": "NGFW de 1U con 17 puertos GE, 4 SFP+, throughput firewall 20 Gbps.",
+    "osiProfile": { "terminate": [1, 2, 3, 4, 5, 6, 7], "transparent": [], "primary": 4 },
+    "ports": [
+      { "label": "17x 10/100/1000", "interfaceCode": "rj45", "quantity": 17, "speedsMbps": [1000], "role": "access" },
+      { "label": "4x SFP+", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "firewall_throughput_gbps", "value": 20, "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party", "note": "Dato pendiente de fuente oficial" },
+      { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "4" }
+    ]
+  },
+
+  {
+    "slug": "3com-officeconnect-hub-8",
+    "name": "3Com OfficeConnect Hub 8",
+    "manufacturerSlug": "3com",
+    "familySlug": "officeconnect",
+    "categoryCode": "CAT-SWT-HUB",
+    "model": "3C16700A",
+    "releasedOn": "1996-01-01",
+    "eosOn": "2005-01-01",
+    "lifecycleStatus": "legacy",
+    "summary": "Hub Ethernet 10BASE-T de 8 puertos — hito de la capa 1; ejemplo canónico de dominio de colisión.",
+    "osiProfile": { "terminate": [1], "transparent": [2, 3, 4, 5, 6, 7], "primary": 1 },
+    "ports": [
+      { "label": "8x 10BASE-T RJ-45", "interfaceCode": "rj45", "quantity": 8, "speedsMbps": [10], "role": "access" }
+    ],
+    "assertions": [
+      { "predicate": "max_speed_mbps", "value": 10, "sourceSlug": "3com-hub-editorial", "confidence": "historical" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" }
+    ]
+  },
+
+  {
+    "slug": "cisco-sfp-10g-sr",
+    "name": "Cisco SFP-10G-SR (10GBASE-SR)",
+    "manufacturerSlug": "cisco",
+    "familySlug": "cisco-optics",
+    "categoryCode": "CAT-OPT",
+    "model": "SFP-10G-SR",
+    "sku": "SFP-10G-SR",
+    "releasedOn": "2006-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Transceptor SFP+ 10GBASE-SR multimodo, alcance 300 m sobre OM3.",
+    "osiProfile": { "terminate": [1], "transparent": [2, 3, 4, 5, 6, 7], "primary": 1 },
+    "ports": [],
+    "assertions": [
+      { "predicate": "reach_m", "value": 300, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" },
+      { "predicate": "wavelength_nm", "value": 850, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" },
+      { "predicate": "terminates-medium", "objectType": "medium", "objectSlug": "mmf-om3" }
+    ]
+  },
+  {
+    "slug": "fs-sfp-10g-lr",
+    "name": "FS SFP-10GLR-31 (10GBASE-LR)",
+    "manufacturerSlug": "dell",
+    "familySlug": "fs-optics",
+    "categoryCode": "CAT-OPT",
+    "model": "SFP-10GLR-31",
+    "releasedOn": "2015-01-01",
+    "lifecycleStatus": "mature",
+    "summary": "Transceptor SFP+ 10GBASE-LR monomodo, alcance 10 km, λ 1310 nm.",
+    "osiProfile": { "terminate": [1], "transparent": [2, 3, 4, 5, 6, 7], "primary": 1 },
+    "ports": [],
+    "assertions": [
+      { "predicate": "reach_m", "value": 10000, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" },
+      { "predicate": "wavelength_nm", "value": 1310, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" },
+      { "predicate": "terminates-medium", "objectType": "medium", "objectSlug": "smf-os2" }
+    ]
+  },
+
+  {
+    "slug": "utp-cat6a",
+    "name": "UTP Categoría 6A",
+    "categoryCode": "CAT-PAS",
+    "manufacturerSlug": "tplink",
+    "lifecycleStatus": "current",
+    "summary": "Par trenzado UTP Cat6A: 10GBASE-T hasta 100 m — medio de referencia para cobre 10G.",
+    "osiProfile": { "terminate": [1], "transparent": [2, 3, 4, 5, 6, 7], "primary": 1 },
+    "ports": [],
+    "assertions": [
+      { "predicate": "max_speed_mbps", "value": 10000, "sourceSlug": "ieee-8023-2018", "confidence": "official" },
+      { "predicate": "max_distance_m", "value": 100, "sourceSlug": "ieee-8023-2018", "confidence": "official" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" }
+    ]
+  },
+  {
+    "slug": "smf-os2",
+    "name": "Fibra monomodo OS2 (G.652.D)",
+    "categoryCode": "CAT-PAS",
+    "manufacturerSlug": "tplink",
+    "lifecycleStatus": "current",
+    "summary": "Fibra monomodo OS2: referente para enlaces de larga distancia (LR/ER/ZR).",
+    "osiProfile": { "terminate": [1], "transparent": [2, 3, 4, 5, 6, 7], "primary": 1 },
+    "ports": [],
+    "assertions": [
+      { "predicate": "max_speed_mbps", "value": 400000, "sourceSlug": "ieee-8023-2018", "confidence": "official", "note": "Soporta 400G por longitud de onda en DWDM" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" }
+    ]
+  },
+
+  {
+    "slug": "cisco-catalyst-6500",
+    "name": "Cisco Catalyst 6500",
+    "manufacturerSlug": "cisco",
+    "familySlug": "catalyst-6500",
+    "categoryCode": "CAT-SWT-L3",
+    "model": "6509-E",
+    "releasedOn": "1999-01-01",
+    "eosOn": "2016-01-01",
+    "lifecycleStatus": "legacy",
+    "summary": "Chasis modular de referencia para campus y núcleo durante dos décadas.",
+    "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 2 },
+    "ports": [],
+    "assertions": [
+      { "predicate": "throughput_gbps", "value": 2560, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "historical" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" },
+      { "predicate": "succeeds", "objectType": "device", "objectSlug": "cisco-catalyst-4000" }
+    ]
+  },
+  {
+    "slug": "cisco-catalyst-4000",
+    "name": "Cisco Catalyst 4000",
+    "manufacturerSlug": "cisco",
+    "familySlug": "catalyst-4000",
+    "categoryCode": "CAT-SWT-L3",
+    "model": "4506",
+    "releasedOn": "1997-01-01",
+    "eosOn": "2012-01-01",
+    "lifecycleStatus": "legacy",
+    "summary": "Chasis modular de campus — hito de la capa 3 en switching.",
+    "osiProfile": { "terminate": [1, 2, 3], "transparent": [4, 5, 6, 7], "primary": 3 },
+    "ports": [],
+    "assertions": [],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
+    ]
+  },
+  {
+    "slug": "genesis-switch-ethernet",
+    "name": "Primer switch Ethernet (Kalpana EIFO)",
+    "manufacturerSlug": "3com",
+    "familySlug": "kalpana",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "EIFO-8",
+    "releasedOn": "1989-01-01",
+    "eosOn": "1998-01-01",
+    "lifecycleStatus": "legacy",
+    "summary": "Hito fundacional: primer switch Ethernet comercial que segmentó dominios de colisión.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [],
+    "assertions": [
+      { "predicate": "supports-protocol", "value": "ethernet", "sourceSlug": "3com-hub-editorial", "confidence": "historical" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  }
+]

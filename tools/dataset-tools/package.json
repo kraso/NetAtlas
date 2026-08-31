@@ -1,0 +1,27 @@
+{
+  "name": "@netatlas/dataset-tools",
+  "version": "0.0.0",
+  "private": true,
+  "description": "NetAtlas — data:lint (invariantes del dataset seed) y dataset:build (seed → SQLite)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "data:lint": "tsx src/lint-cli.ts",
+    "dataset:build": "tsx src/build-cli.ts"
+  },
+  "dependencies": {
+    "@netatlas/data": "workspace:*",
+    "@netatlas/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

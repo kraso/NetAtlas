@@ -1,0 +1,26 @@
+{
+  "name": "@netatlas/data",
+  "version": "0.0.0",
+  "private": true,
+  "description": "NetAtlas — persistencia: migraciones SQLite, migrator y DAOs (adaptador local-first)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./migrations/*.sql": "./migrations/*.sql"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p tsconfig.build.json",
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "migrate": "node scripts/migrate.mjs"
+  },
+  "dependencies": {
+    "@netatlas/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}

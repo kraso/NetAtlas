@@ -1,0 +1,195 @@
+[
+  {
+    "code": "CAT-IFC",
+    "nameEs": "Interfaces de red",
+    "nameEn": "Network interfaces",
+    "aliases": ["nic", "interfaz", "tarjeta de red"],
+    "sortOrder": 1
+  },
+  {
+    "code": "CAT-SWT",
+    "nameEs": "Interconexión y switching",
+    "nameEn": "Switching",
+    "aliases": ["switch", "conmutador"],
+    "sortOrder": 2
+  },
+  {
+    "code": "CAT-SWT-HUB",
+    "parentCode": "CAT-SWT",
+    "nameEs": "Hubs",
+    "nameEn": "Hubs",
+    "aliases": ["hub", "repetidor multipuerto"],
+    "sortOrder": 21
+  },
+  {
+    "code": "CAT-SWT-L2",
+    "parentCode": "CAT-SWT",
+    "nameEs": "Switches capa 2",
+    "nameEn": "Layer-2 switches",
+    "aliases": ["switch l2", "switch gestionable", "conmutador gestionable"],
+    "sortOrder": 22
+  },
+  {
+    "code": "CAT-SWT-L3",
+    "parentCode": "CAT-SWT",
+    "nameEs": "Switches multilayer (L3)",
+    "nameEn": "Multilayer switches",
+    "aliases": ["multilayer", "switch l3", "switch capa 3"],
+    "sortOrder": 23
+  },
+  {
+    "code": "CAT-RTR",
+    "nameEs": "Routing",
+    "nameEn": "Routing",
+    "aliases": ["router", "enrutador", "ruteador"],
+    "sortOrder": 3
+  },
+  {
+    "code": "CAT-RTR-SOHO",
+    "parentCode": "CAT-RTR",
+    "nameEs": "Routers domésticos/SOHO",
+    "nameEn": "Home/SOHO routers",
+    "aliases": ["router hogar", "router wifi"],
+    "sortOrder": 31
+  },
+  {
+    "code": "CAT-RTR-ENT",
+    "parentCode": "CAT-RTR",
+    "nameEs": "Routers empresariales",
+    "nameEn": "Enterprise routers",
+    "aliases": ["router empresa"],
+    "sortOrder": 32
+  },
+  {
+    "code": "CAT-WLS",
+    "nameEs": "Inalámbricos",
+    "nameEn": "Wireless",
+    "aliases": ["wifi", "inalámbrico", "wireless", "ap", "punto de acceso"],
+    "sortOrder": 4
+  },
+  {
+    "code": "CAT-WLS-AP",
+    "parentCode": "CAT-WLS",
+    "nameEs": "Puntos de acceso",
+    "nameEn": "Access points",
+    "aliases": ["ap", "access point", "punto de acceso"],
+    "sortOrder": 41
+  },
+  {
+    "code": "CAT-ACC",
+    "nameEs": "Módems y acceso",
+    "nameEn": "Modems and access",
+    "aliases": ["modem", "ont", "cpe", "acceso"],
+    "sortOrder": 5
+  },
+  {
+    "code": "CAT-ACC-DIAL",
+    "parentCode": "CAT-ACC",
+    "nameEs": "Módems dial-up",
+    "nameEn": "Dial-up modems",
+    "aliases": ["dialup", "modem 56k", "v.90"],
+    "sortOrder": 51
+  },
+  {
+    "code": "CAT-ACC-CABLE",
+    "parentCode": "CAT-ACC",
+    "nameEs": "Módems por cable (DOCSIS)",
+    "nameEn": "Cable modems (DOCSIS)",
+    "aliases": ["docsis", "cable modem"],
+    "sortOrder": 52
+  },
+  {
+    "code": "CAT-ACC-ONT",
+    "parentCode": "CAT-ACC",
+    "nameEs": "ONT/ONU fibra (GPON)",
+    "nameEn": "Optical network terminals (GPON)",
+    "aliases": ["ont", "onu", "gpon", "fibra óptica hogar"],
+    "sortOrder": 53
+  },
+  {
+    "code": "CAT-SEC",
+    "nameEs": "Seguridad",
+    "nameEn": "Security",
+    "aliases": ["firewall", "seguridad"],
+    "sortOrder": 6
+  },
+  {
+    "code": "CAT-SEC-FW",
+    "parentCode": "CAT-SEC",
+    "nameEs": "Firewalls",
+    "nameEn": "Firewalls",
+    "aliases": ["firewall"],
+    "sortOrder": 61
+  },
+  {
+    "code": "CAT-SEC-NGFW",
+    "parentCode": "CAT-SEC",
+    "nameEs": "NGFW / UTM",
+    "nameEn": "NGFW / UTM",
+    "aliases": ["ngfw", "utm"],
+    "sortOrder": 62
+  },
+  {
+    "code": "CAT-TEL",
+    "nameEs": "Telecom y transporte",
+    "nameEn": "Telecom and transport",
+    "aliases": ["telecom", "transporte", "media converter", "gateway voip"],
+    "sortOrder": 7
+  },
+  {
+    "code": "CAT-OPT",
+    "nameEs": "Fibra y óptica",
+    "nameEn": "Fiber optics",
+    "aliases": ["fibra", "óptica", "transceiver", "sfp", "óptico"],
+    "sortOrder": 8
+  },
+  {
+    "code": "CAT-IND",
+    "nameEs": "Industrial / OT",
+    "nameEn": "Industrial / OT",
+    "aliases": ["industrial", "ot", "din"],
+    "sortOrder": 9
+  },
+  {
+    "code": "CAT-IOT",
+    "nameEs": "IoT y LPWAN",
+    "nameEn": "IoT and LPWAN",
+    "aliases": ["iot", "lpwan", "lorawan", "gateway iot"],
+    "sortOrder": 10
+  },
+  {
+    "code": "CAT-DCN",
+    "nameEs": "Centros de datos",
+    "nameEn": "Data centers",
+    "aliases": ["datacenter", "data center", "tor", "leaf", "spine"],
+    "sortOrder": 11
+  },
+  {
+    "code": "CAT-PAS",
+    "nameEs": "Cableado e infraestructura pasiva",
+    "nameEn": "Cabling and passive infrastructure",
+    "aliases": ["cableado", "pasiva", "patch panel", "cable"],
+    "sortOrder": 12
+  },
+  {
+    "code": "CAT-PWR",
+    "nameEs": "Alimentación y PoE",
+    "nameEn": "Power and PoE",
+    "aliases": ["poe", "alimentación", "inyector poe", "psu"],
+    "sortOrder": 13
+  },
+  {
+    "code": "CAT-VIR",
+    "nameEs": "Virtualización y NFV",
+    "nameEn": "Virtualization and NFV",
+    "aliases": ["virtual", "nfv", "vswitch", "vrouter"],
+    "sortOrder": 14
+  },
+  {
+    "code": "CAT-TST",
+    "nameEs": "Medición y prueba",
+    "nameEn": "Testing and measurement",
+    "aliases": ["medición", "prueba", "analizador", "certificador"],
+    "sortOrder": 15
+  }
+]
