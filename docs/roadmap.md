@@ -18,12 +18,12 @@
 
 ## Estado de la Fase 0 (checklist)
 
-- [x] Monorepo pnpm + paquetes domain/data/search/dataset-tools/datagen
+- [x] Monorepo pnpm + paquetes (`packages/`: domain, data, search) + herramientas (`tools/`: dataset-tools, datagen)
 - [x] Esquema inicial `0001_init.sql` (entidades núcleo completas)
 - [x] Entidades de dominio + value objects + puertos + tests (36 unit)
 - [x] FTS5 + facetas + sugerencias (tests de integración)
 - [x] `data:lint` verde sobre el seed (0 errores)
-- [x] `dataset:build` genera `netatlas-seed.sqlite` (18 dispositivos, 30 aristas, 29 assertions)
+- [x] `dataset:build` genera `netatlas-seed.sqlite` (20 dispositivos, 36 aristas, 34 assertions)
 - [x] Benchmark FTS5: **p95 ≈ 2 ms** sobre 10k sintéticos (criterio: <50 ms)
 - [x] ADRs 0001–0008 en `docs/adr/`
 - [x] docs vivos (architecture, database, taxonomy, roadmap, testing, sourcing)

@@ -18,13 +18,16 @@ Regla de dependencias: las flechas apuntan siempre hacia el dominio. El dominio 
 
 La Fase 0 entrega el **dominio puro** y los **adaptadores base de persistencia y búsqueda**:
 
-| Paquete | Rol | Estado F0 |
-|---|---|---|
-| `@netatlas/domain` | Entidades, VO, puertos, catálogo de predicados, AST DSL | ✅ implementado + tests |
-| `@netatlas/data` | Migraciones (0001_init.sql), migrator, driver SQLite, DAO de catálogo | ✅ implementado + tests |
-| `@netatlas/search` | `Fts5SearchIndex` (implementa puerto `SearchIndex`) | ✅ implementado + tests |
-| `@netatlas/dataset-tools` | `data:lint` (invariantes), `dataset:build` (seed → SQLite) | ✅ implementado + tests |
-| `@netatlas/datagen` | Generador sintético 10k + benchmark FTS5 (criterio F0) | ✅ implementado + tests |
+| Componente | Ubicación | Rol | Estado F0 |
+|---|---|---|---|
+| `@netatlas/domain` | `packages/domain` | Entidades, VO, puertos, catálogo de predicados, AST DSL | ✅ implementado + tests |
+| `@netatlas/data` | `packages/data` | Migraciones (0001_init.sql), migrator, driver SQLite, DAO de catálogo | ✅ implementado + tests |
+| `@netatlas/search` | `packages/search` | `Fts5SearchIndex` (implementa puerto `SearchIndex`) | ✅ implementado + tests |
+| `@netatlas/dataset-tools` | `tools/dataset-tools` | Herramienta: `data:lint` (invariantes), `dataset:build` (seed → SQLite) | ✅ implementado + tests |
+| `@netatlas/datagen` | `tools/datagen` | Herramienta: generador sintético 10k + benchmark FTS5 (criterio F0) | ✅ implementado + tests |
+
+> Los paquetes reutilizables por la app viven en `packages/`; las herramientas de datos
+> (`dataset-tools`, `datagen`; en F1+, `import-cli`) viven en `tools/`, según §26 del plan maestro.
 
 ## 6.3 Puertos del dominio (Fase 0)
 

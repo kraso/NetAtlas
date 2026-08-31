@@ -29,13 +29,18 @@ packages/
   domain/       # Entidades, value objects, puertos (TypeScript puro, sin deps)
   data/         # Adaptadores SQLite: migraciones (0001_init.sql), DAOs
   search/       # Índice FTS5, DSL→AST (base), facetas
-  dataset-tools/ # data:lint — validador de invariantes del dataset seed
 tools/
+  dataset-tools/ # data:lint — invariantes del seed + dataset:build — seed → SQLite
   datagen/      # Generador sintético de escala (10k dispositivos) + benchmark FTS5
 datasets/
-  seed/         # Fuente curada: taxonomía + fichas piloto (YAML con assertions)
+  seed/         # Fuente curada: taxonomía + 20 fichas piloto (JSON con assertions)
 docs/           # Documentación viva + ADRs
 ```
+
+> Nota de estructura: según el plan maestro (§26), las herramientas de datos
+> (`datagen`, `dataset-build` → aquí `dataset-tools`, `import-cli`) viven bajo
+> `tools/`, no bajo `packages/`; los paquetes reutilizables por la app son
+> `domain`, `data`, `search` (y en F1+, `app`, `diagrams`, `importers`, …).
 
 ## Comandos
 

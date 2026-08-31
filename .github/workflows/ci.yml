@@ -30,10 +30,10 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Typecheck
-        run: pnpm -r --filter './packages/**' --filter './tools/**' exec tsc --noEmit -p tsconfig.json
+        run: pnpm typecheck
 
       - name: Unit + integration tests
-        run: pnpm -r --filter './packages/**' --filter './tools/**' run test
+        run: pnpm test
 
       - name: data:lint (invariantes del seed)
         run: pnpm data:lint
