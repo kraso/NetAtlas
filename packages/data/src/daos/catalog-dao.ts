@@ -172,6 +172,13 @@ export class CatalogDao {
   }
 
   // ── Puertos ────────────────────────────────────────────────────
+  /** Elimina todos los puertos de un dispositivo (reemplazo idempotente de inventario). */
+  clearPorts(deviceSlug: string): void {
+    const deviceId = this.deviceId(deviceSlug)
+    if (deviceId === undefined) throw new Error(`clearPorts: dispositivo desconocido "${deviceSlug}".`)
+    this.db.prepare('DELETE FROM port WHERE device_id = ?').run(deviceId)
+  }
+
   addPort(row: PortRow): void {
     const deviceId = this.deviceId(row.deviceSlug)
     if (deviceId === undefined) throw new Error(`addPort: dispositivo desconocido "${row.deviceSlug}".`)

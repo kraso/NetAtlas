@@ -47,6 +47,8 @@ export {
   esClaveDsl,
 } from './search/ast.js'
 export type { ClaveDsl, DslTermino, ConsultaDsl } from './search/ast.js'
+export { parseDsl, textoLibre } from './search/parser.js'
+export type { ParseResult, ParseError } from './search/parser.js'
 
 // Puertos (sección 6.6)
 export type { DeviceRepository, CatalogRepository, DeviceQuery, Page } from './ports/device-repository.js'

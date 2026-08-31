@@ -1,4 +1,4 @@
-import type { SqliteDriver, SqlRow } from '@netatlas/data'
+import type { SqliteDriver, SqlRow, SqlValue } from '@netatlas/data'
 import type {
   SearchIndex,
   SearchRequest,
@@ -9,12 +9,13 @@ import type {
   SuggestResult,
 } from '@netatlas/domain'
 import type { Speed } from '@netatlas/domain'
+import { parseDsl, textoLibre, consultaCon } from '@netatlas/domain'
+import { compileDsl } from './dsl-compiler.js'
 
 /**
  * Adaptador FTS5 del puerto SearchIndex (sección 12 del plan maestro).
- * Fase 0: búsqueda textual FTS5 + facetas dinámicas agregadas; el compilador
- * DSL→SQL llega en NET-HW-013 (F1). Toda consulta usa parámetros, nunca
- * concatenación (sección 22.2).
+ * F1: búsqueda textual FTS5 + DSL (AST→SQL parametrizado) + facetas dinámicas.
+ * Toda consulta usa parámetros, nunca concatenación (sección 22.2).
  */
 export class Fts5SearchIndex implements SearchIndex {
   constructor(private readonly db: SqliteDriver) {}
@@ -23,19 +24,21 @@ export class Fts5SearchIndex implements SearchIndex {
     const { rawQuery, limit, facetFilters } = request
     const offset = request.offset ?? 0
 
-    // Sanitiza la consulta FTS5: filtramos operadores de sintaxis y escapamos comillas.
-    const terms = rawQuery
-      .trim()
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((t) => t.replace(/"/g, '""'))
-    const match = terms.length > 0 ? terms.map((t) => `"${t}"*`).join(' AND ') : ''
+    // 1) Intenta parsear DSL. Si es válido y tiene términos de campo, se compila;
+    //    el texto libre (si hay) se delega a FTS. Si el parseo falla, todo es FTS.
+    const parsed = parseDsl(rawQuery)
+    const dslOk = parsed.ok && parsed.ast!.terminos.some((t) => t.kind !== 'texto')
+    const rawText = dslOk ? textoLibre(parsed.ast!) : rawQuery.trim()
 
+    const compiled = dslOk
+      ? compileDsl(parsed.ast!, { rawText })
+      : compileDsl(consultaCon([]), { rawText })
+
+    // compileDsl ya incluye la cláusula FTS (MATCH) cuando hay rawText;
+    // solo añadimos los filtros de faceta.
     const filters = buildFacetFilters(facetFilters)
-
-    const hasMatch = match.length > 0
-    const where = [hasMatch ? 'fts_device MATCH ?' : '1', ...filters.where].join(' AND ')
-    const args: (string | number)[] = hasMatch ? [match] : []
+    const where = [compiled.where, ...filters.where].join(' AND ')
+    const args: SqlValue[] = [...compiled.params, ...filters.params]
 
     const countRow = this.db
       .prepare(
@@ -45,7 +48,7 @@ export class Fts5SearchIndex implements SearchIndex {
          ${filters.join}
          WHERE ${where}`,
       )
-      .get(...args, ...filters.params)
+      .get(...args)
 
     const total = Number(countRow?.total ?? 0)
 
@@ -61,7 +64,7 @@ export class Fts5SearchIndex implements SearchIndex {
          ORDER BY bm25(fts_device)
          LIMIT ? OFFSET ?`,
       )
-      .all(...args, ...filters.params, limit, offset)
+      .all(...args, limit, offset)
 
     const hits: SearchHit[] = hitRows.map((r) => ({
       entityType: 'device',

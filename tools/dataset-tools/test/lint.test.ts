@@ -13,11 +13,11 @@ describe('data:lint — dataset seed', () => {
     seed = loadSeed(seedDir)
   })
 
-  it('carga las 15 macrocategorías y 20 fichas piloto', () => {
-    expect(seed.categories.length).toBeGreaterThanOrEqual(20)
-    expect(seed.devices.length).toBe(20)
-    expect(seed.manufacturers.length).toBeGreaterThanOrEqual(10)
-    expect(seed.sources.length).toBeGreaterThanOrEqual(5)
+  it('carga los catálogos master del MVP (28.1.5)', () => {
+    expect(seed.protocols.length).toBeGreaterThanOrEqual(100)
+    expect(seed.standards.length).toBeGreaterThanOrEqual(80)
+    expect(seed.media.length).toBeGreaterThanOrEqual(25)
+    expect(seed.manufacturers.length).toBeGreaterThanOrEqual(30)
   })
 
   it('no produce errores de invariantes', () => {
@@ -31,6 +31,24 @@ describe('data:lint — dataset seed', () => {
     const codes = new Set(seed.categories.map((c) => c.code))
     for (const dev of seed.devices) {
       expect(codes.has(dev.categoryCode), `categoría ${dev.categoryCode}`).toBe(true)
+    }
+  })
+
+  it('cobertura de fuentes en datos críticos ≥ 80% (criterio 28.1.6#2)', () => {
+    const criticos = seed.devices.flatMap((d) => d.assertions ?? [])
+    expect(criticos.length).toBeGreaterThan(0)
+    const conFuente = criticos.filter((a) => a.sourceSlug?.trim().length).length
+    expect(conFuente / criticos.length).toBeGreaterThanOrEqual(0.8)
+  })
+
+  it('todo protocolo de assertion supports-protocol existe en el catálogo (8.6-1)', () => {
+    const codes = new Set(seed.protocols.map((p) => p.code))
+    for (const dev of seed.devices) {
+      for (const a of dev.assertions ?? []) {
+        if (a.predicate === 'supports-protocol' && typeof a.value === 'string') {
+          expect(codes.has(a.value), `protocolo ${a.value}`).toBe(true)
+        }
+      }
     }
   })
 })

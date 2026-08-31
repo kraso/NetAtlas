@@ -459,5 +459,253 @@
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
     ]
+  },
+  {
+    "slug": "cisco-catalyst-9300-48p",
+    "name": "Cisco Catalyst 9300-48P",
+    "commercialName": "C9300-48P",
+    "manufacturerSlug": "cisco",
+    "familySlug": "catalyst-9300",
+    "categoryCode": "CAT-SWT-L3",
+    "model": "C9300-48P",
+    "releasedOn": "2017-06-01",
+    "lifecycleStatus": "current",
+    "summary": "Switch de campus apilable con 48 puertos Gigabit PoE+, 4 uplinks 1G/10G, stackwise, VXLAN EVPN.",
+    "osiProfile": { "terminate": [1, 2, 3], "transparent": [4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "48x 10/100/1000", "interfaceCode": "rj45", "quantity": 48, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "4x 1G/10G uplink", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [1000, 10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "throughput_gbps", "value": 256, "sourceSlug": "3com-hub-editorial", "confidence": "third-party", "note": "Switching capacity aprox.; validar con datasheet oficial en F2" },
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      { "predicate": "supports-protocol", "value": "vxlan-evpn", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
+    ]
+  },
+  {
+    "slug": "arista-7050sx-64",
+    "name": "Arista 7050SX-64",
+    "manufacturerSlug": "arista",
+    "familySlug": "arista-7050",
+    "categoryCode": "CAT-DCN",
+    "model": "DCS-7050SX-64",
+    "releasedOn": "2012-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Switch ToR 48x 10G SFP+ + 4x 40G QSFP+, ideal leaf/spine Clos.",
+    "osiProfile": { "terminate": [1, 2, 3], "transparent": [4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "48x 10G SFP+", "interfaceCode": "sfp-plus", "quantity": 48, "speedsMbps": [10000], "role": "access" },
+      { "label": "4x 40G QSFP+", "interfaceCode": "qsfp-plus", "quantity": 4, "speedsMbps": [40000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "supports-protocol", "value": "bgp", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      { "predicate": "supports-protocol", "value": "vxlan-evpn", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
+    ]
+  },
+  {
+    "slug": "fortinet-fortigate-200f",
+    "name": "FortiGate 200F",
+    "manufacturerSlug": "fortinet",
+    "familySlug": "fortigate-200f",
+    "categoryCode": "CAT-SEC-NGFW",
+    "model": "FG-200F",
+    "releasedOn": "2020-06-01",
+    "lifecycleStatus": "current",
+    "summary": "NGFW 1U: 2x GE RJ45 + 2x GE SFP + 8x GE, ~18 Gbps firewall, SD-WAN.",
+    "osiProfile": { "terminate": [1, 2, 3, 4, 5, 6, 7], "transparent": [], "primary": 4 },
+    "ports": [
+      { "label": "12x 10/100/1000", "interfaceCode": "rj45", "quantity": 12, "speedsMbps": [1000], "role": "access" },
+      { "label": "4x 1G SFP", "interfaceCode": "sfp", "quantity": 4, "speedsMbps": [1000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "firewall_throughput_gbps", "value": 18, "sourceSlug": "3com-hub-editorial", "confidence": "third-party", "note": "Validar con datasheet oficial en F2" },
+      { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "4" }
+    ]
+  },
+  {
+    "slug": "ubiquiti-unifi-udm-pro",
+    "name": "Ubiquiti UniFi Dream Machine Pro",
+    "manufacturerSlug": "ubiquiti",
+    "familySlug": "unifi-udm",
+    "categoryCode": "CAT-RTR-SOHO",
+    "model": "UDM-Pro",
+    "releasedOn": "2019-11-01",
+    "lifecycleStatus": "current",
+    "summary": "Gateway 10G con 8 puertos 1G, 1 SFP+ 10G, NVR integrado, panel UniFi — router+firewall+gestión AP.",
+    "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 3 },
+    "ports": [
+      { "label": "8x 10/100/1000", "interfaceCode": "rj45", "quantity": 8, "speedsMbps": [1000], "role": "access" },
+      { "label": "1x 10G SFP+", "interfaceCode": "sfp-plus", "quantity": 1, "speedsMbps": [10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      { "predicate": "supports-protocol", "value": "dhcp", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
+    ]
+  },
+  {
+    "slug": "ubiquiti-unifi-uw6-lr",
+    "name": "Ubiquiti UniFi U6-LR",
+    "manufacturerSlug": "ubiquiti",
+    "familySlug": "unifi-u6",
+    "categoryCode": "CAT-WLS-AP",
+    "model": "U6-LR",
+    "releasedOn": "2021-01-01",
+    "lifecycleStatus": "current",
+    "summary": "AP indoor Wi-Fi 6 (802.11ax) 4x4, dual banda, PoE++ (802.3bt), 500+ clientes.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "1x 10/100/1000", "interfaceCode": "rj45", "quantity": 1, "speedsMbps": [1000], "poeStandard": "802.3bt", "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "wifi_standard", "value": "802.11ax", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      { "predicate": "terminates-medium", "value": "wifi-6", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+  {
+    "slug": "mikrotik-crs328-24p",
+    "name": "MikroTik CRS328-24P-4S+RM",
+    "manufacturerSlug": "mikrotik",
+    "familySlug": "crs328",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "CRS328-24P-4S+RM",
+    "releasedOn": "2018-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Switch L2 24 puertos Gigabit PoE+ + 4 SFP+ 10G, RouterOS/SwOS.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "24x 10/100/1000", "interfaceCode": "rj45", "quantity": 24, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "4x 10G SFP+", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "supports-protocol", "value": "802.1q", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+  {
+    "slug": "juniper-ex2300-48p",
+    "name": "Juniper EX2300-48P",
+    "manufacturerSlug": "juniper",
+    "familySlug": "ex2300",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "EX2300-48P",
+    "releasedOn": "2014-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Switch de acceso L2 48 puertos PoE+ + 4 SFP+ 10G, Junos.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "48x 10/100/1000", "interfaceCode": "rj45", "quantity": 48, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "4x 10G SFP+", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [10000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+  {
+    "slug": "hpe-aruba-6300m",
+    "name": "HPE Aruba 6300M 48G",
+    "manufacturerSlug": "aruba",
+    "familySlug": "aruba-6300",
+    "categoryCode": "CAT-SWT-L3",
+    "model": "JL658A",
+    "releasedOn": "2019-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Switch de acceso 48x 1G PoE+ + 4x SFP56 50G, ArubaOS-CX, VSF.",
+    "osiProfile": { "terminate": [1, 2, 3], "transparent": [4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "48x 10/100/1000", "interfaceCode": "rj45", "quantity": 48, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "4x 50G SFP56", "interfaceCode": "sfp56", "quantity": 4, "speedsMbps": [50000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      { "predicate": "supports-protocol", "value": "vxlan", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
+    ]
+  },
+  {
+    "slug": "tplink-archer-ax55",
+    "name": "TP-Link Archer AX55",
+    "manufacturerSlug": "tplink",
+    "familySlug": "archer-ax",
+    "categoryCode": "CAT-RTR-SOHO",
+    "model": "AX55",
+    "releasedOn": "2021-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Router Wi-Fi 6 AX3000, 4 puertos Gigabit, USB — SOHO.",
+    "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 3 },
+    "ports": [
+      { "label": "4x 10/100/1000", "interfaceCode": "rj45", "quantity": 4, "speedsMbps": [1000], "role": "access" },
+      { "label": "1x WAN 1G", "interfaceCode": "rj45", "quantity": 1, "speedsMbps": [1000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "wifi_standard", "value": "802.11ax", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" },
+      { "predicate": "terminates-medium", "objectType": "medium", "objectSlug": "wifi-6" }
+    ]
+  },
+  {
+    "slug": "netgear-gs324tp",
+    "name": "Netgear GS324TP",
+    "manufacturerSlug": "netgear",
+    "familySlug": "gs300",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "GS324TP",
+    "releasedOn": "2017-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Switch smart managed 24x 1G PoE+ + 2x SFP, escritorio/rack.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "24x 10/100/1000", "interfaceCode": "rj45", "quantity": 24, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
+      { "label": "2x 1G SFP", "interfaceCode": "sfp", "quantity": 2, "speedsMbps": [1000], "role": "uplink" }
+    ],
+    "assertions": [],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
+  },
+  {
+    "slug": "siemens-scalance-xc206-2",
+    "name": "Siemens SCALANCE XC206-2",
+    "manufacturerSlug": "siemens",
+    "familySlug": "scalance-xc",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "6GK5206-2BS00",
+    "releasedOn": "2014-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Switch industrial rail DIN 6x 10/100 + 2x 100BaseFX, −20…60 °C, PROFINET-ready.",
+    "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "6x 10/100", "interfaceCode": "rj45", "quantity": 6, "speedsMbps": [100], "role": "access" },
+      { "label": "2x 100FX", "interfaceCode": "fibra", "quantity": 2, "speedsMbps": [100], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "supports-protocol", "value": "profinet", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
   }
 ]

@@ -37,6 +37,31 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.1)
 
+  packages/importers:
+    dependencies:
+      '@netatlas/data':
+        specifier: workspace:*
+        version: link:../data
+      '@netatlas/domain':
+        specifier: workspace:*
+        version: link:../domain
+    devDependencies:
+      '@fast-check/vitest':
+        specifier: ^0.1.3
+        version: 0.1.6(vitest@2.1.9(@types/node@22.20.1))
+      '@types/node':
+        specifier: ^22.10.2
+        version: 22.20.1
+      fast-check:
+        specifier: ^3.23.1
+        version: 3.23.2
+      typescript:
+        specifier: ^5.6.3
+        version: 5.9.3
+      vitest:
+        specifier: ^2.1.8
+        version: 2.1.9(@types/node@22.20.1)
+
   packages/search:
     dependencies:
       '@netatlas/data':
@@ -399,6 +424,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@fast-check/vitest@0.1.6':
+    resolution: {integrity: sha512-/POA3YDsja15aIoXNqQ/vJrm0x7qTRPjL7oDTMLJcOYGqEBjlrmHTKWyRzxgSNa7xyh5B3q8Jib9ALObtMJiEA==}
+    peerDependencies:
+      vitest: '>=0.28.1 <1.0.0 || ^1 || ^2 || ^3'
+
   '@jridgewell/sourcemap-codec@1.6.0':
     resolution: {integrity: sha512-T7jf+5zgsZHwNJ4lvQ7/aezbyk0nNX+zJVWpmHA7VYsEx7a7qr5Rg5IbtJFqkgze5Y2sruq1RUY8Q837Od7iFw==}
 
@@ -617,6 +647,10 @@ packages:
     resolution: {integrity: sha512-KfYbmpRm0VbLjEvVa9yGwCi9GI34xvi7A/HXYWQO65CSD2u3MczUJSuwXKFIxlGsgBQizV9q5J9NHj4VG0n+pA==}
     engines: {node: '>=12.0.0'}
 
+  fast-check@3.23.2:
+    resolution: {integrity: sha512-h5+1OzzfCC3Ef7VbtKdcv7zsstUQwUDlYpUTvjeUsJAssPgLn7QzbboPtL5ro04Mq0rPOsMzl7q5hIbRs2wD1A==}
+    engines: {node: '>=8.0.0'}
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -649,6 +683,9 @@ packages:
   postcss@8.5.26:
     resolution: {integrity: sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ==}
     engines: {node: ^10 || ^12 || >=14}
+
+  pure-rand@6.1.0:
+    resolution: {integrity: sha512-bVWawvoZoBYpp6yIoQtQXHZjmz35RSVHnUOTefl8Vcjr8snTPY1wnpSPMWekcFwbxI6gtmT7rSYPFvz71ldiOA==}
 
   rollup@4.63.1:
     resolution: {integrity: sha512-3Df9jsstwhccuEfmAMi9l8XUh/GOkVObmFTU7CCVBysEbcOZLl84jCtaAZMcPiMz2EGKsATzQcU+Xr3n/wU6cg==}
@@ -914,6 +951,11 @@ snapshots:
   '@esbuild/win32-x64@0.28.2':
     optional: true
 
+  '@fast-check/vitest@0.1.6(vitest@2.1.9(@types/node@22.20.1))':
+    dependencies:
+      fast-check: 3.23.2
+      vitest: 2.1.9(@types/node@22.20.1)
+
   '@jridgewell/sourcemap-codec@1.6.0': {}
 
   '@napi-rs/lzma-linux-x64-gnu@1.5.1':
@@ -1123,6 +1165,10 @@ snapshots:
 
   expect-type@1.4.0: {}
 
+  fast-check@3.23.2:
+    dependencies:
+      pure-rand: 6.1.0
+
   fsevents@2.3.3:
     optional: true
 
@@ -1147,6 +1193,8 @@ snapshots:
       nanoid: 3.3.18
       picocolors: 1.1.1
       source-map-js: 1.2.1
+
+  pure-rand@6.1.0: {}
 
   rollup@4.63.1:
     dependencies:

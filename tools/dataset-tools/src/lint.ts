@@ -63,10 +63,38 @@ interface SeedSource {
   authorityLevel: number
 }
 
+/** Catálogos cerrados (sección 8.1): protocolos, estándares, medios. */
+interface SeedProtocol {
+  code: string
+  name: string
+  family: string
+  osiLayer: number
+  aliases?: string[]
+  status?: string
+}
+
+interface SeedStandard {
+  org: string
+  identifier: string
+  title: string
+  status?: string
+}
+
+interface SeedMedium {
+  code: string
+  kind: string
+  name: string
+  maxDistanceM?: number
+  maxSpeedMbps?: number
+}
+
 export function lintSeed(input: {
   categories: readonly SeedCategory[]
   manufacturers: readonly SeedManufacturer[]
   sources: readonly SeedSource[]
+  protocols: readonly SeedProtocol[]
+  standards: readonly SeedStandard[]
+  media: readonly SeedMedium[]
   devices: readonly SeedDevice[]
 }): LintReport {
   const issues: LintIssue[] = []
@@ -77,7 +105,21 @@ export function lintSeed(input: {
   const categoryCodes = new Set(input.categories.map((c) => c.code))
   const manufacturerSlugs = new Set(input.manufacturers.map((m) => m.slug))
   const sourceSlugs = new Set(input.sources.map((s) => s.slug))
+  const protocolCodes = new Set(input.protocols.map((p) => p.code))
+  const standardRefs = new Set(input.standards.map((s) => `${s.org}/${s.identifier}`.toLowerCase()))
+  const mediumCodes = new Set(input.media.map((m) => m.code))
   const deviceSlugs = new Set<string>()
+
+  // Catálogos cerrados: códigos únicos (con exclusión de conflictos)
+  for (const p of input.protocols) {
+    if (!p.code || p.code.trim() === '') push('error', 'protocol-code', 'Protocolo sin código.')
+  }
+  for (const m of input.media) {
+    if (!m.code || m.code.trim() === '') push('error', 'medium-code', 'Medio sin código.')
+  }
+  for (const s of input.standards) {
+    if (!s.org || !s.identifier) push('error', 'standard-code', `Estándar incompleto: ${s.title ?? '(sin título)'}.`)
+  }
 
   // 1. Categorías huérfanas: todo parentCode debe existir
   for (const category of input.categories) {
@@ -111,6 +153,14 @@ export function lintSeed(input: {
       if (assertion.confidence !== undefined && !isConfidence(assertion.confidence)) {
         push('error', 'assertion-confidence', `Dispositivo "${device.slug}": confianza inválida "${assertion.confidence}".`)
       }
+      // 8.6-1: supports-protocol en assertion debe apuntar a catálogo cerrado
+      if (assertion.predicate === 'supports-protocol' && typeof assertion.value === 'string') {
+        const code = assertion.value.trim().toLowerCase()
+        const exists = protocolCodes.has(code)
+        if (!exists) {
+          push('error', 'closed-catalog', `Dispositivo "${device.slug}": assertion supports-protocol apunta a protocolo inexistente "${assertion.value}".`)
+        }
+      }
     }
 
     // 8. Relaciones: predicado conocido y extremos referenciados
@@ -120,6 +170,17 @@ export function lintSeed(input: {
         push('error', 'relationship-predicate', `Dispositivo "${device.slug}": predicado desconocido "${rel.predicate}".`)
       } else if (rel.objectType === 'device' && !input.devices.some((d) => d.slug === rel.objectSlug)) {
         push('error', 'relationship-object', `Dispositivo "${device.slug}": relación "${rel.predicate}" apunta a dispositivo inexistente "${rel.objectSlug}".`)
+      }
+
+      // 8.6-1: extremos de catálogo cerrado (protocolo/estándar/medio) deben existir
+      if (rel.objectType === 'protocol' && !protocolCodes.has(rel.objectSlug)) {
+        push('error', 'closed-catalog', `Dispositivo "${device.slug}": relación "${rel.predicate}" a protocolo inexistente "${rel.objectSlug}".`)
+      }
+      if (rel.objectType === 'medium' && !mediumCodes.has(rel.objectSlug)) {
+        push('error', 'closed-catalog', `Dispositivo "${device.slug}": relación "${rel.predicate}" a medio inexistente "${rel.objectSlug}".`)
+      }
+      if (rel.objectType === 'standard' && !standardRefs.has(rel.objectSlug.toLowerCase())) {
+        push('error', 'closed-catalog', `Dispositivo "${device.slug}": relación "${rel.predicate}" a estándar inexistente "${rel.objectSlug}".`)
       }
 
       // 9. replaced-by ⇒ EoL+
@@ -184,6 +245,9 @@ export function loadSeed(dir: string): {
   categories: readonly SeedCategory[]
   manufacturers: readonly SeedManufacturer[]
   sources: readonly SeedSource[]
+  protocols: readonly SeedProtocol[]
+  standards: readonly SeedStandard[]
+  media: readonly SeedMedium[]
   devices: readonly SeedDevice[]
 } {
   const read = <T,>(file: string): T => {
@@ -197,6 +261,9 @@ export function loadSeed(dir: string): {
     categories: read('categories.json'),
     manufacturers: read('manufacturers.json'),
     sources: read('sources.json'),
+    protocols: read('protocols.json'),
+    standards: read('standards.json'),
+    media: read('media.json'),
     devices: read('devices.json'),
   }
 }

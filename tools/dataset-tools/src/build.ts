@@ -10,13 +10,14 @@ const MIGRATIONS_DIR = join(here, '..', '..', '..', 'packages', 'data', 'migrati
 
 /**
  * dataset:build — construye el SQLite del dataset seed a partir de las fuentes JSON.
- * El resultado es el artefacto `netatlas-seed.sqlite` (prototipo de esquema + 20 fichas
- * piloto + assertions + aristas), base del MVP (F1).
+ * El resultado es el artefacto `netatlas-seed.sqlite` (esquema + catálogos master +
+ * 20 fichas piloto + assertions + aristas), base del MVP (F1).
  */
 export function buildSeedDatabase(seedDir: string, outPath: string): {
   deviceCount: number
   relationshipCount: number
   assertionCount: number
+  catalogCounts: { protocols: number; standards: number; media: number; manufacturers: number; categories: number }
   schemaVersion: number
 } {
   const seed = loadSeed(seedDir)
@@ -62,6 +63,17 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
       retrievedOn: (src as { retrievedOn?: string }).retrievedOn,
       authorityLevel: src.authorityLevel,
     })
+  }
+
+  // ── Catálogos cerrados: protocolos, estándares, medios (NET-HW-006) ──
+  for (const proto of seed.protocols) {
+    dao.protocolId(proto.code, proto.name, proto.family, proto.osiLayer)
+  }
+  for (const std of seed.standards) {
+    dao.standardId(`${std.org}/${std.identifier}`, std.title)
+  }
+  for (const med of seed.media) {
+    dao.mediumId(med.code, med.kind as 'cobre' | 'fibra' | 'inalambrico' | 'coaxial', med.name)
   }
 
   // ── Predicados canónicos ───────────────────────────────────────────
@@ -176,12 +188,20 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
 
   const schemaRow = driver.prepare('SELECT MAX(version) AS v FROM schema_version').get()
   const schemaVersion = Number(schemaRow?.v ?? 0)
+  const count = (t: string): number => Number(driver.prepare(`SELECT COUNT(*) AS c FROM ${t}`).get()?.c ?? 0)
+  const catalogCounts = {
+    protocols: count('protocol'),
+    standards: count('standard'),
+    media: count('medium'),
+    manufacturers: count('manufacturer'),
+    categories: count('category'),
+  }
   driver.close()
   // Cierra WAL dejando un archivo único portable (checkpoint + delete).
   rmSync(`${outPath}-wal`, { force: true })
   rmSync(`${outPath}-shm`, { force: true })
 
-  return { deviceCount: seed.devices.length, relationshipCount, assertionCount, schemaVersion }
+  return { deviceCount: seed.devices.length, relationshipCount, assertionCount, catalogCounts, schemaVersion }
 }
 
 function resolveObjectId(dao: CatalogDao, type: string, slug: string): number | undefined {

@@ -1,0 +1,38 @@
+[
+
+  { "code": "utp-cat5e", "kind": "cobre", "name": "UTP Cat5e", "maxDistanceM": 100, "maxSpeedMbps": 1000, "standard": { "org": "tia-eia", "identifier": "568.2-D" } },
+  { "code": "utp-cat6", "kind": "cobre", "name": "UTP Cat6", "maxDistanceM": 55, "maxSpeedMbps": 10000, "standard": { "org": "tia-eia", "identifier": "568.2-D" } },
+  { "code": "utp-cat6a", "kind": "cobre", "name": "UTP Cat6A", "maxDistanceM": 100, "maxSpeedMbps": 10000, "standard": { "org": "tia-eia", "identifier": "568.2-D" } },
+  { "code": "stp-cat7", "kind": "cobre", "name": "S/FTP Cat7", "maxDistanceM": 100, "maxSpeedMbps": 10000, "standard": { "org": "iso-iec", "identifier": "11801" } },
+  { "code": "sftp-cat7a", "kind": "cobre", "name": "S/FTP Cat7A", "maxDistanceM": 100, "maxSpeedMbps": 10000, "standard": { "org": "iso-iec", "identifier": "11801" } },
+  { "code": "utp-cat8", "kind": "cobre", "name": "UTP Cat8.1", "maxDistanceM": 30, "maxSpeedMbps": 40000, "standard": { "org": "tia-eia", "identifier": "568.2-D" } },
+  { "code": "coax-rg6", "kind": "coaxial", "name": "Coaxial RG-6 (DOCSIS)", "maxDistanceM": 100, "maxSpeedMbps": 1000 },
+  { "code": "coax-rg59", "kind": "coaxial", "name": "Coaxial RG-59 (vídeo)", "maxDistanceM": 200, "maxSpeedMbps": 10 },
+
+  { "code": "mmf-om1", "kind": "fibra", "name": "Multimodo OM1 (62.5 µm)", "maxDistanceM": 300, "maxSpeedMbps": 1000, "wavelengthNm": 850 },
+  { "code": "mmf-om2", "kind": "fibra", "name": "Multimodo OM2 (50 µm)", "maxDistanceM": 550, "maxSpeedMbps": 1000, "wavelengthNm": 850 },
+  { "code": "mmf-om3", "kind": "fibra", "name": "Multimodo OM3 (50 µm, laser-optimized)", "maxDistanceM": 300, "maxSpeedMbps": 10000, "wavelengthNm": 850 },
+  { "code": "mmf-om4", "kind": "fibra", "name": "Multimodo OM4 (50 µm)", "maxDistanceM": 550, "maxSpeedMbps": 10000, "wavelengthNm": 850 },
+  { "code": "mmf-om5", "kind": "fibra", "name": "Multimodo OM5 (SWDM, 850–953 nm)", "maxDistanceM": 300, "maxSpeedMbps": 100000, "wavelengthNm": 850 },
+
+  { "code": "smf-os1", "kind": "fibra", "name": "Monomodo OS1 (G.652.A)", "maxDistanceM": 40000, "maxSpeedMbps": 10000, "wavelengthNm": 1310 },
+  { "code": "smf-os2", "kind": "fibra", "name": "Monomodo OS2 (G.652.D)", "maxDistanceM": 40000, "maxSpeedMbps": 400000, "wavelengthNm": 1310 },
+  { "code": "smf-g657", "kind": "fibra", "name": "Monomodo G.657.A1 (bend-insensitive)", "maxDistanceM": 2000, "maxSpeedMbps": 100000, "wavelengthNm": 1310 },
+
+  { "code": "wifi-4", "kind": "inalambrico", "name": "Wi-Fi 4 (802.11n, 2.4 GHz)", "maxDistanceM": 70, "maxSpeedMbps": 600 },
+  { "code": "wifi-5", "kind": "inalambrico", "name": "Wi-Fi 5 (802.11ac, 5 GHz)", "maxDistanceM": 50, "maxSpeedMbps": 3466 },
+  { "code": "wifi-6", "kind": "inalambrico", "name": "Wi-Fi 6 (802.11ax, 2.4+5 GHz)", "maxDistanceM": 50, "maxSpeedMbps": 9600 },
+  { "code": "wifi-6e", "kind": "inalambrico", "name": "Wi-Fi 6E (802.11ax, 6 GHz)", "maxDistanceM": 30, "maxSpeedMbps": 9600 },
+  { "code": "wifi-7", "kind": "inalambrico", "name": "Wi-Fi 7 (802.11be, 2.4+5+6 GHz)", "maxDistanceM": 30, "maxSpeedMbps": 46000 },
+
+  { "code": "mw-ptp-6ghz", "kind": "inalambrico", "name": "Microondas PtP licenciado (6 GHz)", "maxDistanceM": 50000, "maxSpeedMbps": 1000 },
+  { "code": "mw-eband", "kind": "inalambrico", "name": "Microondas E-band (70/80 GHz)", "maxDistanceM": 3000, "maxSpeedMbps": 10000 },
+  { "code": "celular-4g-lte", "kind": "inalambrico", "name": "Celular 4G LTE (Cat 4–20)", "maxDistanceM": 10000, "maxSpeedMbps": 2000 },
+  { "code": "celular-5g-nsa", "kind": "inalambrico", "name": "Celular 5G NSA (FR1)", "maxDistanceM": 3000, "maxSpeedMbps": 5000 },
+  { "code": "celular-5g-mmwave", "kind": "inalambrico", "name": "Celular 5G FR2 (mmWave)", "maxDistanceM": 500, "maxSpeedMbps": 10000 },
+  { "code": "satelite-geo", "kind": "inalambrico", "name": "Satélite GEO (VSAT)", "maxDistanceM": 36000000, "maxSpeedMbps": 150 },
+  { "code": "satelite-leo", "kind": "inalambrico", "name": "Satélite LEO (p. ej. Starlink)", "maxDistanceM": 550000, "maxSpeedMbps": 500 },
+  { "code": "lorawan", "kind": "inalambrico", "name": "LoRaWAN (LPWAN)", "maxDistanceM": 15000, "maxSpeedMbps": 0.05 },
+  { "code": "nb-iot", "kind": "inalambrico", "name": "NB-IoT (LPWAN celular)", "maxDistanceM": 10000, "maxSpeedMbps": 0.2 },
+  { "code": "sigfox", "kind": "inalambrico", "name": "Sigfox (LPWAN)", "maxDistanceM": 30000, "maxSpeedMbps": 0.0001 }
+]
