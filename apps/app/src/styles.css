@@ -1,0 +1,139 @@
+:root {
+  /* las variables viven en @netatlas/ui/tokens.css */
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-ui);
+  background: var(--bg-base);
+  color: var(--text-primary);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+.app-shell {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-4);
+}
+
+.app-nav {
+  display: flex;
+  gap: var(--space-4);
+  align-items: center;
+  padding: var(--space-3) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-5);
+}
+
+.app-nav a {
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-decoration: none;
+}
+.app-nav a:hover {
+  color: var(--accent);
+}
+
+.guia-tecnica {
+  color: var(--text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.search-input,
+.facet-input {
+  width: 100%;
+  max-width: 34rem;
+  padding: 10px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: var(--font-size-md);
+}
+.search-input:focus,
+.facet-input:focus {
+  border-color: var(--focus-ring);
+  outline: 2px solid color-mix(in srgb, var(--focus-ring) 35%, transparent);
+  outline-offset: 0;
+}
+
+.grid-categorias {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-3);
+}
+
+.card-categoria {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: var(--space-4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--text-primary);
+}
+.card-categoria:hover {
+  border-color: var(--accent);
+}
+
+.resultado {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.resultado:last-child {
+  border-bottom: none;
+}
+
+.ficha-tabs {
+  display: flex;
+  gap: 2px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+.ficha-tabs button {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+}
+.ficha-tabs button[aria-selected='true'] {
+  color: var(--text-primary);
+  border-bottom-color: var(--accent);
+}
+
+.tabla-specs {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+.tabla-specs th,
+.tabla-specs td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--border);
+}
+.tabla-specs th {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.empty-state {
+  padding: var(--space-5);
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-md);
+}

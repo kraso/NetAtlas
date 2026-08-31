@@ -43,3 +43,31 @@ jobs:
 
       - name: Benchmark FTS5 (SLO F0: p95 < 50 ms sobre 10k)
         run: pnpm bench
+
+  ui:
+    name: UI (apps/app) — typecheck + tests + build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Typecheck app
+        run: pnpm --filter @netatlas/app typecheck
+
+      - name: UI tests (Testing Library + jsdom)
+        run: pnpm --filter @netatlas/app test
+
+      - name: Build producción (vite)
+        run: pnpm --filter @netatlas/app build

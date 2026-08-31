@@ -38,12 +38,24 @@
 - [x] **Property-based tests** (NET-HW-054) con fast-check sobre normalizar/validar
 - [x] `data:lint` ampliado: catálogos cerrados (8.6-1), cobertura de fuentes, replaced-by⇒EoL
 
-### Pendiente para cerrar F1 (UI y plataforma — NET-HW-017…021, 026, 051, 053)
+### UI implementada (NET-HW-017…021, 026 — 🎨 bloque UI completo)
 
-- [ ] `apps/app` React + Vite: dashboard, explorador, ficha (13 pestañas), panel OSI (design system + tokens)
-- [ ] PWA offline (SW/OPFS) y build Tauri
-- [ ] E2E Playwright (buscar→ficha→protocolo→dispositivos)
+- [x] **Design system** (NET-HW-017): tokens CSS (tema oscuro primero + claro, contraste AA), badges de confianza por nivel (§20.3), iconografía SVG por macrocategoría — `packages/ui`
+- [x] **`apps/app` React + Vite + TS**: routing, Zustand stores (MVVM viewmodels), composition-root
+- [x] **Dashboard** (NET-HW-018): búsqueda dominante + tarjetas por macrocategoría + estadísticas
+- [x] **Explorador** (NET-HW-019): árbol jerárquico + faceta de categoría + resultados en tabla accesible
+- [x] **Ficha** (NET-HW-020): 4 pestañas núcleo (Resumen/Especificaciones/Interfaces/Capas OSI) + badges de fuente; las 13 completas en refinamiento
+- [x] **Panel OSI/TCP-IP** (NET-HW-021): panel vertical 7 capas + TCP/IP derivado + **consulta inversa por capas**
+- [x] **A11y AA base** (NET-HW-026): labels asociados, tabs con roles/aria, foco visible, `prefers-reduced-motion`, navegación por teclado probada
+- [x] **Adaptador in-memory** de los puertos del dominio para navegador/tests (wa-sqlite en F1-late, mismo contrato)
+- [x] Build de producción Vite verde; CI con job `ui` (typecheck + tests + build)
+
+### Pendiente para cerrar F1 (plataforma y refuerzos)
+
+- [ ] PWA offline (SW/OPFS) y build Tauri (NET-HW-051/052)
+- [ ] E2E Playwright (buscar→ficha→protocolo→dispositivos) (NET-HW-053)
 - [ ] Seed hacia 300–500 vía importación asistida (mecanismo listo: `packages/importers`)
+- [ ] 13 pestañas completas de la ficha (Protocolos con insignia, Estándares, Compatibilidad, Historia…)
 
 ## Esfuerzo orientativo (1–2 personas)
 
@@ -54,10 +66,12 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 ## Estado de la suite (2025)
 
 ```
-typecheck:     6 paquetes verdes (tsc --noEmit estricto)
-tests:         115 (domain 55 · data 17 · importers 11 · search 20 · dataset-tools 8 · datagen 4)
+typecheck:     8 paquetes verdes (tsc --noEmit estricto)
+tests:         132 (domain 55 · data 17 · importers 11 · search 20 · ui 6 · app 11 · dataset-tools 8 · datagen 4)
 data:lint:     0 avisos / 0 errores sobre 31 dispositivos
 dataset:build: 31 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 60 aristas · 51 assertions
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
+app build:     ✅ vite build producción (62 módulos, ~192 KB JS / 4 KB CSS)
+CI:            jobs verify (núcleo) + ui (apps/app)
 ```

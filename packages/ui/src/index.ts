@@ -1,0 +1,6 @@
+export { ConfidenceBadge, confidenceToken, confidenceLabel } from './components/confidence-badge.js'
+export type { ConfidenceBadgeProps } from './components/confidence-badge.js'
+export { CategoryIcon, macroOf } from './components/category-icon.js'
+export type { MacroCategoriaId, CategoryIconProps } from './components/category-icon.js'
+export { OsiPanel, OSI_LABELS } from './components/osi-panel.js'
+export type { OsiPanelProps } from './components/osi-panel.js'
