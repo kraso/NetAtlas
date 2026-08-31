@@ -6,21 +6,28 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "pnpm icons && vite build",
     "preview": "vite preview",
+    "icons": "node scripts/gen-icons.mjs",
+    "tauri": "tauri",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@netatlas/domain": "workspace:*",
     "@netatlas/ui": "workspace:*",
+    "@tauri-apps/api": "^2.1.1",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "^6.28.0",
+    "workbox-window": "^7.1.0",
     "zustand": "^5.0.2"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@tauri-apps/cli": "^2.1.0",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@testing-library/user-event": "^14.5.2",
@@ -31,6 +38,7 @@
     "jsdom": "^25.0.1",
     "typescript": "^5.6.3",
     "vite": "5.4.21",
+    "vite-plugin-pwa": "^0.21.1",
     "vitest": "^2.1.8"
   }
 }

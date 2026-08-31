@@ -1,0 +1,3 @@
+# Rust build de Tauri (generado; ~GBs)
+target/
+gen/schemas/

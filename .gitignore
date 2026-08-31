@@ -3,6 +3,10 @@ node_modules/
 *.tsbuildinfo
 .pnpm-store/
 
+# Test artifacts
+test-results/
+playwright-report/
+
 # Builds
 dist/
 build/

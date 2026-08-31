@@ -50,12 +50,18 @@
 - [x] **Adaptador in-memory** de los puertos del dominio para navegador/tests (wa-sqlite en F1-late, mismo contrato)
 - [x] Build de producción Vite verde; CI con job `ui` (typecheck + tests + build)
 
-### Pendiente para cerrar F1 (plataforma y refuerzos)
+### Plataforma y calidad (✅ cerradas)
 
-- [ ] PWA offline (SW/OPFS) y build Tauri (NET-HW-051/052)
-- [ ] E2E Playwright (buscar→ficha→protocolo→dispositivos) (NET-HW-053)
+- [x] **PWA offline** (NET-HW-051): manifest.webmanifest con icons 192/512 (+maskable) generados con script PNG sin dependencias; Service Worker (workbox generateSW) con precache de 12 entradas y `navigateFallback` SPA; **modo avión verificado por E2E** (navegación sin red tras primera carga) — criterio 28.1.6#4 (vertiente web)
+- [x] **Tauri** (NET-HW-052): `apps/app/src-tauri` (Cargo.toml, tauri.conf.json con identifier/updater configurado, comandos FS `inspect_dataset`/`read_asset_bytes`, capabilities) — **build release verificado localmente** (`netatlas-desktop.exe`)
+- [x] **E2E Playwright** (NET-HW-053): flujo crítico 28.1.6#3 (buscar→explorar→ficha→capas→dispositivos relacionados) + 404 contextual, en **chromium y firefox**; CI con job `e2e`
+- [x] CI ampliado: jobs `verify` (núcleo), `ui` (PWA build+SW verificado), `e2e`, `tauri` (Windows + Rust toolchain)
+
+### Pendiente para cerrar F1 (contenido y refuerzos)
+
 - [ ] Seed hacia 300–500 vía importación asistida (mecanismo listo: `packages/importers`)
 - [ ] 13 pestañas completas de la ficha (Protocolos con insignia, Estándares, Compatibilidad, Historia…)
+- [ ] Conexión de la UI al dataset real vía wa-sqlite (F1-late; hoy adaptador in-memory)
 
 ## Esfuerzo orientativo (1–2 personas)
 
@@ -72,6 +78,8 @@ data:lint:     0 avisos / 0 errores sobre 31 dispositivos
 dataset:build: 31 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 60 aristas · 51 assertions
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build producción (62 módulos, ~192 KB JS / 4 KB CSS)
-CI:            jobs verify (núcleo) + ui (apps/app)
+app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512
+E2E:           ✅ 5/5 (flujo crítico 28.1.6#3 + 404 + offline PWA) en chromium y firefox
+Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
+CI:            jobs verify · ui (PWA) · e2e · tauri
 ```

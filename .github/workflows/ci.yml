@@ -45,7 +45,7 @@ jobs:
         run: pnpm bench
 
   ui:
-    name: UI (apps/app) — typecheck + tests + build
+    name: UI + PWA — typecheck + tests + build (SW+manifest)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -69,5 +69,66 @@ jobs:
       - name: UI tests (Testing Library + jsdom)
         run: pnpm --filter @netatlas/app test
 
-      - name: Build producción (vite)
+      - name: Build producción (vite + PWA SW/manifest)
         run: pnpm --filter @netatlas/app build
+
+      - name: Verificar artefactos PWA
+        run: |
+          test -f apps/app/dist/sw.js
+          test -f apps/app/dist/manifest.webmanifest
+          test -f apps/app/dist/icons/icon-192.png
+          test -f apps/app/dist/icons/icon-512.png
+
+  e2e:
+    name: E2E Playwright — flujo crítico + offline
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Install browsers
+        run: pnpm --filter @netatlas/app exec playwright install --with-deps chromium firefox
+
+      - name: E2E (flujo crítico 28.1.6#3 + 404 + offline PWA)
+        run: pnpm --filter @netatlas/app test:e2e
+
+  tauri:
+    name: Tauri — build binario escritorio
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      # https://github.com/tauri-apps/tauri-action — compila binario sin bundle para CI
+      - name: Build Tauri (release, sin bundle NSIS/MSI)
+        run: pnpm --filter @netatlas/app exec tauri build --no-bundle
+
+      - name: Verificar binario
+        shell: pwsh
+        run: Test-Path apps/app/src-tauri/target/release/netatlas-desktop.exe
