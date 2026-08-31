@@ -54,6 +54,25 @@ export type { ParseResult, ParseError } from './search/parser.js'
 export type { DeviceRepository, CatalogRepository, DeviceQuery, Page } from './ports/device-repository.js'
 export type { GraphRepository, NeighborsQuery, Path } from './ports/graph-repository.js'
 export type { SourcingRepository } from './ports/sourcing-repository.js'
+
+// Calculadoras (sección 28 / NET-HW-028)
+export { POE_CLASSES, poeClassMaxW, calculePoeBudget, maxPoePorts } from './calculators/poe.js'
+export type { PoeClassInfo, PoeBudgetInput, PoeBudgetResult } from './calculators/poe.js'
+export { FIBRAS, TRANSCEIVERS_CANONICOS, calculeEnlaceOptico } from './calculators/optical-link.js'
+export type { FibraSpec, TransceiverSpec, EnlaceOpticoInput, EnlaceOpticoResult } from './calculators/optical-link.js'
+export { calculaSubred, vlsm } from './calculators/subnetting.js'
+export type { RedInfo } from './calculators/subnetting.js'
+export {
+  convierteVelocidad,
+  formatoVelocidadHumano,
+  convierteDatos,
+  dbmToMw,
+  mwToDbm,
+  ratioToDb,
+  dbToRatio,
+  convierteDistancia,
+} from './calculators/converters.js'
+export type { UnidadVelocidad, UnidadDatos, UnidadDistancia } from './calculators/converters.js'
 export type {
   SearchIndex,
   SearchHit,

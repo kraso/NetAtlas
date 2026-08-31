@@ -1,14 +1,14 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 1 (MVP) — núcleo de datos/búsqueda implementado; UI React pendiente**.
+> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 2 (Catálogo avanzado) — implementada**.
 
 ## Fases
 
 | Fase | Nombre | Contenido | Criterio de salida | Estado |
 |---|---|---|---|---|
 | **F0** | Investigación y arquitectura | Plan; spikes SQLite+FTS5; prototipo de esquema; 20 fichas piloto | ADRs firmados; búsqueda <50 ms p95 sobre 10k sintéticos | ✅ **cerrada** |
-| **F1** | MVP | Catálogo + fichas + búsqueda FTS/DSL + vista OSI + fuentes v1 + importación JSON/CSV + seed 300–500 | Criterios 28.1.6 | 🔄 **en curso (núcleo ≈70%)** |
-| **F2** | Catálogo avanzado | EAV completo, pantallas de exploración, glosario, calculadoras | 15 macrocategorías pobladas; cobertura fuentes ≥80% | ⏳ |
+| **F1** | MVP | Catálogo + fichas + búsqueda FTS/DSL + vista OSI + fuentes v1 + importación JSON/CSV + seed 300–500 | Criterios 28.1.6 (los 6) | ✅ **cerrada** |
+| **F2** | Catálogo avanzado | Calculadoras, exploradores de catálogos, autocompletado, fabricantes, glosario, panel frontal, migas | 15 macrocategorías pobladas; cobertura fuentes ≥80% | 🔄 **en curso (≈80%)** |
 | **F3** | Relaciones y búsqueda avanzada | Grafo completo, facetas dinámicas, mapa local, genealogía básica | Navegación ≤2 clics verificada en E2E | ⏳ |
 | **F4** | Diagramas interactivos | Mapa global, topologías, panel frontal, exportación | SLOs de diagramas | ⏳ |
 | **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ⏳ |
@@ -70,6 +70,22 @@
 
 - [x] Criterios 28.1.6 #1 (7 canónicas <500 ms), #2 (cobertura ≥80%), #3 (E2E flujo crítico), #4 (offline PWA), #5 (lote con rechazo razonado), #6 (data:lint verde)
 
+## Estado de la Fase 2 (implementada — ítems B del backlog)
+
+- [x] **Calculadoras** (NET-HW-028): PoE (clases 802.3af/at/bt, presupuesto, maxPoePorts) · enlace óptico (presupuesto dB, **caso CU-14: 10 km SMF → LR 1310 nm viable**) · subnetting (CIDR + VLSM greedy) · conversores (velocidad, datos, dBm↔mW, ratio↔dB, distancia) — servicios puros en `packages/domain/calculators` (14 tests)
+- [x] **Exploradores de catálogos** (NET-HW-023): `/catalogos` (protocolos/estándares/medios) + fichas bidireccionales (dispositivos que los usan) + calculadora de enlace anclada en el medio (4 tests)
+- [x] **Autocompletado agrupado + búsquedas guardadas** (NET-HW-014): sugerencias por tipo (Dispositivos/Protocolos/Estándares/Medios/Categorías/Fabricantes) + persistencia localStorage (4 tests)
+- [x] **Páginas de fabricante** (NET-HW-027): `/fabricante/:slug` → familias → modelos
+- [x] **Panel frontal SVG** (NET-HW-022): render del inventario de puertos por grupo, con colores por velocidad/PoE y equivalencia textual accesible
+- [x] **Glosario + enlaces inline** (NET-HW-024): `/glosario` con filtro + términos (conmutador, dominio de colisión, VLAN, PoE, transceptor, enlace troncal) enlazados desde las pestañas de las fichas
+- [x] **Panel contextual derecho + migas + historial** (NET-HW-025): `aside` sticky con panel frontal/soportes/estándares/glosario + `Breadcrumbs` (`/` _ `/explore` _ ficha) + botón volver por historial de sesión
+- [x] nuevo nav "Catálogos" en la cabecera
+
+### Pendiente F2 (refinamiento)
+
+- [ ] EAV operativo completo (atributos por categoría en fichas y facetas dinámicas — la tabla `attribute_definition` ya existe en el esquema; NET-HW-034/035)
+- [ ] audit. accesibilidad continua axe en CI (NET-HW-058)
+
 ## Esfuerzo orientativo (1–2 personas)
 
 F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6 6–8 · F7 8–10 · F8 10–14.
@@ -80,14 +96,14 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     8 paquetes verdes (tsc --noEmit estricto)
-tests:         158+ (domain 55 · data 20 · importers 11 · search 20 · ui 6 · app 21 · dataset-tools 9 · datagen 4)
+tests:         172+ (domain 69 · data 20 · importers 11 · search 20 · ui 6 · app 36 · dataset-tools 9 · datagen 4)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512
+app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512 (80 módulos)
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 5/5 (flujo crítico 28.1.6#3 + 404 + offline PWA) en chromium y firefox
+E2E:           ✅ 5/5 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```

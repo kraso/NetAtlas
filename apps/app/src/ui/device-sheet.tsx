@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom'
 import { OsiPanel, ConfidenceBadge, confidenceLabel } from '@netatlas/ui'
 import { useCatalogStore } from '../viewmodels/catalog-store.js'
 import { useServices } from '../composition-root.js'
+import { Breadcrumbs } from './breadcrumbs.js'
+import { FrontPanel } from './front-panel.js'
 import type { Device } from '@netatlas/domain'
 import type { Assertion, Relationship } from '@netatlas/domain'
 
@@ -72,30 +74,78 @@ export function DeviceSheet(): React.JSX.Element {
 
   return (
     <section aria-labelledby={`ficha-${device.slug.value}`}>
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', to: '/' },
+          { label: 'Explorar', to: '/explore' },
+          { label: device.name },
+        ]}
+      />
       <h1 id={`ficha-${device.slug.value}`}>{device.name}</h1>
       <p className="mono guia-tecnica">
-        {device.slug.value} · {cat?.nameEs ?? device.categoryCode} · {device.manufacturerSlug}
+        {device.slug.value} · {cat?.nameEs ?? device.categoryCode} ·{' '}
+        <Link to={`/fabricante/${device.manufacturerSlug}`}>{device.manufacturerSlug}</Link>
       </p>
 
-      <div role="tablist" aria-label="Pestañas de la ficha" className="ficha-tabs">
-        {PESTAÑAS.map((t) => (
-          <button
-            key={t.id}
-            role="tab"
-            id={`tab-${t.id}`}
-            aria-selected={pestaña === t.id}
-            aria-controls={`panel-${t.id}`}
-            onClick={() => setPestaña(t.id)}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 24 }}>
+        <div>
+          <div role="tablist" aria-label="Pestañas de la ficha" className="ficha-tabs">
+            {PESTAÑAS.map((t) => (
+              <button
+                key={t.id}
+                role="tab"
+                id={`tab-${t.id}`}
+                aria-selected={pestaña === t.id}
+                aria-controls={`panel-${t.id}`}
+                onClick={() => setPestaña(t.id)}
+              >
+                {t.label}
+              </button>
+            ))}
+          </div>
 
-      <div id={`panel-${pestaña}`} role="tabpanel" aria-labelledby={`tab-${pestaña}`}>
-        <PestanaContent device={device} pestaña={pestaña} />
+          <div id={`panel-${pestaña}`} role="tabpanel" aria-labelledby={`tab-${pestaña}`}>
+            <PestanaContent device={device} pestaña={pestaña} />
+          </div>
+        </div>
+
+        <PanelContextual device={device} />
       </div>
     </section>
+  )
+}
+
+/** Panel contextual derecho (NET-HW-025): resumen de relaciones + panel frontal. */
+function PanelContextual({ device }: { device: Device }): React.JSX.Element {
+  const { relaciones } = useDeviceRelations(device)
+  const soportes = relaciones.filter((r) => r.predicate === 'supports-protocol')
+  const estandares = relaciones.filter((r) => r.predicate === 'implements-standard')
+
+  return (
+    <aside aria-label="Panel contextual" className="card" style={{ position: 'sticky', top: 16, height: 'fit-content' }}>
+      <h2 style={{ fontSize: 'var(--font-size-md)' }}>Panel frontal</h2>
+      <FrontPanel ports={device.ports} />
+
+      <h3 style={{ fontSize: 'var(--font-size-sm)', marginTop: 16 }}>Soportes ({soportes.length})</h3>
+      <p className="guia-tecnica">
+        {soportes.length > 0
+          ? soportes.slice(0, 6).map((r) => (
+              <Link key={r.object.slug} to={`/protocolo/${r.object.slug}`} className="mono" style={{ marginRight: 6 }}>
+                {r.object.slug}
+              </Link>
+            ))
+          : 'Sin soportes curados.'}
+      </p>
+
+      <h3 style={{ fontSize: 'var(--font-size-sm)', marginTop: 12 }}>Estándares ({estandares.length})</h3>
+      <p className="guia-tecnica">
+        {estandares.length > 0 ? estandares.map((r) => <span key={r.object.slug} className="mono" style={{ marginRight: 6 }}>{r.object.slug}</span>) : 'Sin estándares curados.'}
+      </p>
+
+      <p style={{ marginTop: 12 }}>
+        <Link to="/glosario" className="guia-tecnica">Glosario técnico →</Link>
+      </p>
+    </aside>
   )
 }
 
@@ -210,13 +260,19 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
       return soportes.length === 0 ? (
         <Empty message="Sin protocolos curados (se alimenta de la arista supports-protocol)." />
       ) : (
-        <ul>
-          {soportes.map((r) => (
-            <li key={r.object.slug}>
-              <Link to={`/protocolo/${r.object.slug}`} className="mono">{r.object.slug}</Link>
-            </li>
-          ))}
-        </ul>
+        <div className="stack">
+          <ul>
+            {soportes.map((r) => (
+              <li key={r.object.slug}>
+                <Link to={`/protocolo/${r.object.slug}`} className="mono">{r.object.slug}</Link>
+              </li>
+            ))}
+          </ul>
+          <p className="guia-tecnica">
+            ¿Qué es un <Link to="/glosario/conmutador">conmutador</Link> o una{' '}
+            <Link to="/glosario/vlan">VLAN</Link>? Ver el <Link to="/glosario">glosario técnico</Link>.
+          </p>
+        </div>
       )
 
     case 'capacidades':

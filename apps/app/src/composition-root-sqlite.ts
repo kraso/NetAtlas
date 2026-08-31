@@ -8,11 +8,11 @@ import {
 import { Fts5SearchIndex } from '@netatlas/search'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import type { AppServices, UiDeviceRepo, UiCatalogRepo, UiSearchRepo, UiGraphRepo, UiSourcingRepo } from './composition-root.js'
+import type { AppServices, UiSearchRepo } from './composition-root.js'
 import type { InMemoryDataset } from './adapters/in-memory.js'
 
 /**
- * Composition root de la UI — MODO SQLITE REAL (Fase C).
+ * Composition root de la UI — MODO SQLITE REAL.
  *
  * Construye los mismos puertos que las vistas consumen (AppServices) pero con
  * los repositorios reales de packages/data + FTS5 de packages/search, sobre el
@@ -20,46 +20,52 @@ import type { InMemoryDataset } from './adapters/in-memory.js'
  *
  * Navegador: esta composición usa node:sqlite (Node: desktop/tests/CI).
  * En la PWA estática el rol lo juega wa-sqlite con EL MISMO contrato de
- * puertos (F1-late); vistas y viewmodels no cambian.
+ * puertos; vistas y viewmodels no cambian.
  */
 
 const DB_PATH = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', 'datasets', 'netatlas-seed.sqlite')
 
-/** Vista del dataset real para componentes que muestran estadísticas. */
-function snapshotAccess(driver: NodeSqliteDriver): InMemoryDataset {
-  const count = (t: string): number =>
-    Number(driver.prepare(`SELECT COUNT(*) AS c FROM ${t}`).get()?.c ?? 0)
-  return {
-    devices: [],
-    manufacturers: [],
-    categories: [],
-    relationships: [],
-    assertions: [],
-    sources: [],
-    // getters dinámicos para los pocos usos de lectura
-  } as unknown as InMemoryDataset & {
-    readonly deviceCount: number
+/** Contrato de búsqueda SQLite + autocompletado agrupado (NET-HW-014). */
+class SqliteUiSearch extends Fts5SearchIndex implements UiSearchRepo {
+  constructor(
+    driver: NodeSqliteDriver,
+    private readonly catalog: SqliteCatalogRepository,
+  ) {
+    super(driver)
+  }
+
+  async suggestGrouped(prefix: string, limitPerGroup: number): Promise<Readonly<Record<string, readonly { slug: string; label: string }[]>>> {
+    const [protocols, standards, media] = await Promise.all([
+      this.catalog.listProtocols(),
+      this.catalog.listStandards(),
+      this.catalog.listMedia(),
+    ])
+    const p = prefix.toLowerCase()
+    const match = (s: string): boolean => s.toLowerCase().includes(p)
+    const slice = <T,>(list: readonly { slug: string; label: string }[]): readonly { slug: string; label: string }[] =>
+      list.filter((i) => match(i.slug) || match(i.label)).slice(0, limitPerGroup)
+
+    const devices = await this.suggest(prefix, limitPerGroup)
+    return {
+      'Dispositivos': devices.map((d) => ({ slug: d.slug, label: d.label })),
+      'Protocolos': slice(protocols.map((pr) => ({ slug: pr.code, label: pr.name }))),
+      'Estándares': slice(standards.map((s) => ({ slug: `${s.org}/${s.identifier}`, label: s.title }))),
+      'Medios': slice(media.map((m) => ({ slug: m.code, label: m.name }))),
+    }
   }
 }
 
 export function buildSqliteServices(dbPath = DB_PATH): AppServices {
   const driver = new NodeSqliteDriver(dbPath)
-
-  const devices: UiDeviceRepo = new SqliteDeviceRepository(driver)
-  const catalog: UiCatalogRepo = new SqliteCatalogRepository(driver)
-  const graph: UiGraphRepo = new SqliteGraphRepository(driver)
-  const sourcing: UiSourcingRepo = new SqliteSourcingRepository(driver)
-  const search: UiSearchRepo = new Fts5SearchIndex(driver)
-
-  const snapshot = snapshotAccess(driver)
-  void snapshot
+  const catalog = new SqliteCatalogRepository(driver)
+  const search = new SqliteUiSearch(driver, catalog)
 
   return {
-    devices,
+    devices: new SqliteDeviceRepository(driver),
     catalog,
     search,
-    graph,
-    sourcing,
+    graph: new SqliteGraphRepository(driver),
+    sourcing: new SqliteSourcingRepository(driver),
     dataset: {
       devices: [],
       manufacturers: [],
@@ -67,7 +73,7 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
       relationships: [],
       assertions: [],
       sources: [],
-    },
+    } as unknown as InMemoryDataset,
   }
 }
 

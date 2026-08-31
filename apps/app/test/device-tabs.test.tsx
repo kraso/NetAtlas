@@ -42,10 +42,10 @@ describe('Ficha de dispositivo — 13 pestañas (§10.5)', () => {
   it('Protocolos: muestra los soportes del grafo (por edoción)', async () => {
     renderApp('/device/cisco-c9300-48p')
     fireEvent.click(await screen.findByRole('tab', { name: 'Protocolos' }))
-    // El demo declara ospf, bgp y vxlan para el 9300
-    expect(await screen.findByRole('link', { name: 'ospf' })).toBeDefined()
-    expect(screen.getByRole('link', { name: 'bgp' })).toBeDefined()
-    expect(screen.getByRole('link', { name: 'vxlan' })).toBeDefined()
+    // El demo declara ospf, bgp y vxlan para el 9300 (aparecen en pestaña y panel contextual)
+    expect((await screen.findAllByRole('link', { name: 'ospf' })).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByRole('link', { name: 'bgp' }).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByRole('link', { name: 'vxlan' }).length).toBeGreaterThanOrEqual(1)
   })
 
   it('Historia: muestra la relación de sucesión', async () => {

@@ -1,18 +1,18 @@
 import React from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { CategoryIcon } from '@netatlas/ui'
 import { useCatalogStore, rootCategories } from '../viewmodels/catalog-store.js'
 import { useSearchStore } from '../viewmodels/search-store.js'
 import { useServices } from '../composition-root.js'
+import { SearchBox } from './search-box.js'
 
 /**
- * Dashboard (§10.3): barra de búsqueda dominante + accesos por macrocategoría.
- * Panel de estadísticas del dataset (número de dispositivos y categorías).
+ * Dashboard (§10.3): caja de búsqueda dominante con autocompletado
+ * agrupado (NET-HW-014) + accesos por macrocategoría + estadísticas.
  */
 export function Dashboard(): React.JSX.Element {
-  const navigate = useNavigate()
   const categories = useCatalogStore((s) => s.categories)
-  const { query, setQuery, dslPreview } = useSearchStore()
+  const { dslPreview } = useSearchStore()
   const [deviceCount, setDeviceCount] = React.useState(0)
 
   React.useEffect(() => {
@@ -22,14 +22,6 @@ export function Dashboard(): React.JSX.Element {
     })()
   }, [])
 
-  const submit = (e: React.FormEvent): void => {
-    e.preventDefault()
-    const trimmed = query.trim()
-    // El DSL y el texto libre van al mismo campo; la ficha se abre si hay hit exacto.
-    if (trimmed.length === 0) return
-    navigate(`/explore?q=${encodeURIComponent(trimmed)}`)
-  }
-
   const raices = rootCategories(categories)
 
   return (
@@ -38,28 +30,12 @@ export function Dashboard(): React.JSX.Element {
         NetAtlas — Dashboard
       </h1>
 
-      <form role="search" onSubmit={submit} aria-label="Buscar hardware de redes">
-        <label htmlFor="busqueda" className="sr-only">
-          Buscar dispositivos, protocolos o estándares
-        </label>
-        <input
-          id="busqueda"
-          className="search-input"
-          type="search"
-          placeholder="Ej. +protocolo:bgp +protocolo:ospf · switch 48 puertos · cat:sw"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          data-testid="busqueda-dashboard"
-        />
-        <button type="submit" style={{ marginTop: 8 }}>
-          Buscar
-        </button>
-        {dslPreview.length > 0 ? (
-          <p className="mono guia-tecnica" role="status">
-            Consulta detectada: {dslPreview.join(' ')}
-          </p>
-        ) : null}
-      </form>
+      <SearchBox />
+      {dslPreview.length > 0 ? (
+        <p className="mono guia-tecnica" role="status">
+          Consulta detectada: {dslPreview.join(' ')}
+        </p>
+      ) : null}
 
       <h2>Explorar por categoría</h2>
       <div className="grid-categorias">

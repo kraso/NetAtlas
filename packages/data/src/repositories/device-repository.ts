@@ -294,6 +294,43 @@ export class SqliteCatalogRepository implements CatalogRepository {
     )
     return categories
   }
+
+  // ── Catálogos cerrados para exploradores (NET-HW-023) ─────────────────────
+
+  async listProtocols(): Promise<readonly { code: string; name: string; family: string; osiLayer: number }[]> {
+    const rows = this.db
+      .prepare('SELECT code, name, family, osi_layer FROM protocol ORDER BY family, code')
+      .all() as SqlRow[]
+    return rows.map((r) => ({
+      code: String(r.code),
+      name: String(r.name),
+      family: String(r.family),
+      osiLayer: Number(r.osi_layer),
+    }))
+  }
+
+  async listStandards(): Promise<readonly { org: string; identifier: string; title: string }[]> {
+    const rows = this.db
+      .prepare('SELECT org, identifier, title FROM standard ORDER BY org, identifier')
+      .all() as SqlRow[]
+    return rows.map((r) => ({
+      org: String(r.org),
+      identifier: String(r.identifier),
+      title: String(r.title),
+    }))
+  }
+
+  async listMedia(): Promise<readonly { code: string; kind: string; name: string; maxSpeedMbps?: number }[]> {
+    const rows = this.db
+      .prepare('SELECT code, kind, name, max_speed_mbps FROM medium ORDER BY kind, code')
+      .all() as SqlRow[]
+    return rows.map((r) => ({
+      code: String(r.code),
+      kind: String(r.kind),
+      name: String(r.name),
+      maxSpeedMbps: r.max_speed_mbps !== null ? Number(r.max_speed_mbps) : undefined,
+    }))
+  }
 }
 
 // Re-export para consumidores que quieran construir slugs directamente

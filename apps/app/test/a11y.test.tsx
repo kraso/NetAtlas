@@ -29,7 +29,7 @@ describe('A11y AA base (NET-HW-026)', () => {
     renderApp('/')
     const input = await screen.findByTestId('busqueda-dashboard')
     // El label sr-only referencia el input por htmlFor
-    const label = screen.getByLabelText('Buscar dispositivos, protocolos o estándares')
+    const label = screen.getByLabelText('Buscar dispositivos, protocolos, estándares, medios o fabricantes')
     expect(label).toBe(input)
     expect(input.id).toBe('busqueda')
   })
@@ -43,8 +43,8 @@ describe('A11y AA base (NET-HW-026)', () => {
     fireEvent.click(tabInterfaces)
     const panel = screen.getByRole('tabpanel', { name: 'Interfaces' })
     expect(panel).toBeDefined()
-    // La tabla de interfaces usa encabezados con scope
-    const th = screen.getAllByRole('columnheader')
+    // La tabla de interfaces usa encabezados con scope (espera la carga async)
+    const th = await screen.findAllByRole('columnheader')
     expect(th.length).toBeGreaterThanOrEqual(4)
   })
 

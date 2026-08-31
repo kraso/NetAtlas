@@ -46,6 +46,9 @@ export interface InMemoryDataset {
   readonly relationships: readonly Relationship[]
   readonly assertions: readonly Assertion[]
   readonly sources: readonly Source[]
+  readonly protocols?: readonly { code: string; name: string; family: string; osiLayer: number }[]
+  readonly standards?: readonly { org: string; identifier: string; title: string }[]
+  readonly media?: readonly { code: string; kind: string; name: string; maxSpeedMbps?: number }[]
 }
 
 export class InMemoryDeviceRepository implements DeviceRepository {
@@ -110,6 +113,18 @@ export class InMemoryCatalogRepository implements CatalogRepository {
   async listCategories(): Promise<readonly Category[]> {
     return this.data.categories
   }
+
+  async listProtocols(): Promise<readonly { code: string; name: string; family: string; osiLayer: number }[]> {
+    return this.data.protocols ?? []
+  }
+
+  async listStandards(): Promise<readonly { org: string; identifier: string; title: string }[]> {
+    return this.data.standards ?? []
+  }
+
+  async listMedia(): Promise<readonly { code: string; kind: string; name: string; maxSpeedMbps?: number }[]> {
+    return this.data.media ?? []
+  }
 }
 
 /** Índice de búsqueda en memoria: texto libre + filtros por campo básicos. */
@@ -150,6 +165,21 @@ export class InMemorySearchIndex implements SearchIndex {
       .filter((d) => d.name.toLowerCase().includes(p) || d.slug.value.includes(p))
       .slice(0, limit)
       .map((d) => ({ entityType: 'device' as const, slug: d.slug.value, label: d.name }))
+  }
+
+  /** Autocompletado agrupado por tipo (dispositivos, categorías, protocolos, estándares, fabricantes). */
+  async suggestGrouped(prefix: string, limitPerGroup: number): Promise<Readonly<Record<string, readonly { slug: string; label: string }[]>>> {
+    const p = prefix.toLowerCase()
+    const match = (s: string): boolean => s.toLowerCase().includes(p)
+    const g = (items: readonly { slug: string; label: string }[]): readonly { slug: string; label: string }[] =>
+      items.filter((i) => match(i.slug) || match(i.label)).slice(0, limitPerGroup)
+    return {
+      'Dispositivos': g(this.data.devices.map((d) => ({ slug: d.slug.value, label: d.name }))),
+      'Categorías': g(this.data.categories.map((c) => ({ slug: c.code, label: c.nameEs }))),
+      'Protocolos': g((this.data.protocols ?? []).map((pr) => ({ slug: pr.code, label: pr.name }))),
+      'Estándares': g((this.data.standards ?? []).map((s) => ({ slug: `${s.org}/${s.identifier}`, label: s.title }))),
+      'Fabricantes': g(this.data.manufacturers.map((m) => ({ slug: m.slug.value, label: m.name }))),
+    }
   }
 
   async byMaxSpeed(_minSpeed: Speed, request: SearchRequest): Promise<SearchResponse> {
@@ -321,7 +351,26 @@ export function buildDemoDataset(): InMemoryDataset {
   // Enlaza assertions a los ids de subject del índice
   void assertId
 
-  return { devices, manufacturers, categories, relationships, assertions, sources }
+  // Catálogos cerrados mínimos para los exploradores (NET-HW-023)
+  const protocols = [
+    { code: 'ospf', name: 'OSPF', family: 'routing', osiLayer: 3 },
+    { code: 'bgp', name: 'BGP', family: 'routing', osiLayer: 3 },
+    { code: 'vxlan', name: 'VXLAN', family: 'overlay', osiLayer: 2 },
+    { code: 'mpls', name: 'MPLS', family: 'routing', osiLayer: 3 },
+    { code: 'ipsec', name: 'IPsec', family: 'security', osiLayer: 3 },
+    { code: '802.11ax', name: '802.11ax (Wi-Fi 6)', family: 'wifi', osiLayer: 1 },
+  ]
+  const standards = [
+    { org: 'ieee', identifier: '802.3at', title: 'Power over Ethernet Plus' },
+    { org: 'ieee', identifier: '802.3an', title: '10GBASE-T' },
+  ]
+  const media = [
+    { code: 'smf-os2', kind: 'fibra', name: 'Monomodo OS2', maxSpeedMbps: 400000 },
+    { code: 'utp-cat6a', kind: 'cobre', name: 'UTP Cat6A', maxSpeedMbps: 10000 },
+    { code: 'mmf-om3', kind: 'fibra', name: 'Multimodo OM3', maxSpeedMbps: 10000 },
+  ]
+
+  return { devices, manufacturers, categories, relationships, assertions, sources, protocols, standards, media }
 }
 
 // Re-export de utilidad para viewmodels

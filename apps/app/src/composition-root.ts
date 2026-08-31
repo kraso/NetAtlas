@@ -28,11 +28,17 @@ export interface UiCatalogRepo {
   listCategories(): Promise<readonly Category[]>
   manufacturerBySlug(slug: string): Promise<Manufacturer | undefined>
   categoryByCode(code: string): Promise<Category | undefined>
+  /** Catálogos cerrados para exploradores bidireccionales (NET-HW-023). */
+  listProtocols(): Promise<readonly { code: string; name: string; family: string; osiLayer: number }[]>
+  listStandards(): Promise<readonly { org: string; identifier: string; title: string }[]>
+  listMedia(): Promise<readonly { code: string; kind: string; name: string; maxSpeedMbps?: number }[]>
 }
 
 export interface UiSearchRepo {
   query(request: { rawQuery: string; limit: number; offset?: number; facetFilters?: Record<string, string[]> }): Promise<SearchResponse>
   suggest(prefix: string, limit: number): Promise<readonly SuggestResult[]>
+  /** Autocompletado agrupado por tipo (NET-HW-014). */
+  suggestGrouped(prefix: string, limitPerGroup: number): Promise<Readonly<Record<string, readonly { slug: string; label: string }[]>>>
 }
 
 export interface UiGraphRepo {

@@ -45,9 +45,9 @@ describe('UI sobre SQLite real (Fase C)', () => {
     renderApp('/device/aruba-2930f-48g-poeplus')
     expect(await screen.findByRole('heading', { name: 'Aruba 2930F 48G PoE+ 4SFP+' })).toBeDefined()
     fireEvent.click(screen.getByRole('tab', { name: 'Protocolos' }))
-    // El seed real declara ospf y vxlan para el 2930F
-    expect(await screen.findByRole('link', { name: 'ospf' })).toBeDefined()
-    expect(screen.getByRole('link', { name: 'vxlan' })).toBeDefined()
+    // El seed real declara ospf y vxlan para el 2930F (pestaña + panel contextual)
+    expect((await screen.findAllByRole('link', { name: 'ospf' })).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByRole('link', { name: 'vxlan' }).length).toBeGreaterThanOrEqual(1)
   })
 
   it('la pestaña Referencias muestra assertions con fuente real', async () => {

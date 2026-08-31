@@ -4,21 +4,27 @@ import { confidenceLabel } from '@netatlas/ui'
 import { useServices } from '../composition-root.js'
 
 /**
- * Ficha de protocolo (§10.7) — bidireccionalidad:
- * la pestaña Protocolos de un dispositivo enlaza aquí, y la ficha del
- * protocolo devuelve la lista de dispositivos que lo soportan
+ * Ficha de protocolo (§10.7, NET-HW-023) — bidireccional:
+ * detalle del protocolo (del catálogo cerrado) + dispositivos que lo soportan
  * (arista supports-protocol invertida).
  */
 export function ProtocolSheet(): React.JSX.Element {
   const { code = '' } = useParams<{ code: string }>()
+  const [detalle, setDetalle] = React.useState<{ name: string; family: string; osiLayer: number } | undefined>()
   const [dispositivos, setDispositivos] = React.useState<readonly { slug: string; name: string }[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
     void (async () => {
-      const { graph, devices } = useServices.getState().services
-      const edges = await graph.edgesOf({ type: 'protocol', slug: code })
-      const soportados = edges.filter((e) => e.predicate === 'supports-protocol')
+      const { graph, devices, catalog } = useServices.getState().services
+      const [protocolos, edges] = await Promise.all([
+        catalog.listProtocols(),
+        graph.edgesOf({ type: 'protocol', slug: code }),
+      ])
+      const detalle = protocolos.find((p) => p.code === code)
+      setDetalle(detalle ? { name: detalle.name, family: detalle.family, osiLayer: detalle.osiLayer } : undefined)
+
+      const soportados = edges.filter((e) => e.predicate === 'supports-protocol' && e.object.slug === code)
       const lista: { slug: string; name: string }[] = []
       for (const e of soportados) {
         const d = await devices.findBySlug(e.subject.slug)
@@ -32,7 +38,13 @@ export function ProtocolSheet(): React.JSX.Element {
   return (
     <section aria-labelledby="titulo-protocolo">
       <h1 id="titulo-protocolo" className="mono">{code.replace(/-/g, ' ')}</h1>
-      <p className="guia-tecnica">Protocolo · familia y detalle se curan en F2 (catálogo de protocolos §14).</p>
+      {detalle ? (
+        <p className="guia-tecnica">
+          {detalle.name} · familia {detalle.family} · capa OSI {detalle.osiLayer}
+        </p>
+      ) : (
+        <p className="guia-tecnica">Protocolo sin ficha de catálogo (§14 pendiente de curación).</p>
+      )}
 
       <h2>Dispositivos que lo soportan ({dispositivos.length})</h2>
       {loading ? <p role="status">Cargando…</p> : null}
@@ -51,8 +63,7 @@ export function ProtocolSheet(): React.JSX.Element {
       )}
 
       <p className="guia-tecnica" style={{ marginTop: 16 }}>
-        Insignia de confianza de cada soporte: <span className="mono">{confidenceLabel('third-party')}</span> en el dataset de demostración; con
-        assertions reales en el SQLite (Fase C).
+        Soporte con insignia de confianza de cada relación (en el SQLite real: assertions {confidenceLabel('third-party')} asistidas).
       </p>
     </section>
   )
