@@ -412,5 +412,52 @@
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
     ]
+  },
+  {
+    "slug": "cisco-ncs-5500",
+    "name": "Cisco NCS 5500 (edge/core router)",
+    "manufacturerSlug": "cisco",
+    "familySlug": "ncs-5500",
+    "categoryCode": "CAT-RTR-ENT",
+    "model": "NCS-5501",
+    "releasedOn": "2015-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Router de proveedor (edge/core) con 48 puertos 1G/10G y 6 QSFP28 — ejemplo de la escala de operador.",
+    "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 3 },
+    "ports": [
+      { "label": "48x 10GE SFP+", "interfaceCode": "sfp-plus", "quantity": 48, "speedsMbps": [10000], "role": "access" },
+      { "label": "6x 100GE QSFP28", "interfaceCode": "qsfp28", "quantity": 6, "speedsMbps": [100000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "routing_throughput_mbps", "value": 1000000, "sourceSlug": "cisco-isr4321-datasheet", "confidence": "third-party", "note": "Throughput agregado; pendiente datasheet oficial" },
+      { "predicate": "supports-protocol", "value": "bgp", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
+      { "predicate": "supports-protocol", "value": "mpls", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" },
+      { "predicate": "implements-standard", "objectType": "standard", "objectSlug": "ieee/802.3at" }
+    ]
+  },
+  {
+    "slug": "nvidia-connectx-6-dx",
+    "name": "NVIDIA ConnectX-6 Dx (SmartNIC 100G)",
+    "manufacturerSlug": "ubiquiti",
+    "familySlug": "connectx-6",
+    "categoryCode": "CAT-IFC",
+    "model": "MCX623106AN-CDAT",
+    "releasedOn": "2020-01-01",
+    "lifecycleStatus": "mature",
+    "summary": "Adaptador de red inteligente 100GbE PCIe Gen4 con offload acelerado y seguridad — puente CAT-IFC/CAT-DCN.",
+    "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 2 },
+    "ports": [
+      { "label": "2x 100GE QSFP56", "interfaceCode": "qsfp56", "quantity": 2, "speedsMbps": [100000], "role": "uplink" }
+    ],
+    "assertions": [
+      { "predicate": "max_speed_mbps", "value": 100000, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party", "note": "Dato de puerto mensual; pendiente fuente oficial" },
+      { "predicate": "supports-protocol", "value": "roce", "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" }
+    ],
+    "relationships": [
+      { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
+    ]
   }
 ]

@@ -15,7 +15,7 @@ describe('data:lint — dataset seed', () => {
 
   it('carga las 15 macrocategorías y 20 fichas piloto', () => {
     expect(seed.categories.length).toBeGreaterThanOrEqual(20)
-    expect(seed.devices.length).toBe(18)
+    expect(seed.devices.length).toBe(20)
     expect(seed.manufacturers.length).toBeGreaterThanOrEqual(10)
     expect(seed.sources.length).toBeGreaterThanOrEqual(5)
   })

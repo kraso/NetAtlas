@@ -3,6 +3,7 @@ import { loadSeed } from './lint.js'
 import { findPredicate } from '@netatlas/domain'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
+import { rmSync } from 'node:fs'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const MIGRATIONS_DIR = join(here, '..', '..', '..', 'packages', 'data', 'migrations')
@@ -19,6 +20,10 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
   schemaVersion: number
 } {
   const seed = loadSeed(seedDir)
+  // Rebuild limpio: elimina una BD previa (el artefacto es inmutable por release).
+  rmSync(outPath, { force: true })
+  rmSync(`${outPath}-wal`, { force: true })
+  rmSync(`${outPath}-shm`, { force: true })
   const driver = new NodeSqliteDriver(outPath)
   try {
     applyMigrations(driver, loadMigrations(MIGRATIONS_DIR))
@@ -172,6 +177,9 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
   const schemaRow = driver.prepare('SELECT MAX(version) AS v FROM schema_version').get()
   const schemaVersion = Number(schemaRow?.v ?? 0)
   driver.close()
+  // Cierra WAL dejando un archivo único portable (checkpoint + delete).
+  rmSync(`${outPath}-wal`, { force: true })
+  rmSync(`${outPath}-shm`, { force: true })
 
   return { deviceCount: seed.devices.length, relationshipCount, assertionCount, schemaVersion }
 }
