@@ -6,6 +6,7 @@ import { useServices } from '../composition-root.js'
 import type { UiDeviceAttributeValue } from '../composition-root.js'
 import { Breadcrumbs } from './breadcrumbs.js'
 import { FrontPanel } from './front-panel.js'
+import { MapaLocal } from './mapa-local.js'
 import type { Device } from '@netatlas/domain'
 import type { Assertion, Relationship } from '@netatlas/domain'
 
@@ -382,7 +383,7 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
       )
 
     case 'diagramas':
-      return <Empty message="Panel frontal generado e imágenes llegan en F4 (diagramas interactivos)." />
+      return <MapaLocal device={device} />
 
     case 'historia':
       return (

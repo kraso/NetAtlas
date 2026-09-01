@@ -14,6 +14,9 @@ import type {
   UiDeviceAttributeValue,
   UiFacetCount,
   UiAttributesRepo,
+  UiGraphNode,
+  UiGraphEdge,
+  UiGraphSubgraph,
 } from './adapters/in-memory.js'
 import type { Device, Category, Manufacturer, Assertion, Relationship, SearchResponse, SearchHit, SuggestResult } from '@netatlas/domain'
 import type { Page, DeviceQuery } from '@netatlas/domain'
@@ -50,11 +53,15 @@ export interface UiSearchRepo {
 
 export interface UiGraphRepo {
   edgesOf(node: { type: string; slug: string }): Promise<readonly Relationship[]>
+  /** Subgrafo local multi-salto para el mapa (NET-HW-030). */
+  vecindad(node: { type: string; slug: string }, maxDepth: number, predicates?: readonly string[]): Promise<UiGraphSubgraph>
+  /** Predicados incidentes a un nodo (filtros del mapa). */
+  predicadosDe(node: { type: string; slug: string }): Promise<readonly { code: string; count: number }[]>
 }
 
 // Tipos y contrato EAV (§9.4): re-exportados del adaptador in-memory para que
 // las vistas no dependan del motor de datos.
-export type { UiAttributeDefinition, UiDeviceAttributeValue, UiFacetCount, UiAttributesRepo }
+export type { UiAttributeDefinition, UiDeviceAttributeValue, UiFacetCount, UiAttributesRepo, UiGraphNode, UiGraphEdge, UiGraphSubgraph }
 
 export interface UiSourcingRepo {
   assertionsForDevice(slug: string): Promise<readonly Assertion[]>

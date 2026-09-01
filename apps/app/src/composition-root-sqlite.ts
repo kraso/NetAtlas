@@ -9,7 +9,9 @@ import {
 import { Fts5SearchIndex } from '@netatlas/search'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import type { AppServices, UiSearchRepo } from './composition-root.js'
+import { buildSubgraph } from './adapters/in-memory.js'
+import type { AppServices, UiSearchRepo, UiGraphRepo } from './composition-root.js'
+import type { GraphNode, Relationship } from '@netatlas/domain'
 import type { InMemoryDataset } from './adapters/in-memory.js'
 
 /**
@@ -65,7 +67,7 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
     devices: new SqliteDeviceRepository(driver),
     catalog,
     search,
-    graph: new SqliteGraphRepository(driver),
+    graph: new SqliteUiGraph(driver),
     sourcing: new SqliteSourcingRepository(driver),
     attributes: new SqliteAttributesRepository(driver),
     dataset: {
@@ -81,3 +83,18 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
 
 // Re-export del builder para tests que quieran el driver
 export { NodeSqliteDriver }
+
+/** Grafo UI sobre SQLite: vecindad multi-salto + predicados para el mapa (NET-HW-030). */
+class SqliteUiGraph extends SqliteGraphRepository implements UiGraphRepo {
+  async vecindad(node: GraphNode, maxDepth: number, predicates?: readonly string[]): Promise<ReturnType<typeof buildSubgraph>> {
+    const aristas = await this.neighbors({ node, maxDepth, predicates })
+    return buildSubgraph(aristas)
+  }
+
+  async predicadosDe(node: GraphNode): Promise<readonly { code: string; count: number }[]> {
+    const aristas: readonly Relationship[] = await this.edgesOf(node)
+    const counts = new Map<string, number>()
+    for (const r of aristas) counts.set(r.predicate, (counts.get(r.predicate) ?? 0) + 1)
+    return [...counts.entries()].map(([code, count]) => ({ code, count }))
+  }
+}

@@ -7,6 +7,10 @@ export default defineConfig({
     include: ['test/**/*.test.ts', 'test/**/*.test.tsx'],
     environment: 'jsdom',
     setupFiles: ['./test/setup.ts'],
+    // Pool singleton: jsdom + sqlite (node:sqlite) disparan OOM en workers paralelos.
+    pool: 'threads',
+    maxWorkers: 1,
+    minWorkers: 1,
     server: {
       deps: {
         external: [/^node:/],

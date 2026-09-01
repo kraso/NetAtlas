@@ -82,11 +82,58 @@ export interface UiFacetCount {
   readonly count: number
 }
 
+/** Nodo del subgrafo local para el mapa (NET-HW-030). */
+export interface UiGraphNode {
+  readonly id: string
+  readonly type: string
+  readonly label: string
+}
+
+/** Arista del subgrafo local (dirección subject → object normalizada). */
+export interface UiGraphEdge {
+  readonly id: string
+  readonly source: string
+  readonly target: string
+  readonly predicate: string
+}
+
+/** Subgrafo local de un nodo: nodos + aristas + predicados presentes. */
+export interface UiGraphSubgraph {
+  readonly nodes: readonly UiGraphNode[]
+  readonly edges: readonly UiGraphEdge[]
+  readonly predicates: readonly { code: string; count: number }[]
+}
+
 export interface UiAttributesRepo {
   attributeDefinitionsByCategory(code: string): Promise<readonly UiAttributeDefinition[]>
   attributeValuesForDevice(slug: string): Promise<readonly UiDeviceAttributeValue[]>
   facetCounts(categoryCode: string, key: string): Promise<readonly UiFacetCount[]>
   filterByFacetValues(categoryCode: string, facets: Readonly<Record<string, readonly string[]>>): Promise<readonly string[]>
+}
+
+/** Construye el subgrafo a partir de aristas normalizadas del dominio. */
+export function buildSubgraph(relationships: readonly Relationship[]): UiGraphSubgraph {
+  const nodes = new Map<string, UiGraphNode>()
+  const edges: UiGraphEdge[] = []
+  const predicados = new Map<string, number>()
+  for (const r of relationships) {
+    const sourceId = `${r.subject.type}:${r.subject.slug}`
+    const targetId = `${r.object.type}:${r.object.slug}`
+    if (!nodes.has(sourceId)) nodes.set(sourceId, { id: sourceId, type: r.subject.type, label: r.subject.slug })
+    if (!nodes.has(targetId)) nodes.set(targetId, { id: targetId, type: r.object.type, label: r.object.slug })
+    edges.push({
+      id: `${sourceId}|${r.predicate}|${targetId}`,
+      source: sourceId,
+      target: targetId,
+      predicate: r.predicate,
+    })
+    predicados.set(r.predicate, (predicados.get(r.predicate) ?? 0) + 1)
+  }
+  return {
+    nodes: [...nodes.values()],
+    edges,
+    predicates: [...predicados.entries()].map(([code, count]) => ({ code, count })),
+  }
 }
 
 export interface InMemoryAttributeDefinition extends UiAttributeDefinition {
@@ -257,6 +304,47 @@ export class InMemoryGraphRepository implements GraphRepository {
   async paths(_from: GraphNode, _to: GraphNode, _maxDepth: number): Promise<readonly Path[]> {
     return []
   }
+
+  /** Vecindad a profundidad N (BFS local; NET-HW-030). */
+  async vecindad(node: GraphNode, maxDepth: number, predicates?: readonly string[]): Promise<UiGraphSubgraph> {
+    const visitado = new Set<string>(`${node.type}:${node.slug}`)
+    const frontera: GraphNode[] = [node]
+    const acumulado: Relationship[] = []
+    for (let depth = 0; depth < maxDepth && frontera.length > 0; depth++) {
+      const actual = [...frontera]
+      frontera.length = 0
+      for (const nodo of actual) {
+        const aristas = await this.edgesOf(nodo)
+        for (const arista of aristas) {
+          if (predicates && !predicates.includes(arista.predicate)) continue
+          acumulado.push(arista)
+          const peer = arista.subject.type === nodo.type && arista.subject.slug === nodo.slug ? arista.object : arista.subject
+          const key = `${peer.type}:${peer.slug}`
+          if (visitado.has(key)) continue
+          visitado.add(key)
+          if (depth < maxDepth - 1) frontera.push(peer)
+        }
+      }
+    }
+    return buildSubgraph(dedupImpl(acumulado))
+  }
+
+  /** Predicados incidentes a un nodo (para los filtros del mapa). */
+  async predicadosDe(node: GraphNode): Promise<readonly { code: string; count: number }[]> {
+    const aristas = await this.edgesOf(node)
+    const counts = new Map<string, number>()
+    for (const r of aristas) counts.set(r.predicate, (counts.get(r.predicate) ?? 0) + 1)
+    return [...counts.entries()].map(([code, count]) => ({ code, count }))
+  }
+}
+
+function dedupImpl(rels: readonly Relationship[]): Relationship[] {
+  const unicos = new Map<string, Relationship>()
+  for (const r of rels) {
+    const k = `${r.subject.type}:${r.subject.slug}|${r.predicate}|${r.object.type}:${r.object.slug}`
+    if (!unicos.has(k)) unicos.set(k, r)
+  }
+  return [...unicos.values()]
 }
 
 export class InMemorySourcingRepository implements SourcingRepository {

@@ -65,8 +65,8 @@ describe('Ficha de dispositivo — 13 pestañas (§10.5)', () => {
 
   it('pestañas pendientes muestran empty-state curado (sin inventar)', async () => {
     renderApp('/device/cisco-c9300-48p')
-    fireEvent.click(await screen.findByRole('tab', { name: 'Diagramas' }))
-    expect(await screen.findByText(/pendiente|llegan en F4/i)).toBeDefined()
+    fireEvent.click(await screen.findByRole('tab', { name: 'Arquitectura' }))
+    expect(await screen.findByText(/pendiente/i)).toBeDefined()
   })
 })
 
