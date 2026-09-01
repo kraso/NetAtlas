@@ -15,12 +15,14 @@
     "dataset:build": "tsx src/build-cli.ts",
     "data:manifiesto": "tsx src/manifiesto-cli.ts",
     "data:delta": "tsx src/delta-cli.ts",
+    "data:ia": "tsx src/ia-cli.ts",
     "gen-assist": "tsx src/assisted-gen.ts"
   },
   "dependencies": {
     "@netatlas/data": "workspace:*",
     "@netatlas/domain": "workspace:*",
-    "@netatlas/import-cli": "workspace:*"
+    "@netatlas/import-cli": "workspace:*",
+    "@netatlas/search": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

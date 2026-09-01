@@ -113,6 +113,68 @@ export type { DeviceRepository, CatalogRepository, DeviceQuery, Page } from './p
 export type { GraphRepository, NeighborsQuery, Path } from './ports/graph-repository.js'
 export type { SourcingRepository } from './ports/sourcing-repository.js'
 
+// IA (sección 21 / F7)
+export {
+  HERRAMIENTAS,
+  herramientaPorNombre,
+  esLlamadaValida,
+  comprender,
+  normalizar,
+  detectarSlug,
+  extraerVelocidadMbps,
+  textoSinRuido,
+  contextoVacio,
+  citaDeHecho,
+  fraseDeHecho,
+  responderConContexto,
+  verificarAlucinaciones,
+  slugsCitados,
+  IndiceVectorialTFIDF,
+  tokenizar,
+  rankingHibrido,
+  extraerRoles,
+  parsearSpec,
+  validarSpecJSON,
+  generarTopologia,
+  capaDeRol,
+  ROLES_CONOCIDOS,
+  evaluarConjuntoOro,
+  hechosDeRespuesta,
+  cubreHechosEsperados,
+  umbralDepliegue,
+  crearClienteIA,
+  ejecutarPlan,
+  contextoDesdeResultados,
+} from './ia/index.js'
+export type {
+  AssistantPort,
+  PreguntaIA,
+  RespuestaIA,
+  CitaIA,
+  HerramientaIA,
+  LlamadaHerramienta,
+  ResultadoHerramienta,
+  ToolContext,
+  EscenarioIA,
+  PlanIA,
+  HechoIA,
+  ContextoRecuperado,
+  EntidadVectorizable,
+  VectorTFIDF,
+  HitLexico,
+  HitHibrido,
+  RolRequerido,
+  TopologiaSpec,
+  GeneradorContexto,
+  TopologiaGenerada,
+  HechoEsperado,
+  PreguntaOro,
+  OracleHechos,
+  HechoAfirmado,
+  EvalResultado,
+  ClienteIAOptions,
+} from './ia/index.js'
+
 // Calculadoras (sección 28 / NET-HW-028)
 export { POE_CLASSES, poeClassMaxW, calculePoeBudget, maxPoePorts } from './calculators/poe.js'
 export type { PoeClassInfo, PoeBudgetInput, PoeBudgetResult } from './calculators/poe.js'

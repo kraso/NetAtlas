@@ -12,6 +12,7 @@ import { Glossary, GlossaryTermSheet } from './ui/glossary.js'
 import { Comparar } from './ui/comparar.js'
 import { Topologias } from './ui/topologies.js'
 import { Calidad } from './ui/calidad.js'
+import { Asistente } from './ui/asistente.js'
 import { useCatalogStore } from './viewmodels/catalog-store.js'
 
 // Las vistas con Cytoscape se cargan bajo demanda (solo-diferencias de la
@@ -35,6 +36,7 @@ export function App(): React.JSX.Element {
           <NavLink to="/explore">Explorar</NavLink>
           <NavLink to="/catalogos">Catálogos</NavLink>
           <NavLink to="/topologies">Topologías</NavLink>
+          <NavLink to="/asistente">Asistente</NavLink>
           <NavLink to="/calidad">Calidad</NavLink>
           <span className="guia-tecnica">Enciclopedia técnica de hardware de redes</span>
         </nav>
@@ -55,6 +57,7 @@ export function App(): React.JSX.Element {
             <Route path="/comparar" element={<Comparar />} />
             <Route path="/topologies" element={<Topologias />} />
             <Route path="/calidad" element={<Calidad />} />
+            <Route path="/asistente" element={<Asistente />} />
             <Route path="/topology/:slug" element={<TopologySheet />} />
             <Route path="/mapa-global" element={<MapaGlobal />} />
           </Routes>

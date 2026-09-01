@@ -9,12 +9,15 @@ import {
   SqliteQualityRepository,
   SqliteReconciliationRepository,
   ManifestRepository,
+  SqliteToolContext,
 } from '@netatlas/data'
 import { Fts5SearchIndex } from '@netatlas/search'
+import { crearClienteIA } from '@netatlas/domain'
+import type { RespuestaIA } from '@netatlas/domain'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { buildSubgraph } from './adapters/in-memory.js'
-import type { AppServices, UiSearchRepo, UiGraphRepo, UiQualityRepo } from './composition-root.js'
+import type { AppServices, UiSearchRepo, UiGraphRepo, UiQualityRepo, UiAssistantRepo } from './composition-root.js'
 import type { UiReconciliationRow } from './adapters/in-memory.js'
 import type { GraphNode, Relationship } from '@netatlas/domain'
 import type { InMemoryDataset } from './adapters/in-memory.js'
@@ -67,6 +70,7 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
   const driver = new NodeSqliteDriver(dbPath)
   const catalog = new SqliteCatalogRepository(driver)
   const search = new SqliteUiSearch(driver, catalog)
+  const toolCtx = new SqliteToolContext(driver, search)
 
   return {
     devices: new SqliteDeviceRepository(driver),
@@ -77,6 +81,7 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
     attributes: new SqliteAttributesRepository(driver),
     topologies: new SqliteTopologyRepository(driver),
     quality: new SqliteUiQuality(driver, dbPath),
+    asistente: new SqliteUiAssistant(toolCtx),
     dataset: {
       devices: [],
       manufacturers: [],
@@ -90,6 +95,36 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
 
 // Re-export del builder para tests que quieran el driver
 export { NodeSqliteDriver }
+
+/** Asistente IA sobre SQLite real (F7 §21): cliente del dominio + flag. */
+class SqliteUiAssistant implements UiAssistantRepo {
+  private readonly port: { ask(p: { texto: string }): Promise<RespuestaIA> }
+
+  constructor(toolCtx: SqliteToolContext) {
+    this.port = crearClienteIA(toolCtx) as { ask(p: { texto: string }): Promise<RespuestaIA> }
+  }
+
+  async ask(texto: string): Promise<RespuestaIA> {
+    return this.port.ask({ texto })
+  }
+
+  enabled(): boolean {
+    try {
+      return localStorage.getItem('netatlas.ai.enabled') === 'on'
+    } catch {
+      return false
+    }
+  }
+
+  setEnabled(on: boolean): void {
+    try {
+      if (on) localStorage.setItem('netatlas.ai.enabled', 'on')
+      else localStorage.removeItem('netatlas.ai.enabled')
+    } catch {
+      // Sin almacenamiento: el flag no persiste pero no falla.
+    }
+  }
+}
 
 /** Calidad + cola de reconciliación sobre SQLite (+ manifiesto del dataset). */
 class SqliteUiQuality implements UiQualityRepo {

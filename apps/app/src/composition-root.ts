@@ -9,6 +9,7 @@ import {
   InMemoryTopologyRepository,
   InMemoryQualityRepository,
   buildDemoDataset,
+  UiAssistantRepoDemo,
 } from './adapters/in-memory.js'
 import type { InMemoryDataset } from './adapters/in-memory.js'
 import type {
@@ -22,7 +23,7 @@ import type {
   UiTopologyRepo,
   UiQualityRepo,
 } from './adapters/in-memory.js'
-import type { Device, Category, Manufacturer, Assertion, Relationship, SearchResponse, SearchHit, SuggestResult } from '@netatlas/domain'
+import type { Device, Category, Manufacturer, Assertion, Relationship, SearchResponse, SearchHit, SuggestResult, RespuestaIA } from '@netatlas/domain'
 import type { Page, DeviceQuery } from '@netatlas/domain'
 
 /**
@@ -79,6 +80,14 @@ export interface UiSourcingRepo {
   assertionsForDevice(slug: string): Promise<readonly Assertion[]>
 }
 
+/** Asistente IA (F7, §21): chat con citas obligatorias + flag ai.enabled. */
+export interface UiAssistantRepo {
+  ask(texto: string): Promise<RespuestaIA>
+  /** Flag `ai.enabled` (off por defecto, §21.4). Persistido en localStorage. */
+  enabled(): boolean
+  setEnabled(on: boolean): void
+}
+
 export interface AppServices {
   readonly devices: UiDeviceRepo
   readonly catalog: UiCatalogRepo
@@ -88,6 +97,7 @@ export interface AppServices {
   readonly attributes: UiAttributesRepo
   readonly topologies: UiTopologyRepo
   readonly quality: UiQualityRepo
+  readonly asistente: UiAssistantRepo
   readonly dataset: InMemoryDataset
 }
 
@@ -102,6 +112,7 @@ export function buildServices(dataset?: InMemoryDataset): AppServices {
     attributes: new InMemoryAttributesRepository(data),
     topologies: new InMemoryTopologyRepository(data),
     quality: new InMemoryQualityRepository(data),
+    asistente: new UiAssistantRepoDemo(data),
     dataset: data,
   }
 }

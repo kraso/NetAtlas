@@ -245,6 +245,9 @@ importers:
       '@netatlas/import-cli':
         specifier: workspace:*
         version: link:../import-cli
+      '@netatlas/search':
+        specifier: workspace:*
+        version: link:../../packages/search
     devDependencies:
       '@types/node':
         specifier: ^22.10.2

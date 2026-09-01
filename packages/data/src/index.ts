@@ -30,3 +30,6 @@ export type { RuntimeContext, CompositionOptions } from './composition-root.js'
 
 /** Versión de esquema del dataset que esta app soporta (sección 19.4). */
 export const DATASET_SCHEMA_VERSION = 2
+
+// Asistente IA (sección 21 / F7)
+export { SqliteToolContext, crearOracleSqlite, construirConjuntoOroDesdeDataset } from './ia/sqlite-assistant.js'

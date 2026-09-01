@@ -1,6 +1,6 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 6 (Estándares/protocolos/importación pro) — implementada**.
+> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 7 (IA) — implementada**.
 
 ## Fases
 
@@ -13,7 +13,7 @@
 | **F4** | Diagramas interactivos | Mapa global, visor de topologías, panel frontal generado, flujo de paquetes, exportación SVG/PNG | SLOs de diagramas (23.2) cumplidos | ✅ **cerrada** |
 | **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ✅ **cerrada** |
 | **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ✅ **cerrada** |
-| **F7** | IA | RAG + asistente + generación de topologías + eval | 0 alucinaciones de specs | ⏳ |
+| **F7** | IA | RAG + asistente + generación de topologías + eval | 0 alucinaciones de specs | ✅ **cerrada** |
 | **F8A/B** | Sincronización + web pública | Servidor PostgreSQL, API, auth | offline+sync; API consumible | ⏳ |
 
 ## Estado de la Fase 0 (✅ cerrada)
@@ -145,6 +145,21 @@
 - [x] **Criterio F6 — lote externo sin SQL a mano** (test de integración): YAML+XML mixtos importados por `ejecutarImportacion` sobre SQLite real → altas + fusión automática (score ≥0.98) + 2 conflictos en cola (0.825/0.817) con diff + 0 rechazos + BD y calidad verificadas sin tocar SQL
 - [x] **Mitigación de OOM del entorno**: pools singleton de Vitest (data/app/importers), heap `NODE_OPTIONS=--max-old-space-size=2048`, `--workspace-concurrency=1` y `workers=1` en Playwright (el diagnóstico confirmó que no hay huérfanos ni falta de RAM física: el límite está en la cuota del contenedor cuando se lanzan muchos procesos)
 
+## Estado de la Fase 7 (implementada — IA, criterio F7 aprobado)
+
+- [x] **NET-HW-059 AssistantPort + herramientas de function-calling**: puerto `AssistantPort` en el dominio (§21.4, adaptador local/mock/cloud futuro) + catálogo `HERRAMIENTAS` (`search_catalog`, `get_device`, `compare_devices`, `find_compatible`, `build_topology`, `what_layers`, `successors`) con esquemas JSON; el cliente orquesta comprensión→herramientas→respuesta citada (`ia/`) — la IA es un cliente más de la capa de aplicación (11 tests dominio)
+- [x] **NET-HW-060 RAG con citas obligatorias + conjunto de oro**: `responderConContexto` redacta SOLO desde el contexto recuperado; cada afirmación enlaza a entidad/fuente (assertion); guardarraíl de honestidad (`no-tengo-datos`); `construirConjuntoOroDesdeDataset` + `evaluarConjuntoOro` con oráculo SQLite que comprueba cada cita contra las tablas — **criterio F7: 0 alucinaciones y fidelidad de citas 100% ≥ 95% sobre el seed real (134 preguntas / 395 citas, deploy autorizado)**
+- [x] **NET-HW-061 Generación de topologías por lenguaje natural**: `extraerRoles`/`parsearSpec`/`validarSpecJSON` → `generarTopologia` resuelve roles a dispositivos reales por categoría, valida enlaces con interfaz común y persiste vía repositorio (8 tests)
+- [x] **NET-HW-016 Embeddings locales + ranking híbrido**: vector TF-IDF determinista sin dependencias pesadas (`IndiceVectorialTFIDF`, coseno) + `rankingHibrido` léxico+vectorial (6 tests); contrato `SearchIndex` opaco para sustituir por sqlite-vec+ONNX en el navegador sin tocar UI (ADR-06)
+- [x] **UI del asistente** (`/asistente`): chat con citas enlazadas a fichas, transparencia de herramientas ejecutadas (`<details>`), respuesta honesta sin datos, **feature flag `ai.enabled` OFF por defecto** (§21.4 — la app funciona 100% sin IA; panel "IA desactivada" con botón de activación). Adaptador in-memory (demo) + SQLite real (`SqliteToolContext`); reúso del índice FTS5 de la UI
+- [x] **CLI `data:ia`**: `pnpm data:ia "pregunta"` (respuesta con citas sobre el seed) y `pnpm data:ia --eval [--max=N]` (eval con umbral §21.3: despliegue solo si fidelidad ≥95% y 0 alucinaciones)
+- [x] **Verificación**: 131 tests de dominio + 82 de app (incl. eval F7 e integración UI) + **E2E 40/40** en chromium y firefox (asistente: flag off, chat con citas, honestidad, topología); `docs/ai.md` documenta arquitectura, guardarraíles y evaluación
+
+### Pendiente F7 (refinamiento)
+
+- [ ] embeddings ONNX/sqlite-vec en el navegador (la implementación TF-IDF local ya está detrás del mismo contrato `SearchIndex`)
+- [ ] proveedor LLM cloud opcional tras el flag (la etapa de comprensión es sustituible manteniendo el puerto)
+
 ## Esfuerzo orientativo (1–2 personas)
 
 F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6 6–8 · F7 8–10 · F8 10–14.
@@ -155,14 +170,15 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     9 paquetes verdes (tsc --noEmit estricto)
-tests:         26 suites con 260 verdes (domain 93 · data 37 · importers 15 · search 20 · ui 6 · app 74 · dataset-tools 11 · datagen 4)
+tests:         29 suites con 306 verdes (domain 131 · data 37 · importers 15 · search 20 · ui 6 · app 82 · dataset-tools 11 · datagen 4)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 268 kB (84 gzip) + cy-vendor 465 kB solo diagramas
+app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 130 kB (38 gzip) + react-vendor 165 kB + cy-vendor 465 kB solo diagramas
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 32/32 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6)
+E2E:           ✅ 40/40 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7)
+IA:            ✅ data:ia --eval → 134 preguntas · 395 citas · fidelidad 100% · 0 alucinaciones · deploy autorizado (criterio F7)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```
