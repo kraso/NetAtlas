@@ -5,6 +5,7 @@ import {
   SqliteGraphRepository,
   SqliteSourcingRepository,
   SqliteAttributesRepository,
+  SqliteTopologyRepository,
 } from '@netatlas/data'
 import { Fts5SearchIndex } from '@netatlas/search'
 import { fileURLToPath } from 'node:url'
@@ -70,6 +71,7 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
     graph: new SqliteUiGraph(driver),
     sourcing: new SqliteSourcingRepository(driver),
     attributes: new SqliteAttributesRepository(driver),
+    topologies: new SqliteTopologyRepository(driver),
     dataset: {
       devices: [],
       manufacturers: [],
@@ -84,8 +86,15 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
 // Re-export del builder para tests que quieran el driver
 export { NodeSqliteDriver }
 
-/** Grafo UI sobre SQLite: vecindad multi-salto + predicados para el mapa (NET-HW-030). */
+/** Grafo UI sobre SQLite: vecindad multi-salto + predicados + mapa global (NET-HW-030/036). */
 class SqliteUiGraph extends SqliteGraphRepository implements UiGraphRepo {
+  private readonly raw: NodeSqliteDriver
+
+  constructor(driver: NodeSqliteDriver) {
+    super(driver)
+    this.raw = driver
+  }
+
   async vecindad(node: GraphNode, maxDepth: number, predicates?: readonly string[]): Promise<ReturnType<typeof buildSubgraph>> {
     const aristas = await this.neighbors({ node, maxDepth, predicates })
     return buildSubgraph(aristas)
@@ -96,5 +105,39 @@ class SqliteUiGraph extends SqliteGraphRepository implements UiGraphRepo {
     const counts = new Map<string, number>()
     for (const r of aristas) counts.set(r.predicate, (counts.get(r.predicate) ?? 0) + 1)
     return [...counts.entries()].map(([code, count]) => ({ code, count }))
+  }
+
+  /** Mapa global agregado por categoría (NET-HW-036). */
+  async mapaGlobal(): Promise<ReturnType<typeof buildSubgraph>> {
+    const nodeRows = this.raw
+      .prepare(
+        `SELECT c.code AS code, c.name_es AS name, COUNT(DISTINCT d.id) AS n
+         FROM device d JOIN category c ON c.id = d.category_id
+         GROUP BY c.code, c.name_es`,
+      )
+      .all() as { code: string; name: string; n: number }[]
+    const nodes = nodeRows
+      .sort((a, b) => b.n - a.n)
+      .map((x) => ({ id: `category:${x.code}`, type: 'category', label: `${x.name} (${x.n})` }))
+
+    const edgeRows = this.raw
+      .prepare(
+        `SELECT a.code AS a, b.code AS b, COUNT(*) AS n
+         FROM relationship r
+         JOIN device x ON r.subject_type = 'device' AND r.subject_id = x.id
+         JOIN device y ON r.object_type = 'device' AND r.object_id = y.id
+         JOIN category a ON a.id = x.category_id
+         JOIN category b ON b.id = y.category_id
+         WHERE a.code <> b.code
+         GROUP BY a.code, b.code`,
+      )
+      .all() as { a: string; b: string; n: number }[]
+    const edges = edgeRows.map(({ a, b, n }) => ({
+      id: `category:${a}|category:${b}|n${n}`,
+      source: `category:${a}`,
+      target: `category:${b}`,
+      predicate: `${n} enlace${n > 1 ? 's' : ''} entre categorías`,
+    }))
+    return { nodes, edges, predicates: [] }
   }
 }

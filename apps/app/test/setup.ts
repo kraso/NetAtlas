@@ -15,15 +15,23 @@ afterEach(() => {
  */
 vi.mock('cytoscape', () => {
   return {
-    default: (opciones: Record<string, unknown>): Record<string, unknown> => {
-      cyMockState.calls.push([opciones])
-      return {
-        on: () => {},
-        destroy: () => {},
-        elements: () => ({}),
-        layout: () => ({ run: () => {} }),
-        style: () => ({}),
-      }
-    },
+    default: Object.assign(
+      (opciones: Record<string, unknown>): Record<string, unknown> => {
+        cyMockState.calls.push([opciones])
+        return {
+          on: (evento: string, selector: unknown, cb?: () => void) => {
+            cyMockState.handlers[evento] = typeof cb === 'function' ? cb : (selector as () => void)
+          },
+          destroy: () => {},
+          elements: () => ({ removeClass: () => {}, addClass: () => {} }),
+          getElementById: () => ({ addClass: () => {} }),
+          layout: () => ({ run: () => {} }),
+          style: () => ({}),
+          nodes: () => [],
+          use: () => {},
+        }
+      },
+      { use: () => {} },
+    ),
   }
 })

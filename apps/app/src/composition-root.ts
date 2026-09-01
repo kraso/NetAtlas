@@ -6,6 +6,7 @@ import {
   InMemoryGraphRepository,
   InMemorySourcingRepository,
   InMemoryAttributesRepository,
+  InMemoryTopologyRepository,
   buildDemoDataset,
 } from './adapters/in-memory.js'
 import type { InMemoryDataset } from './adapters/in-memory.js'
@@ -17,6 +18,7 @@ import type {
   UiGraphNode,
   UiGraphEdge,
   UiGraphSubgraph,
+  UiTopologyRepo,
 } from './adapters/in-memory.js'
 import type { Device, Category, Manufacturer, Assertion, Relationship, SearchResponse, SearchHit, SuggestResult } from '@netatlas/domain'
 import type { Page, DeviceQuery } from '@netatlas/domain'
@@ -57,11 +59,16 @@ export interface UiGraphRepo {
   vecindad(node: { type: string; slug: string }, maxDepth: number, predicates?: readonly string[]): Promise<UiGraphSubgraph>
   /** Predicados incidentes a un nodo (filtros del mapa). */
   predicadosDe(node: { type: string; slug: string }): Promise<readonly { code: string; count: number }[]>
+  /** Mapa global con agregación por categoría (NET-HW-036). */
+  mapaGlobal(): Promise<UiGraphSubgraph>
 }
+
+/** Contrato de topologías (F4 §13.3) — re-exportado del adaptador in-memory. */
+export type { Topology as UiTopology, TopologyNode as UiTopologyNode, TopologyEdge as UiTopologyEdge } from '@netatlas/domain'
 
 // Tipos y contrato EAV (§9.4): re-exportados del adaptador in-memory para que
 // las vistas no dependan del motor de datos.
-export type { UiAttributeDefinition, UiDeviceAttributeValue, UiFacetCount, UiAttributesRepo, UiGraphNode, UiGraphEdge, UiGraphSubgraph }
+export type { UiAttributeDefinition, UiDeviceAttributeValue, UiFacetCount, UiAttributesRepo, UiGraphNode, UiGraphEdge, UiGraphSubgraph, UiTopologyRepo }
 
 export interface UiSourcingRepo {
   assertionsForDevice(slug: string): Promise<readonly Assertion[]>
@@ -74,6 +81,7 @@ export interface AppServices {
   readonly graph: UiGraphRepo
   readonly sourcing: UiSourcingRepo
   readonly attributes: UiAttributesRepo
+  readonly topologies: UiTopologyRepo
   readonly dataset: InMemoryDataset
 }
 
@@ -86,6 +94,7 @@ export function buildServices(dataset?: InMemoryDataset): AppServices {
     graph: new InMemoryGraphRepository(data),
     sourcing: new InMemorySourcingRepository(data),
     attributes: new InMemoryAttributesRepository(data),
+    topologies: new InMemoryTopologyRepository(data),
     dataset: data,
   }
 }

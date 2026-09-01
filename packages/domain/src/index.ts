@@ -50,6 +50,24 @@ export type { ClaveDsl, DslTermino, ConsultaDsl } from './search/ast.js'
 export { parseDsl, textoLibre } from './search/parser.js'
 export type { ParseResult, ParseError } from './search/parser.js'
 
+// Topologías (sección 13 / F4)
+export {
+  TopologyNode,
+  TopologyEdge,
+  Topology,
+  validateLinkCompatibility,
+  TOPOLOGY_NODE_TYPES,
+} from './topologies/topology.js'
+export type {
+  TopologyKind,
+  TopologyProps,
+  TopologyNodeProps,
+  TopologyEdgeProps,
+  LinkCompatibilityInput,
+  LinkCompatibilityResult,
+} from './topologies/topology.js'
+export type { TopologyRepository, TopologyPosition } from './ports/topology-repository.js'
+
 // Puertos (sección 6.6)
 export type { DeviceRepository, CatalogRepository, DeviceQuery, Page } from './ports/device-repository.js'
 export type { GraphRepository, NeighborsQuery, Path } from './ports/graph-repository.js'

@@ -9,6 +9,7 @@ import {
   Relationship,
   Assertion,
   Source,
+  Topology,
 } from '@netatlas/domain'
 import type {
   DeviceRepository,
@@ -53,6 +54,8 @@ export interface InMemoryDataset {
   readonly attributeDefinitions?: readonly InMemoryAttributeDefinition[]
   /** EAV demo (F3): valores por dispositivo. */
   readonly deviceAttributeValues?: readonly InMemoryDeviceAttributeValue[]
+  /** Topologías demo (F4 §13.3). */
+  readonly topologies?: readonly Topology[]
 }
 
 /** Contrato de atributos (EAV §9.4) para las vistas — sin acoplar a @netatlas/data. */
@@ -144,6 +147,15 @@ export interface InMemoryDeviceAttributeValue {
   readonly deviceSlug: string
   readonly key: string
   readonly display: string
+}
+
+/** Contrato de topologías (F4 §13.3): visor + persistencia de layout + laboratorio. */
+export interface UiTopologyRepo {
+  list(): Promise<readonly Topology[]>
+  bySlug(slug: string): Promise<Topology | undefined>
+  upsert(topology: Topology): Promise<void>
+  saveLayout(slug: string, positions: ReadonlyArray<{ nodeId: string; x: number; y: number }>): Promise<void>
+  remove(slug: string): Promise<void>
 }
 
 export class InMemoryDeviceRepository implements DeviceRepository {
@@ -336,6 +348,43 @@ export class InMemoryGraphRepository implements GraphRepository {
     for (const r of aristas) counts.set(r.predicate, (counts.get(r.predicate) ?? 0) + 1)
     return [...counts.entries()].map(([code, count]) => ({ code, count }))
   }
+
+  /** Mapa global agregado por categoría (NET-HW-036): nodos = categorías con conteo. */
+  async mapaGlobal(): Promise<UiGraphSubgraph> {
+    const catName = new Map(this.data.categories.map((c) => [c.code, c.nameEs]))
+    const catDe = new Map(this.data.devices.map((d) => [d.slug.value, d.categoryCode]))
+    const conteoCat = new Map<string, number>()
+    for (const d of this.data.devices) conteoCat.set(d.categoryCode, (conteoCat.get(d.categoryCode) ?? 0) + 1)
+
+    const nodes = [...conteoCat.entries()]
+      .sort((a, b) => b[1] - a[1])
+      .map(([code, n]) => ({
+        id: `category:${code}`,
+        type: 'category' as const,
+        label: `${catName.get(code) ?? code} (${n})`,
+      }))
+
+    const entreCategorias = new Map<string, { a: string; b: string; n: number }>()
+    for (const r of this.data.relationships) {
+      if (r.subject.type !== 'device' || r.object.type !== 'device') continue
+      const a = catDe.get(r.subject.slug)
+      const b = catDe.get(r.object.slug)
+      if (!a || !b || a === b) continue
+      const [x, y] = a < b ? [a, b] : [b, a]
+      const key = `${x}|${y}`
+      const actual = entreCategorias.get(key) ?? { a: x, b: y, n: 0 }
+      actual.n++
+      entreCategorias.set(key, actual)
+    }
+    const edges = [...entreCategorias.values()].map(({ a, b, n }) => ({
+      id: `category:${a}|category:${b}|n${n}`,
+      source: `category:${a}`,
+      target: `category:${b}`,
+      predicate: `${n} enlace${n > 1 ? 's' : ''} entre categorías`,
+    }))
+
+    return { nodes, edges, predicates: [] }
+  }
 }
 
 function dedupImpl(rels: readonly Relationship[]): Relationship[] {
@@ -473,6 +522,125 @@ export class InMemoryAttributesRepository implements UiAttributesRepo {
       }
     }
     return out
+  }
+}
+
+// ── Topologías in-memory (F4 §13.3) ─────────────────────────────────────────
+// Las topologías de referencia viven en el dataset; el layout se persiste como
+// override por slug en localStorage (el visor abre igual tras recargar). Las
+// topologías de usuario (laboratorio, NET-HW-034) se guardan enteras.
+
+const K_TOPOLOGIAS_USUARIO = 'netatlas.topologies.user.v1'
+const layoutKey = (slug: string): string => `netatlas.layout.${slug}`
+
+function storageGet(key: string): string | null {
+  try {
+    return typeof localStorage !== 'undefined' ? localStorage.getItem(key) : null
+  } catch {
+    return null
+  }
+}
+
+function storageSet(key: string, value: string): void {
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.setItem(key, value)
+  } catch {
+    // Sin almacenamiento (SSR/tests sin jsdom): el layout se pierde, no falla.
+  }
+}
+
+function storageRemove(key: string): void {
+  try {
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(key)
+  } catch {
+    // idem
+  }
+}
+
+/** Reconstruye una Topology desde su representación JSON (la serialización de getters no es directa). */
+function topologyFromJson(j: Record<string, unknown>): Topology {
+  const nodes = (j.nodes as { entityType: string; entitySlug: string; x?: number; y?: number; layerHint?: number }[]).map((n) => ({
+    entityType: n.entityType as 'device' | 'category',
+    entitySlug: n.entitySlug,
+    x: n.x,
+    y: n.y,
+    layerHint: n.layerHint,
+  }))
+  const edges = (j.edges as { from: string; to: string; linkKind?: string; mediumCode?: string; label?: string }[]).map((e) => ({
+    from: e.from,
+    to: e.to,
+    linkKind: e.linkKind,
+    mediumCode: e.mediumCode,
+    label: e.label,
+  }))
+  return Topology.create({
+    slug: String((j.slug as { value: string }).value ?? j.slug),
+    name: String(j.name),
+    kind: String(j.kind) as 'reference' | 'user',
+    nodes,
+    edges,
+    metadata: (j.metadata ?? {}) as Record<string, unknown>,
+  })
+}
+
+export class InMemoryTopologyRepository implements UiTopologyRepo {
+  constructor(private readonly data: InMemoryDataset) {}
+
+  async list(): Promise<readonly Topology[]> {
+    const demo = (this.data.topologies ?? []).map((t) => this.conLayout(t))
+    const usuario = this.leerUsuarias().map((t) => this.conLayout(t))
+    return [...demo, ...usuario]
+  }
+
+  async bySlug(slug: string): Promise<Topology | undefined> {
+    const demo = (this.data.topologies ?? []).find((t) => t.slug.value === slug)
+    const usuario = this.leerUsuarias().find((t) => t.slug.value === slug)
+    const base = demo ?? usuario
+    return base ? this.conLayout(base) : undefined
+  }
+
+  async upsert(topology: Topology): Promise<void> {
+    if (topology.kind === 'user') {
+      const lista = this.leerUsuarias().filter((t) => t.slug.value !== topology.slug.value)
+      lista.push(topology)
+      storageSet(K_TOPOLOGIAS_USUARIO, JSON.stringify(lista))
+    }
+    // Las de referencia son de solo lectura; el layout se persiste por override.
+  }
+
+  async saveLayout(slug: string, positions: ReadonlyArray<{ nodeId: string; x: number; y: number }>): Promise<void> {
+    const mapa: Record<string, { x: number; y: number }> = {}
+    for (const p of positions) mapa[p.nodeId] = { x: p.x, y: p.y }
+    storageSet(layoutKey(slug), JSON.stringify(mapa))
+  }
+
+  async remove(slug: string): Promise<void> {
+    storageSet(K_TOPOLOGIAS_USUARIO, JSON.stringify(this.leerUsuarias().filter((t) => t.slug.value !== slug)))
+    storageRemove(layoutKey(slug))
+  }
+
+  private leerUsuarias(): Topology[] {
+    const raw = storageGet(K_TOPOLOGIAS_USUARIO)
+    if (!raw) return []
+    try {
+      const lista = JSON.parse(raw) as Record<string, unknown>[]
+      return lista.map(topologyFromJson).filter((t): t is Topology => t.kind === 'user')
+    } catch {
+      return []
+    }
+  }
+
+  private conLayout(t: Topology): Topology {
+    const raw = storageGet(layoutKey(t.slug.value))
+    if (!raw) return t
+    try {
+      const mapa = JSON.parse(raw) as Record<string, { x: number; y: number }>
+      return t.withLayout(
+        Object.entries(mapa).map(([nodeId, v]) => ({ nodeId, x: v.x, y: v.y })),
+      )
+    } catch {
+      return t
+    }
   }
 }
 
@@ -644,7 +812,72 @@ export function buildDemoDataset(): InMemoryDataset {
     valor('cisco-9120axi', 'wifi_max_rate_mbps', '2400'),
   ]
 
-  return { devices, manufacturers, categories, relationships, assertions, sources, protocols, standards, media, attributeDefinitions, deviceAttributeValues }
+  // ── Topologías demo (F4 §13.3) ──────────────────────────────────────────
+  const topologies: Topology[] = [
+    Topology.create({
+      slug: 'clos-demo',
+      name: 'Clos de demostración (L3)',
+      kind: 'reference',
+      nodes: [
+        { entityType: 'device', entitySlug: 'mikrotik-ccr1036', x: 0, y: 120, layerHint: 3 },
+        { entityType: 'device', entitySlug: 'cisco-c9300-48p', x: 100, y: 0, layerHint: 3 },
+        { entityType: 'device', entitySlug: 'aruba-6300m-48g', x: 260, y: 0, layerHint: 3 },
+        { entityType: 'device', entitySlug: 'fortinet-200f', x: 180, y: 120, layerHint: 4 },
+        { entityType: 'device', entitySlug: 'aruba-2930f-48g', x: 360, y: 120, layerHint: 2 },
+        { entityType: 'device', entitySlug: 'cisco-9120axi', x: 480, y: 120, layerHint: 1 },
+      ],
+      edges: [
+        { from: 'device:mikrotik-ccr1036', to: 'device:cisco-c9300-48p', label: '1G' },
+        { from: 'device:mikrotik-ccr1036', to: 'device:aruba-6300m-48g', label: '10G' },
+        { from: 'device:cisco-c9300-48p', to: 'device:aruba-6300m-48g', label: '40G spine' },
+        { from: 'device:cisco-c9300-48p', to: 'device:fortinet-200f', label: '10G' },
+        { from: 'device:aruba-6300m-48g', to: 'device:aruba-2930f-48g', label: '1G' },
+        { from: 'device:aruba-2930f-48g', to: 'device:cisco-9120axi', label: 'PoE+' },
+      ],
+    }),
+    Topology.create({
+      slug: 'sucursal-demo',
+      name: 'Sucursal de demostración',
+      kind: 'reference',
+      nodes: [
+        { entityType: 'device', entitySlug: 'mikrotik-ccr1036', x: 0, y: 0, layerHint: 3 },
+        { entityType: 'device', entitySlug: 'aruba-2930f-48g', x: 200, y: 0, layerHint: 2 },
+        { entityType: 'device', entitySlug: 'cisco-9120axi', x: 400, y: 0, layerHint: 1 },
+        { entityType: 'category', entitySlug: 'CAT-WLS', x: 400, y: 120, layerHint: 1 },
+      ],
+      edges: [
+        { from: 'device:mikrotik-ccr1036', to: 'device:aruba-2930f-48g', label: '1G' },
+        { from: 'device:aruba-2930f-48g', to: 'device:cisco-9120axi', label: 'PoE+' },
+        { from: 'device:cisco-9120axi', to: 'category:CAT-WLS', label: 'categoría' },
+      ],
+    }),
+  ]
+  // Topología de 300 nodos (solo para el SLO de diagramas §23.2 en E2E)
+  {
+    const nodos: { entityType: 'device'; entitySlug: string; x: number; y: number }[] = []
+    const edges: { from: string; to: string }[] = []
+    for (let i = 1; i <= 300; i++) {
+      nodos.push({
+        entityType: 'device',
+        entitySlug: `virt-${String(i).padStart(4, '0')}`,
+        x: ((i - 1) % 20) * 60,
+        y: Math.floor((i - 1) / 20) * 60,
+      })
+      if (i > 1) edges.push({ from: `device:virt-${String(i - 1).padStart(4, '0')}`, to: `device:virt-${String(i).padStart(4, '0')}` })
+    }
+    for (let i = 21; i <= 300; i += 25) edges.push({ from: 'device:virt-0001', to: `device:virt-${String(i).padStart(4, '0')}` })
+    topologies.push(
+      Topology.create({
+        slug: 'estres-300',
+        name: 'Estrés — 300 nodos (SLO de diagramas)',
+        kind: 'reference',
+        nodes: nodos,
+        edges,
+      }),
+    )
+  }
+
+  return { devices, manufacturers, categories, relationships, assertions, sources, protocols, standards, media, attributeDefinitions, deviceAttributeValues, topologies }
 }
 
 // Re-export de utilidad para viewmodels

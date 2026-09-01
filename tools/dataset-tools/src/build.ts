@@ -1,6 +1,7 @@
 import { NodeSqliteDriver, CatalogDao, loadMigrations, applyMigrations } from '@netatlas/data'
 import { loadSeed } from './lint.js'
 import { findPredicate } from '@netatlas/domain'
+import type { TopologyNodeProps, TopologyEdgeProps } from '@netatlas/domain'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -191,6 +192,9 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
   // categoría; 'stackable' se deriva de puertos de rol stack/resumen del seed.
   seedAttributes(dao, seed)
 
+  // ── Topologías de referencia (F4 / §13.3) ────────────────────────────────────
+  seedTopologies(dao, driver)
+
   const schemaRow = driver.prepare('SELECT MAX(version) AS v FROM schema_version').get()
   const schemaVersion = Number(schemaRow?.v ?? 0)
   const count = (t: string): number => Number(driver.prepare(`SELECT COUNT(*) AS c FROM ${t}`).get()?.c ?? 0)
@@ -221,6 +225,120 @@ function resolveObjectId(dao: CatalogDao, type: string, slug: string): number | 
       return dao.mediumId(slug, slug.startsWith('smf') || slug.startsWith('mmf') ? 'fibra' : 'inalambrico')
     default:
       return undefined
+  }
+}
+
+/**
+ * Topologías de referencia (NET-HW-033/034, §13.3): tres diagramas sembrados
+ * sobre dispositivos reales del seed (navegables). `demostracion-300` ejerce
+ * el SLO de diagramas (§23.2: ≤300 nodos layout+render <500 ms) en E2E.
+ */
+function seedTopologies(dao: CatalogDao, driver: NodeSqliteDriver): void {
+  const primerosDe = (categoryCode: string, limit: number, offset = 0): string[] => {
+    const rows = driver
+      .prepare(
+        `SELECT d.slug AS slug FROM device d
+         JOIN category c ON c.id = d.category_id
+         WHERE c.code = ? ORDER BY d.id LIMIT ? OFFSET ?`,
+      )
+      .all(categoryCode, limit, offset) as { slug: string }[]
+    return rows.map((r) => String(r.slug))
+  }
+
+  const nodo = (type: 'device' | 'category', slug: string, x: number, y: number, layerHint?: number): TopologyNodeProps => ({
+    entityType: type,
+    entitySlug: slug,
+    x,
+    y,
+    layerHint,
+  })
+
+  const crear = (def: { slug: string; name: string; kind: 'reference'; nodes: TopologyNodeProps[]; edges: TopologyEdgeProps[] }): void => {
+    if (def.nodes.length === 0) return
+    // Persistencia directa (síncrona) reutilizando la resolución de ids del DAO
+    const topologyId = Number(
+      driver.prepare('INSERT INTO topology (slug, name, kind, metadata) VALUES (?, ?, ?, \'{}\')').run(def.slug, def.name, def.kind).lastInsertRowid,
+    )
+    const nodeIdByOpenId = new Map<string, number>()
+    for (const n of def.nodes) {
+      const entityId = n.entityType === 'device' ? dao.deviceId(n.entitySlug) : dao.categoryId(n.entitySlug)
+      if (entityId === undefined) continue
+      const res = driver
+        .prepare(
+          'INSERT INTO topology_node (topology_id, entity_type, entity_id, x, y, layer_hint) VALUES (?, ?, ?, ?, ?, ?)',
+        )
+        .run(topologyId, n.entityType, entityId, n.x ?? null, n.y ?? null, n.layerHint ?? null)
+      nodeIdByOpenId.set(`${n.entityType}:${n.entitySlug}`, Number(res.lastInsertRowid))
+    }
+    for (const e of def.edges) {
+      const from = nodeIdByOpenId.get(e.from)
+      const to = nodeIdByOpenId.get(e.to)
+      if (from === undefined || to === undefined) continue
+      const mediumId = e.mediumCode !== undefined ? dao.mediumId(e.mediumCode, 'cobre') : null
+      driver
+        .prepare(
+          'INSERT INTO topology_edge (topology_id, from_node, to_node, link_kind, medium_id, label) VALUES (?, ?, ?, ?, ?, ?)',
+        )
+        .run(topologyId, from, to, e.linkKind ?? 'link', mediumId, e.label ?? null)
+    }
+  }
+
+  // 1) Clos de 3 etapas (centro de datos): 2 spines + 4 leaves sobre CAT-DCN
+  const spines = primerosDe('CAT-DCN', 2)
+  const leaves = primerosDe('CAT-DCN', 4, 2)
+  if (spines.length >= 2 && leaves.length >= 4) {
+    const nodes: TopologyNodeProps[] = [
+      nodo('category', 'CAT-DCN', 160, -80, 2),
+      ...spines.map((s, i) => nodo('device', s, i * 180, 0, 2)),
+      ...leaves.map((l, i) => nodo('device', l, i * 160, 180, 3)),
+    ]
+    const edges: TopologyEdgeProps[] = []
+    for (const sp of spines) for (const lf of leaves) edges.push({ from: `device:${sp}`, to: `device:${lf}`, label: '40G uplink' })
+    crear({ slug: 'clos-3-etapas', name: 'Centro de datos — Clos de 3 etapas', kind: 'reference', nodes, edges })
+  }
+
+  // 2) Sucursal típica: router → switch → AP
+  const rtr = primerosDe('CAT-RTR-ENT', 1)[0]
+  const sw = primerosDe('CAT-SWT-L2', 1)[0]
+  const ap = primerosDe('CAT-WLS-AP', 1)[0]
+  if (rtr && sw && ap) {
+    crear({
+      slug: 'sucursal-tipica',
+      name: 'Sucursal típica (router + switch + AP)',
+      kind: 'reference',
+      nodes: [
+        nodo('device', rtr, 0, 0, 3),
+        nodo('device', sw, 220, 0, 2),
+        nodo('device', ap, 440, 0, 1),
+        nodo('category', 'CAT-WLS-AP', 440, 120, 1),
+      ],
+      edges: [
+        { from: `device:${rtr}`, to: `device:${sw}`, label: '1G' },
+        { from: `device:${sw}`, to: `device:${ap}`, label: 'PoE+' },
+        { from: `device:${ap}`, to: 'category:CAT-WLS-AP', label: 'categoría' },
+      ],
+    })
+  }
+
+  // 3) Demostración de 300 nodos (SLO §23.2): primeros 300 dispositivos
+  const todos = primerosDe('CAT-IFC', 300) as string[]
+  if (todos.length > 0) {
+    // Si la categoría no alcanza, completar con cualquier dispositivo
+    if (todos.length < 300) {
+      const extra = driver.prepare('SELECT slug FROM device ORDER BY id').all() as { slug: string }[]
+      for (const e of extra) {
+        if (todos.length >= 300) break
+        if (!todos.includes(String(e.slug))) todos.push(String(e.slug))
+      }
+    }
+    const nodes: TopologyNodeProps[] = todos.slice(0, 300).map((s, i) =>
+      nodo('device', s, (i % 20) * 60, Math.floor(i / 20) * 60, 3),
+    )
+    const edges: TopologyEdgeProps[] = []
+    for (let i = 1; i < nodes.length; i++) edges.push({ from: `device:${nodes[i - 1]!.entitySlug}`, to: `device:${nodes[i]!.entitySlug}`, linkKind: 'link' })
+    // Algún entramado extra para que no sea una cadena pura
+    for (let i = 20; i < nodes.length; i += 25) edges.push({ from: `device:${nodes[0]!.entitySlug}`, to: `device:${nodes[i]!.entitySlug}`, linkKind: 'link' })
+    crear({ slug: 'demostracion-300', name: 'Demostración — 300 nodos (SLO de diagramas)', kind: 'reference', nodes, edges })
   }
 }
 
