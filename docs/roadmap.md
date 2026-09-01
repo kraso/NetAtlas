@@ -1,6 +1,6 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 8A (sincronización) — implementada**. Pendiente F8B (web pública + API).
+> Fuente normativa: PLAN MAESTRO §27. Estado: **todas las fases cerradas — F8B (web pública y API) implementada**. Plan maestro completo ✅
 
 ## Fases
 
@@ -15,7 +15,7 @@
 | **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ✅ **cerrada** |
 | **F7** | IA | RAG + asistente + generación de topologías + eval | 0 alucinaciones de specs | ✅ **cerrada** |
 | **F8A** | Sincronización | Servidor + adaptador PostgreSQL + réplica offline + contribuciones | App funciona offline y sincroniza al recuperar red | ✅ **cerrada** |
-| **F8B** | Web pública y API | Despliegue público, API REST documentada (OpenAPI), auth, perfiles | Terceros consumen la API con clave | ⏳ |
+| **F8B** | Web pública y API | Despliegue público, API REST documentada (OpenAPI), auth, perfiles | Terceros consumen la API con clave | ✅ **cerrada** |
 
 ## Estado de la Fase 0 (✅ cerrada)
 
@@ -174,6 +174,20 @@
 - [ ] E2E navegador de contribución → cola local → sync (requiere cablear la réplica en la UI PWA; el criterio ya se verifica a nivel de servicio)
 - [ ] CRDT/last-writer-wins por entidad con merge en el servidor (hoy LWW por revisión por id de contribución)
 
+## Estado de la Fase 8B (implementada — web pública y API, criterio F8B aprobado)
+
+- [x] **NET-HW-065 API pública documentada (OpenAPI) + claves**: `@netatlas/server` expone `/v1/*` protegida por **clave API `na_…`** (solo se almacena el hash SHA-256, nunca el secreto — §22.2); **OpenAPI 3.1** servida en `GET /openapi.json` (ficha, búsqueda, categorías, snapshot, favoritos, perfil); **rate limiting** por clave (ventana deslizante, `NETATLAS_RATE`) con `429` + `Retry-After`; **auditoría** de cada petición autenticada (clave/endpoint/estado)
+- [x] **NET-HW-064 Web pública + perfiles + favoritos sincronizados**: dominio puro `public/` (claves, `PerfilUsuario` con roles, `Favorito` con formato `tipo:slug` validado + límite de abuso); servidor con auto-creación de perfil `reader` en primer uso y endpoints `GET /v1/me`, `GET/POST/DELETE /v1/favorites`; **UI**: botón ★ en la ficha (localStorage, mismo contrato de datos que la API — sincronizable)
+- [x] **Criterio F8B — "terceros consumen la API con clave"** (test de integración con servidor HTTP real): emisión de clave → sin clave 401 en `/v1/me`; con clave: búsqueda + ficha + categorías 200; favoritos add/list/remove; entidad mal formada 400; **rate limit 429** tras superar el límite; la clave nunca está en claro (solo hash)
+- [x] CLI `pnpm --filter @netatlas/server server` — ahora sirve API pública `/v1` + `/openapi.json` (claves, rate limit) sobre el mismo volumen de sync interno
+- [x] **Verificación**: `docs/api.md` documenta auth/claves/rate limit/ejemplos; suite global con `server 28/28` (incl. 8 tests del criterio F8B) + favoritos UI (2 tests); roadmap con **todas las fases cerradas**
+
+### Pendiente F8B (refinamiento)
+
+- [ ] Despliegue real: HTTPS/proxy, CDN de activos, conjuntos de datos descargables firmados (§31.3)
+- [ ] Rate limit compartido multi-nodo (hoy in-memory por instancia)
+- [ ] OIDC para consumidores humanos + roles curator/reviewer distribuidos (el sync interno ya valida JWT RS256)
+
 ## Esfuerzo orientativo (1–2 personas)
 
 F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6 6–8 · F7 8–10 · F8 10–14.
@@ -184,16 +198,17 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     10 de 11 paquetes verdes (tsc --noEmit estricto; el workspace suma @netatlas/server)
-tests:         51 suites con 330 verdes (domain 135 · data 37 · importers 15 · search 20 · ui 6 · app 82 · dataset-tools 11 · datagen 4 · server 20)
+tests:         55 suites con 347 verdes (domain 138 · data 37 · importers 15 · search 20 · ui 6 · app 84 · dataset-tools 11 · datagen 4 · server 32)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 130 kB (38 gzip) + react-vendor 165 kB + cy-vendor 465 kB solo diagramas
+app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 131 kB (38 gzip) + react-vendor 165 kB + cy-vendor 465 kB solo diagramas
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
 E2E:           ✅ 40/40 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7)
 IA:            ✅ data:ia --eval → 134 preguntas · 395 citas · fidelidad 100% · 0 alucinaciones · deploy autorizado (criterio F7)
-F8A servidor:  ✅ API REST + auth OIDC (JWT RS256) + adaptadores SQLite/PostgreSQL + criterio offline+sync (20 tests)
+F8A servidor:  ✅ API REST + auth OIDC (JWT RS256) + adaptadores SQLite/PostgreSQL + criterio offline+sync
+F8B API púb.:  ✅ /v1 con clave na_… + OpenAPI 3.1 (/openapi.json) + rate limit 429 + auditoría + favoritos/perfil (criterio F8B)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```
