@@ -42,7 +42,8 @@ describe('Explorador (NET-HW-019)', () => {
     // Al menos un switch del dataset demo
     expect(await screen.findByText('Cisco Catalyst 9300-48P')).toBeDefined()
     const table = screen.getByRole('table')
-    expect(within(table).getAllByRole('columnheader').length).toBe(3)
+    // Columna de selección para el comparador (F5/CU-02) + Dispositivo/Categoría/Fabricante
+    expect(within(table).getAllByRole('columnheader').length).toBe(4)
   })
 
   it('muestra estado vacío sin consulta ni categoría', async () => {

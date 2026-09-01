@@ -1,6 +1,6 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 4 (Diagramas interactivos) — implementada**.
+> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 5 (Comparador de dispositivos) — implementada**.
 
 ## Fases
 
@@ -11,6 +11,7 @@
 | **F2** | Catálogo avanzado | Calculadoras, exploradores de catálogos, autocompletado, fabricantes, glosario, panel frontal, migas | 15 macrocategorías pobladas; cobertura fuentes ≥80% | ✅ **cerrada** |
 | **F3** | Relaciones y búsqueda avanzada | Grafo completo, facetas dinámicas, mapa local, genealogía básica | Navegación ≤2 clics verificada en E2E | ✅ **cerrada** |
 | **F4** | Diagramas interactivos | Mapa global, visor de topologías, panel frontal generado, flujo de paquetes, exportación SVG/PNG | SLOs de diagramas (23.2) cumplidos | ✅ **cerrada** |
+| **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ✅ **cerrada** |
 | **F4** | Diagramas interactivos | Mapa global, topologías, panel frontal, exportación | SLOs de diagramas | ⏳ |
 | **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ⏳ |
 | **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ⏳ |
@@ -119,6 +120,21 @@
 
 - [ ] virtualización >1.500 nodos (agregación por categoría) y modo Canvas >5.000 (ADR-03)
 - [ ] layouts en Web Worker y persistencia de «reordenar» como layout de usuario
+- [ ] **deuda técnica — bundle de Cytoscape**: el chunk principal supera el umbral de 500 kB de Vite (≈754 kB, 241 kB gzip) al incluir cytoscape + cytoscape-svg. Abordar después con: (a) `build.rollupOptions.output.manualChunks` separando `cytoscape`, `cytoscape-svg` y `@netatlas/ui` en chunks propios (winning: paralelismo y cache del SW), o (b) import dinámico de las vistas `/topology/:slug` y `/mapa-global` (carga Cytoscape solo al abrir un diagrama) reduciendo el primer pintado. Verificar SLO §23.2 tras el cambio y re-ejecutar E2E de topologías.
+
+## Estado de la Fase 5 (implementada — comparador, CU-02 aprobado)
+
+- [x] **Motor de comparación 100% puro** (`packages/domain/src/compare/motor.ts`): `compareDevices` → `ComparisonReport` con unificación de filas (comunes primero), normalización numérica por tipo de atributo, reglas `higher-better`/`lower-better`/`set-compare`/`none` con insignias ▲/▼ y explicación de limitación ("176 Gbps frente a 256 Gbps"), detección de diferencias (modo solo-diferencias), compatibilidades curadas (`compatible-with`), veredicto por plantilla determinista sin IA y aviso de comparación transversal (§18.4) con lista de atributos específicos (11 tests)
+- [x] **NET-HW-041 Reglas declarativas de (in)compatibilidad** en el dominio: sin interfaz común (velocidades), SMF vs MMF, PoE requerido > presupuesto; la UI las combina con la arista curada por par (4 tests)
+- [x] **NET-HW-040 UI del comparador N columnas** (`/comparar`): selección 2–N por querystring `ids=` (retrocompatible a/b) y **desde el explorador** (casillas + «Comparar seleccionados»), tabla por atributos con filas plegables, modo «Solo diferencias» con contador, resaltado ▲ mejor valor, panel de veredicto, aviso transversal, añadir/eliminar candidatos con buscador
+- [x] **NET-HW-042 Exportación CSV** (descargable real) **y PDF vía imprimir del navegador** (diálogo nativo, documentado; pendiente jsPDF si se quiere PDF descargable directo)
+- [x] **CU-02 aprobado en E2E** (chromium y firefox): explorador `cat:sw` → marca 3 switches → comparador → aviso transversal → veredicto con diferencias reales del seed (PoE 0 frente a 48; específicos: PoE/stacking/capacidad) → modo solo-diferencias oculta la fila idéntica → exporta CSV. Suite E2E completa **28/28**
+- [x] Demo ajustada: el 9300 de demostración sin PoE (8.2.5) para evidenciar diferencias reales en CU-02
+
+### Pendiente F5 (refinamiento)
+
+- [ ] PDF descargable directo (jsPDF/window.print con captura) si el flujo de impresión no basta
+- [ ] URL compartible del reporte con veredicto persistido en la querystring (ya compartible por ids)
 
 ## Esfuerzo orientativo (1–2 personas)
 
@@ -130,14 +146,14 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     9 paquetes verdes (tsc --noEmit estricto)
-tests:         20 suites con 208 verdes (domain 75 · data 32 · importers 11 · search 20 · ui 6 · app 65 · dataset-tools 9 · datagen 4)
+tests:         23 suites con 222 verdes (domain 86 · data 32 · importers 11 · search 20 · ui 6 · app 71 · dataset-tools 9 · datagen 4)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías (7+4+300 nodos)
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
 app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 24/24 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA + navegación ≤2 clics O3/F3 + topologías F4 + SLO diagramas §23.2 <500 ms)
+E2E:           ✅ 28/28 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA + ≤2 clics O3/F3 + topologías F4 + SLO diagramas §23.2 + comparador CU-02 F5)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```

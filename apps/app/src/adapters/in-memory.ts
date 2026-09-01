@@ -679,7 +679,22 @@ export function buildDemoDataset(): InMemoryDataset {
     })
 
   const devices = [
-    dev('cisco-c9300-48p', 'Cisco Catalyst 9300-48P', 'cisco', 'CAT-SWT-L3', [[1, 2, 3], [4, 5, 6, 7], 2]),
+    // El 9300 de demostración NO ofrece PoE en los puertos (8.2.5): permite que el
+    // comparador (CU-02/F5) muestre diferencias reales frente a 6300M/2930F.
+    Device.create({
+      slug: 'cisco-c9300-48p',
+      name: 'Cisco Catalyst 9300-48P',
+      manufacturerSlug: 'cisco',
+      categoryCode: 'CAT-SWT-L3',
+      lifecycleStatus: 'current',
+      osiProfile: OsiProfileValue.create({ terminate: [1, 2, 3], transparent: [4, 5, 6, 7], primary: 2 }),
+      summary: 'Dispositivo de demostración: Cisco Catalyst 9300-48P.',
+      releasedOn: '2020-01-01',
+      ports: [
+        Port.create({ label: '48x 10/100/1000', interfaceCode: 'rj45', quantity: 48, speedsMbps: [1000], role: 'access' }),
+        Port.create({ label: '4x SFP+', interfaceCode: 'sfp-plus', quantity: 4, speedsMbps: [10000], role: 'uplink' }),
+      ],
+    }),
     dev('aruba-6300m-48g', 'Aruba 6300M 48G', 'aruba', 'CAT-SWT-L3', [[1, 2, 3], [4, 5, 6, 7], 2]),
     dev('aruba-2930f-48g', 'Aruba 2930F 48G PoE+', 'aruba', 'CAT-SWT-L2', [[1, 2], [3, 4, 5, 6, 7], 2]),
     dev('mikrotik-ccr1036', 'MikroTik CCR1036-8G-2S+', 'mikrotik', 'CAT-RTR', [[1, 2, 3, 4], [5, 6, 7], 3]),

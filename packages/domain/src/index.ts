@@ -50,6 +50,23 @@ export type { ClaveDsl, DslTermino, ConsultaDsl } from './search/ast.js'
 export { parseDsl, textoLibre } from './search/parser.js'
 export type { ParseResult, ParseError } from './search/parser.js'
 
+// Comparador (sección 18 / F5)
+export { compareDevices, evaluateCompatibilidad } from './compare/motor.js'
+export type {
+  CompareValueType,
+  CompareRule,
+  CompareAttributeDef,
+  CompareDeviceValue,
+  CompareDeviceInput,
+  ComparisonValueCell,
+  ComparisonRow,
+  CompatibilityNote,
+  CompareDevicesInput,
+  DeclarativeCompatInput,
+  DeclarativeCompatResult,
+  ComparisonReport,
+} from './compare/motor.js'
+
 // Topologías (sección 13 / F4)
 export {
   TopologyNode,

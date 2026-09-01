@@ -70,6 +70,8 @@ describe('Similares y comparar desde aquí (NET-HW-032)', () => {
 
   it('el comparador sin contendientes muestra el mensaje de ayuda', async () => {
     renderApp('/comparar')
-    expect(await screen.findByText(/el comparador necesita dos dispositivos/i)).toBeDefined()
+    // El mensaje incluye un enlace interno, así que el texto está fragmentado
+    const ayuda = await screen.findByText((_content, el) => el?.tagName === 'P' && (el.textContent ?? '').includes('al menos dos dispositivos'))
+    expect(ayuda).toBeDefined()
   })
 })

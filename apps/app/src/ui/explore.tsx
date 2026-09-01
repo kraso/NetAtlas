@@ -1,5 +1,5 @@
 import React from 'react'
-import { useSearchParams, Link } from 'react-router-dom'
+import { useSearchParams, Link, useNavigate } from 'react-router-dom'
 import { CategoryIcon } from '@netatlas/ui'
 import { useCatalogStore, rootCategories, childrenOf } from '../viewmodels/catalog-store.js'
 import { useSearchStore } from '../viewmodels/search-store.js'
@@ -24,6 +24,7 @@ interface FacetaUI {
 
 export function Explore(): React.JSX.Element {
   const [params, setParams] = useSearchParams()
+  const navegar = useNavigate()
   const categories = useCatalogStore((s) => s.categories)
   const selectedCat = params.get('cat')
   const query = params.get('q') ?? ''
@@ -33,6 +34,8 @@ export function Explore(): React.JSX.Element {
   // F3 — facetas dinámicas EAV
   const [facetas, setFacetas] = React.useState<readonly FacetaUI[]>([])
   const [seleccion, setSeleccion] = React.useState<Record<string, readonly string[]>>({})
+  // F5 — selección múltiple hacia el comparador (CU-02)
+  const [marcados, setMarcados] = React.useState<ReadonlySet<string>>(new Set())
 
   const raices = rootCategories(categories)
   const facetasActivas = Object.keys(seleccion).filter((k) => (seleccion[k]?.length ?? 0) > 0).length
@@ -109,6 +112,20 @@ export function Explore(): React.JSX.Element {
 
   const limpiarFacetas = (): void => setSeleccion({})
 
+  const toggleMarcar = (slug: string): void => {
+    setMarcados((prev) => {
+      const next = new Set(prev)
+      if (next.has(slug)) next.delete(slug)
+      else next.add(slug)
+      return next
+    })
+  }
+
+  const compararSeleccionados = (): void => {
+    const ids = [...marcados]
+    if (ids.length >= 2) navegar(`/comparar?ids=${ids.join(',')}`)
+  }
+
   const selectCat = (code: string): void => {
     const next = new URLSearchParams(params)
     next.set('cat', code)
@@ -175,6 +192,15 @@ export function Explore(): React.JSX.Element {
           {selectedCat ? <FacetasPanel facetas={facetas} seleccion={seleccion} onToggle={toggleValor} onLimpiar={limpiarFacetas} activas={facetasActivas} /> : null}
 
           <section aria-label="Resultados" style={{ marginTop: 16 }}>
+            {marcados.size >= 2 ? (
+              <button type="button" onClick={compararSeleccionados} style={{ marginBottom: 8 }} data-testid="comparar-seleccionados">
+                Comparar seleccionados ({marcados.size}) →
+              </button>
+            ) : (
+              <p className="guia-tecnica" style={{ margin: '4px 0 8px' }}>
+                Marca al menos dos dispositivos para compararlos (CU-02 / F5).
+              </p>
+            )}
             {loading ? <p role="status">Cargando…</p> : null}
             {visibles.length === 0 && !loading ? (
               <div className="empty-state">Sin resultados. Elige una categoría o escribe una consulta (desde el ciclo 28.1.6#1, el DSL resuelve las 7 canónicas).</div>
@@ -182,6 +208,9 @@ export function Explore(): React.JSX.Element {
               <table className="tabla-specs">
                 <thead>
                   <tr>
+                    <th scope="col">
+                      <span className="sr-only">Comparar</span>
+                    </th>
                     <th scope="col">Dispositivo</th>
                     <th scope="col">Categoría</th>
                     <th scope="col">Fabricante</th>
@@ -190,6 +219,14 @@ export function Explore(): React.JSX.Element {
                 <tbody>
                   {visibles.map((d) => (
                     <tr key={d.slug.value}>
+                      <td>
+                        <input
+                          type="checkbox"
+                          aria-label={`Comparar ${d.name}`}
+                          checked={marcados.has(d.slug.value)}
+                          onChange={() => toggleMarcar(d.slug.value)}
+                        />
+                      </td>
                       <td>
                         <Link to={`/device/${d.slug.value}`}>{d.name}</Link>
                       </td>
