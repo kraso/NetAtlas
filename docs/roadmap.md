@@ -1,6 +1,6 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 7 (IA) — implementada**.
+> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 8A (sincronización) — implementada**. Pendiente F8B (web pública + API).
 
 ## Fases
 
@@ -14,7 +14,8 @@
 | **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ✅ **cerrada** |
 | **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ✅ **cerrada** |
 | **F7** | IA | RAG + asistente + generación de topologías + eval | 0 alucinaciones de specs | ✅ **cerrada** |
-| **F8A/B** | Sincronización + web pública | Servidor PostgreSQL, API, auth | offline+sync; API consumible | ⏳ |
+| **F8A** | Sincronización | Servidor + adaptador PostgreSQL + réplica offline + contribuciones | App funciona offline y sincroniza al recuperar red | ✅ **cerrada** |
+| **F8B** | Web pública y API | Despliegue público, API REST documentada (OpenAPI), auth, perfiles | Terceros consumen la API con clave | ⏳ |
 
 ## Estado de la Fase 0 (✅ cerrada)
 
@@ -160,6 +161,19 @@
 - [ ] embeddings ONNX/sqlite-vec en el navegador (la implementación TF-IDF local ya está detrás del mismo contrato `SearchIndex`)
 - [ ] proveedor LLM cloud opcional tras el flag (la etapa de comprensión es sustituible manteniendo el puerto)
 
+## Estado de la Fase 8A (implementada — sincronización, criterio offline+sync aprobado)
+
+- [x] **NET-HW-062 Servidor + adaptador PostgreSQL + API REST + auth OIDC**: nuevo paquete `@netatlas/server` con API REST sobre `node:http` (sin dependencias): `GET /api/health`, `GET /api/device/:slug`, `GET /api/search`, `GET /api/categories`, `GET /api/snapshot?since=N`, `POST /api/contributions` (auth). **Auth OIDC real**: verificación JWT RS256 contra JWKS remoto con `node:crypto` (exp/iat/aud/iss, sin librerías) + Bearer estático para despliegues de un solo admin. **Adaptador PostgreSQL** (`PostgresServidorStore`) con el MISMO contrato `ServidorStore` que el SQLite (`SqliteServidorStore` sobre el runtime real) — §6.7: cambiar de motor no toca dominio ni vistas (prueba ácida verificada en test con driver doble; conexión real por `NETATLAS_PG`)
+- [x] **NET-HW-063 Réplica offline + outbox de contribuciones**: dominio puro `sincronizar()` (finalidad §23.4[3]) con `OutboxRepository` (cola local), `SyncServer`/`ReplicaRepository` (pull snapshot + push confirmado, LWW por versión) — sin red, pull y push fallan blandamente y **la cola permanece intacta**; adaptadores SQLite runtime-only (`netatlas_outbox`/`netatlas_replica`, FUERA del manifiesto §22.4) y transporte HTTP (`HttpSyncServer`)
+- [x] **Criterio F8A — "app funciona offline y sincroniza al recuperar red"** (test de integración con servidor HTTP real + seed de 330 dispositivos): offline ⇒ 2 contribuciones encoladas y 0 perdidas con red caída; al recuperar la red ⇒ pull del snapshot puebla la réplica (330 dispositivos) y push confirma 2/2 (cola vacía); sin token ⇒ 401 y la cola persiste. **Aprobado**
+- [x] CLI `pnpm --filter @netatlas/server server [--port]` (SQLite por defecto; `NETATLAS_PG` cambia a PostgreSQL; `NETATLAS_SERVER_TOKEN`/`NETATLAS_OIDC_*` para auth)
+- [x] **Verificación**: 4 tests dominio sync + 20 tests server (API HTTP real + auth OIDC + adaptador PG + criterio) — suite global **330 tests / 10 suites**; typecheck 10/11 paquetes
+
+### Pendiente F8A (refinamiento)
+
+- [ ] E2E navegador de contribución → cola local → sync (requiere cablear la réplica en la UI PWA; el criterio ya se verifica a nivel de servicio)
+- [ ] CRDT/last-writer-wins por entidad con merge en el servidor (hoy LWW por revisión por id de contribución)
+
 ## Esfuerzo orientativo (1–2 personas)
 
 F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6 6–8 · F7 8–10 · F8 10–14.
@@ -169,8 +183,8 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 ## Estado de la suite (2025)
 
 ```
-typecheck:     9 paquetes verdes (tsc --noEmit estricto)
-tests:         29 suites con 306 verdes (domain 131 · data 37 · importers 15 · search 20 · ui 6 · app 82 · dataset-tools 11 · datagen 4)
+typecheck:     10 de 11 paquetes verdes (tsc --noEmit estricto; el workspace suma @netatlas/server)
+tests:         51 suites con 330 verdes (domain 135 · data 37 · importers 15 · search 20 · ui 6 · app 82 · dataset-tools 11 · datagen 4 · server 20)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
@@ -179,6 +193,7 @@ app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: bas
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
 E2E:           ✅ 40/40 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7)
 IA:            ✅ data:ia --eval → 134 preguntas · 395 citas · fidelidad 100% · 0 alucinaciones · deploy autorizado (criterio F7)
+F8A servidor:  ✅ API REST + auth OIDC (JWT RS256) + adaptadores SQLite/PostgreSQL + criterio offline+sync (20 tests)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```
