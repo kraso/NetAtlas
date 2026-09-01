@@ -113,6 +113,25 @@ export type { DeviceRepository, CatalogRepository, DeviceQuery, Page } from './p
 export type { GraphRepository, NeighborsQuery, Path } from './ports/graph-repository.js'
 export type { SourcingRepository } from './ports/sourcing-repository.js'
 
+// API pública y perfiles (F8B, §31.3/31.5 / NET-HW-064/065)
+// (Las claves de API viven en @netatlas/server: usan node:crypto y el dominio
+// debe seguir siendo agnóstico de plataforma para la PWA.)
+export {
+  ROLES_PERFIL,
+  esRolPerfil,
+  crearPerfil,
+  esEntidadValida,
+  MAX_FAVORITOS,
+  crearFavorito,
+} from './public/index.js'
+export type {
+  RolPerfil,
+  PerfilUsuario,
+  Favorito,
+  CrearPerfilInput,
+  PerfilRepository,
+} from './public/index.js'
+
 // Sincronización (F8A, §23.4 / NET-HW-063)
 export { crearOutboxEntry, sincronizar } from './sync/index.js'
 export type {

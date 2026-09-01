@@ -12,3 +12,17 @@ export { PostgresServidorStore, traducirParametros } from './postgres-store.js'
 export type { PgDriver, PgConfig, PgConnector, PgRow } from './postgres-store.js'
 export type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, SqlExecutor } from './store.js'
 export { HttpSyncServer } from './sync-http.js'
+// API pública (F8B, NET-HW-064/065)
+export { SqlitePublicStore } from './public-store.js'
+export { crearApiPublica } from './api-publica.js'
+export type { ApiPublicaOptions } from './api-publica.js'
+export { documentoOpenApi, rutaAbierta } from './openapi.js'
+export { crearRateLimiter } from './rate-limiter.js'
+export type { RateLimiter } from './rate-limiter.js'
+export {
+  generarClaveApi,
+  hashClaveApi,
+  prefijoClave,
+  esFormatoClaveApi,
+  compararHashes,
+} from './api-keys.js'

@@ -18,6 +18,7 @@ import { NodeSqliteDriver, applyMigrations, loadMigrations } from '@netatlas/dat
 import { Fts5SearchIndex } from '@netatlas/search'
 import { SqliteServidorStore, SqliteExecutor, PostgresServidorStore } from './index.js'
 import type { ServidorStore, PgDriver } from './index.js'
+import { SqlitePublicStore, crearApiPublica } from './index.js'
 import { StaticBearerVerifier, OidcJwtVerifier } from './index.js'
 import type { AuthVerifier } from './index.js'
 import { crearServidor } from './index.js'
@@ -28,14 +29,23 @@ function arg(name: string): string | undefined {
   return a?.slice(`--${name}=`.length)
 }
 
-async function almacen(): Promise<{ store: ServidorStore; close: () => void }> {
+async function almacen(): Promise<{ store: ServidorStore; publicStore: SqlitePublicStore; close: () => void }> {
   const pgUrl = process.env.NETATLAS_PG
   if (pgUrl) {
     // Adaptador PostgreSQL (NET-HW-062): conexión real por env.
-    const { PgConnector } = await import('./index.js') as { PgConnector?: (c: { connectionString: string }) => PgDriver }
     const conector = pgConnectorReal()
     const pg = conector({ connectionString: pgUrl })
-    return { store: new PostgresServidorStore(pg), close: () => void pg.close() }
+    // Con PG, las claves/perfiles viven en una BD SQLite auxiliar por
+    // sencillez operativa (los datos de consumidores son ligeros y locales).
+    const auxDriver = new NodeSqliteDriver(':memory:')
+    return {
+      store: new PostgresServidorStore(pg),
+      publicStore: new SqlitePublicStore(auxDriver),
+      close: () => {
+        void pg.close()
+        auxDriver.close()
+      },
+    }
   }
 
   const dbPath = arg('db') ?? join(here, '..', '..', '..', 'datasets', 'netatlas-seed.sqlite')
@@ -50,7 +60,11 @@ async function almacen(): Promise<{ store: ServidorStore; close: () => void }> {
   }
   const search = new Fts5SearchIndex(driver)
   const store = new SqliteServidorStore(driver, new SqliteExecutor(driver), search)
-  return { store, close: () => driver.close() }
+  return {
+    store,
+    publicStore: new SqlitePublicStore(driver),
+    close: () => driver.close(),
+  }
 }
 
 /** Conector pg real (requiere el paquete `pg` instalado opcionalmente). */
@@ -106,16 +120,22 @@ function autenticacion(): AuthVerifier {
 }
 
 async function main(): Promise<void> {
-  const { store, close } = await almacen()
+  const { store, publicStore, close } = await almacen()
   const auth = autenticacion()
-  const middleware = crearServidor(store, auth, '0.1.0')
+  const base = crearServidor(store, auth, '0.2.0')
+  // API pública (F8B): /v1/* con clave `na_…`, rate limit y /openapi.json.
+  const limite = Number(arg('rate') ?? process.env.NETATLAS_RATE ?? '120')
+  const api = crearApiPublica({ store, publicStore, base, limitePorMinuto: limite })
   const port = Number(arg('port') ?? process.env.PORT ?? '8787')
 
   const server: Server = createServer((req, res) => {
-    void middleware(req, res)
+    void api(req, res)
   })
   server.listen(port, '127.0.0.1', () => {
-    console.log(`netatlas-server 0.1.0 escuchando en http://127.0.0.1:${port} (auth: ${process.env.NETATLAS_SERVER_TOKEN ? 'Bearer estático' : 'OIDC'})`)
+    console.log(`netatlas-server 0.2.0 escuchando en http://127.0.0.1:${port}`)
+    console.log(`  · API pública /v1 (claves na_…, límite ${limite}/min)`)
+    console.log(`  · OpenAPI 3.1 en http://127.0.0.1:${port}/openapi.json`)
+    console.log(`  · sync interno /api (auth: ${process.env.NETATLAS_SERVER_TOKEN ? 'Bearer estático' : 'OIDC'})`)
   })
   process.on('SIGINT', () => {
     server.close(() => {

@@ -2,6 +2,7 @@ import React from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { OsiPanel, ConfidenceBadge, confidenceLabel } from '@netatlas/ui'
 import { useCatalogStore } from '../viewmodels/catalog-store.js'
+import { useFavoritosStore, useEsFavorito } from '../viewmodels/favorites-store.js'
 import { useServices } from '../composition-root.js'
 import type { UiDeviceAttributeValue } from '../composition-root.js'
 import { Breadcrumbs } from './breadcrumbs.js'
@@ -52,14 +53,19 @@ export function DeviceSheet(): React.JSX.Element {
   const [device, setDevice] = React.useState<Device | undefined>()
   const [pestaña, setPestaña] = React.useState<string>('resumen')
   const [notFound, setNotFound] = React.useState(false)
+  // Favoritos del usuario (F8B, NET-HW-064): local-first, sincronizable con /v1/favorites.
+  const esFavorito = useEsFavorito(slug)
+  const alternarFavorito = useFavoritosStore((s) => s.alternar)
+  const sincronizarFavoritos = useFavoritosStore((s) => s.sincronizar)
 
   React.useEffect(() => {
+    sincronizarFavoritos()
     void (async () => {
       const d = await useServices.getState().services.devices.findBySlug(slug)
       setDevice(d)
       setNotFound(d === undefined)
     })()
-  }, [slug])
+  }, [slug, sincronizarFavoritos])
 
   if (notFound) {
     return (
@@ -89,7 +95,17 @@ export function DeviceSheet(): React.JSX.Element {
       <h1 id={`ficha-${device.slug.value}`}>{device.name}</h1>
       <p className="mono guia-tecnica">
         {device.slug.value} · {cat?.nameEs ?? device.categoryCode} ·{' '}
-        <Link to={`/fabricante/${device.manufacturerSlug}`}>{device.manufacturerSlug}</Link>
+        <Link to={`/fabricante/${device.manufacturerSlug}`}>{device.manufacturerSlug}</Link>{' '}
+        <button
+          type="button"
+          className="btn-favorito"
+          aria-pressed={esFavorito}
+          data-testid={`favorito-${device.slug.value}`}
+          onClick={() => alternarFavorito(device.slug.value)}
+          title={esFavorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}
+        >
+          {esFavorito ? '★ En favoritos' : '☆ Favorito'}
+        </button>
       </p>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 260px', gap: 24 }}>
