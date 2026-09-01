@@ -84,7 +84,7 @@
 
 ### Pendiente F2 (refinamiento)
 
-- [ ] audit. accesibilidad continua axe en CI (NET-HW-058)
+- [x] **auditoría de accesibilidad continua axe en CI (NET-HW-058)**: spec E2E `a11y-axe.spec.ts` recorre dashboard, explorador (con filtro), ficha (con pestaña), catálogos y calidad ejecutando axe-core (WCAG 2.2 A/AA) sobre el build real en chromium y firefox — **0 violaciones**. Los fixes de a11y: tokens de contraste AA en ambos temas (`--text-muted` 4.5+:1), enlaces dentro de bloques de texto siempre subrayados (`link-in-text-block`), `role="combobox"` + `aria-haspopup="listbox"` en la búsqueda (ARIa APG) y el panel OSI sin roles ARIA mixtos. Complementa la a11y jsdom de NET-HW-026 con verificación en el navegador real; bloquea el job `e2e` de CI
 
 ## Estado de la Fase 3 (implementada — grafo y relaciones)
 

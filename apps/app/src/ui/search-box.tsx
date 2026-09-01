@@ -62,6 +62,8 @@ export function SearchBox(): React.JSX.Element {
           id="busqueda"
           className="search-input"
           type="search"
+          role="combobox"
+          aria-haspopup="listbox"
           placeholder="Ej. +protocolo:bgp +protocolo:ospf · switch 48 puertos · cat:sw"
           value={query}
           onChange={(e) => {

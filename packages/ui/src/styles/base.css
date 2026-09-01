@@ -42,6 +42,18 @@ a:hover {
   text-decoration: underline;
 }
 
+/* Enlaces dentro de bloques de texto: siempre subrayados (WCAG 1.4.1
+   link-in-text-block; el color accent puede diferir <3:1 del texto circundante) */
+p a,
+li a,
+dd a,
+address a,
+blockquote a,
+.guia-tecnica a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 button {
   font-family: var(--font-ui);
 }

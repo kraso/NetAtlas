@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { registerSW } from 'virtual:pwa-register'
 import '@netatlas/ui/tokens.css'
+import '@netatlas/ui/base.css'
 import { App } from './App.js'
 import './styles.css'
 
