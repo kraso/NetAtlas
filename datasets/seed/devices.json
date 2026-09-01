@@ -525,7 +525,21 @@
     ],
     "assertions": [
       { "predicate": "firewall_throughput_gbps", "value": 18, "sourceSlug": "3com-hub-editorial", "confidence": "third-party", "note": "Validar con datasheet oficial en F2" },
-      { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Intel Xeon D-1627 (8 núcleos @ 2.90 GHz)",
+          "soc": { "family": "SoC4", "note": "SoC4 integra CPU propia y CP9XLite que no se usan en este modelo" },
+          "contentProcessors": ["CP9", "CP9"],
+          "networkProcessors": ["NP6XLite"],
+          "storage": { "type": "SSD", "capacityGB": 480 },
+          "summary": "CPU x86 separada + dos procesadores de contenido CP9 + un procesador de red NP6XLite (SoC4); todo el tráfico entre interfaces de datos puede ser descargado por el NP6XLite."
+        },
+        "sourceSlug": "fortinet-fg200f-datasheet",
+        "confidence": "official",
+        "note": "CPU y puertos según datasheet Fortinet; la memoria RAM queda pendiente de cifra oficial exacta."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "4" }

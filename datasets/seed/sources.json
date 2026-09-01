@@ -92,5 +92,14 @@
     "url": null,
     "retrievedOn": "2025-02-10",
     "authorityLevel": 4
+  },
+  {
+    "slug": "fortinet-fg200f-datasheet",
+    "kind": "datasheet",
+    "publisher": "Fortinet",
+    "title": "FortiGate 200F Series Data Sheet + Hardware acceleration (FortiOS 7.6.2)",
+    "url": "https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
   }
 ]

@@ -59,4 +59,16 @@ test.describe('Auditoría axe continua (F2, NET-HW-058)', () => {
     const ficha = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa']).analyze()
     expect(ficha.violations).toEqual([])
   })
+
+  test('la pestaña Arquitectura del FortiGate 200F curada (F2) no introduce violaciones', async ({ page }) => {
+    await page.goto('/device/fortinet-200f')
+    await page.waitForLoadState('networkidle')
+    await page.getByRole('tab', { name: 'Arquitectura' }).click()
+    // El contenido curado del datasheet está presente (tabla + fuente + confianza).
+    await expect(page.getByText(/Intel Xeon D-1627/)).toBeVisible()
+    const resultados = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze()
+    expect(resultados.violations).toEqual([])
+  })
 })

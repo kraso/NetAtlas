@@ -198,14 +198,14 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     10 de 11 paquetes verdes (tsc --noEmit estricto; el workspace suma @netatlas/server)
-tests:         66 suites con 393 verdes (domain 160 · data 37 · importers 15 · search 20 · ui 6 · app 97 · dataset-tools 11 · datagen 4 · server 43)
+tests:         67 suites con 395 verdes (domain 160 · data 37 · importers 15 · search 20 · ui 6 · app 99 · dataset-tools 11 · datagen 4 · server 43)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
 app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 131 kB (38 gzip) + react-vendor 165 kB + cy-vendor 465 kB solo diagramas + jspdf 390 kB solo al exportar PDF
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 60/60 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7 + escala F4 + enlace F5 + axe F2 + sync navegador F8A)
+E2E:           ✅ 62/62 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7 + escala F4 + enlace F5 + axe F2 + sync navegador F8A + arquitectura 200F)
 IA:            ✅ data:ia --eval → 134 preguntas · 395 citas · fidelidad 100% · 0 alucinaciones · deploy autorizado (criterio F7)
 F8A servidor:  ✅ API REST + auth OIDC (JWT RS256) + adaptadores SQLite/PostgreSQL + criterio offline+sync
 F8B API púb.:  ✅ /v1 con clave na_… + OpenAPI 3.1 (/openapi.json) + rate limit 429 + auditoría + favoritos/perfil (criterio F8B)

@@ -65,4 +65,18 @@ describe('UI sobre SQLite real (Fase C)', () => {
     // Se verifica que el explorador consulta el índice real sin romper).
     expect(await screen.findByRole('navigation', { name: 'Árbol de categorías' })).toBeDefined()
   })
+
+  it('la pestaña Arquitectura del FortiGate 200F muestra la arquitectura interna curada (F2)', async () => {
+    renderApp('/device/fortinet-fortigate-200f')
+    expect(await screen.findByRole('heading', { name: 'FortiGate 200F' })).toBeDefined()
+    fireEvent.click(screen.getByRole('tab', { name: 'Arquitectura' }))
+    // Datos curados del datasheet oficial de Fortinet (CPU, SoC, CP, NP, almacenamiento).
+    expect(await screen.findByText(/Intel Xeon D-1627/)).toBeDefined()
+    expect(screen.getAllByText(/NP6XLite/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/CP9/).length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText(/480 GB/)).toBeDefined()
+    // Fuente con enlace al datasheet y confianza oficial.
+    expect(screen.getByText(/FortiGate 200F Series Data Sheet/)).toBeDefined()
+    expect(screen.getAllByText('Oficial').length).toBeGreaterThanOrEqual(1)
+  })
 })

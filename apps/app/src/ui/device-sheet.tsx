@@ -405,8 +405,47 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
         </div>
       )
 
-    case 'arquitectura':
-      return <Empty message="Arquitectura interna (ASIC, CPU, memoria) pendiente de curación (F2)." />
+    case 'arquitectura': {
+      const arq = assertionDe('internal-architecture')
+      if (!arq) {
+        return <Empty message="Arquitectura interna (ASIC, CPU, memoria) pendiente de curación (F2)." />
+      }
+      const v = JSON.parse(arq.valueJson) as {
+        cpu?: string
+        soc?: { family?: string; note?: string }
+        contentProcessors?: readonly string[]
+        networkProcessors?: readonly string[]
+        storage?: { type?: string; capacityGB?: number }
+        summary?: string
+      }
+      return (
+        <div className="stack">
+          {v.summary ? <p>{v.summary}</p> : null}
+          <table className="tabla-specs">
+            <tbody>
+              {v.cpu ? <tr><th scope="row">CPU</th><td className="mono">{v.cpu}</td></tr> : null}
+              {v.soc?.family ? <tr><th scope="row">SoC</th><td className="mono">{v.soc.family}{v.soc.note ? ` — ${v.soc.note}` : ''}</td></tr> : null}
+              {v.contentProcessors && v.contentProcessors.length > 0 ? (
+                <tr><th scope="row">Procesadores de contenido</th><td className="mono">{v.contentProcessors.join(' + ')}</td></tr>
+              ) : null}
+              {v.networkProcessors && v.networkProcessors.length > 0 ? (
+                <tr><th scope="row">Procesadores de red</th><td className="mono">{v.networkProcessors.join(' + ')}</td></tr>
+              ) : null}
+              {v.storage?.capacityGB ? (
+                <tr><th scope="row">Almacenamiento</th><td className="mono">{v.storage.type} {v.storage.capacityGB} GB</td></tr>
+              ) : null}
+            </tbody>
+          </table>
+          <p className="guia-tecnica">
+            Fuente:{' '}
+            <a href={arq.source?.url ?? undefined} target="_blank" rel="noreferrer">{arq.source?.title}</a>{' '}
+            <ConfidenceBadge confidence={arq.confidence} size="sm" />
+            {arq.pendingReview ? <span className="guia-tecnica"> · pendiente revisión</span> : null}
+          </p>
+          {arq.note ? <p className="guia-tecnica">{arq.note}</p> : null}
+        </div>
+      )
+    }
 
     case 'capas':
       return <OsiTab device={device} />

@@ -68,6 +68,19 @@ describe('Ficha de dispositivo — 13 pestañas (§10.5)', () => {
     fireEvent.click(await screen.findByRole('tab', { name: 'Arquitectura' }))
     expect(await screen.findByText(/pendiente/i)).toBeDefined()
   })
+
+  it('Arquitectura curada: el FortiGate 200F del demo muestra CPU/SoC/CP/NP/almacenamiento con fuente', async () => {
+    renderApp('/device/fortinet-200f')
+    fireEvent.click(await screen.findByRole('tab', { name: 'Arquitectura' }))
+    // Datos curados del datasheet oficial de Fortinet.
+    expect(await screen.findByText(/Intel Xeon D-1627/)).toBeDefined()
+    expect(screen.getAllByText(/NP6XLite/).length).toBeGreaterThanOrEqual(1)
+    expect(screen.getAllByText(/CP9/).length).toBeGreaterThanOrEqual(2)
+    expect(screen.getByText(/480 GB/)).toBeDefined()
+    // Fuente y confianza oficial.
+    expect(screen.getByText(/FortiGate 200F Series Data Sheet/)).toBeDefined()
+    expect(screen.getAllByText('Oficial').length).toBeGreaterThanOrEqual(1)
+  })
 })
 
 describe('Protocolo bidireccional (§10.7)', () => {
