@@ -340,4 +340,87 @@ export class CatalogDao {
     const row = this.db.prepare('SELECT number FROM osi_layer WHERE number = ?').get(Number(number))
     return row ? Number(row.number) : undefined
   }
+
+  // ── EAV: attribute_definition / device_attribute (§9.4) ─────────────────
+
+  /** Define un atributo de categoría (idempotente por (category, key)). */
+  defineAttribute(def: {
+    readonly categoryCode: string
+    readonly key: string
+    readonly labelEs: string
+    readonly valueType: 'number' | 'text' | 'enum' | 'bool' | 'range'
+    readonly unit?: string
+    readonly enumValues?: readonly string[]
+    readonly isFacet?: boolean
+    readonly isComparable?: boolean
+    readonly compareRule?: 'higher-better' | 'lower-better' | 'set-compare' | 'none'
+  }): number {
+    const categoryId = this.categoryId(def.categoryCode)
+    if (categoryId === undefined) throw new Error(`defineAttribute: categoría "${def.categoryCode}" inexistente.`)
+    const existing = this.db
+      .prepare('SELECT id FROM attribute_definition WHERE category_id = ? AND key = ?')
+      .get(categoryId, def.key)
+    if (existing) return Number(existing.id)
+    const res = this.db
+      .prepare(
+        `INSERT INTO attribute_definition
+           (category_id, key, label_es, value_type, unit, enum_json, is_facet, is_comparable, compare_rule, sort_order)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0)`,
+      )
+      .run(
+        categoryId,
+        def.key,
+        def.labelEs,
+        def.valueType,
+        def.unit ?? null,
+        def.enumValues ? JSON.stringify(def.enumValues) : null,
+        def.isFacet ? 1 : 0,
+        def.isComparable ?? true ? 1 : 0,
+        def.compareRule ?? 'none',
+      )
+    return Number(res.lastInsertRowid)
+  }
+
+  /** Asigna (o reemplaza) el valor de un atributo a un dispositivo. */
+  setDeviceAttribute(
+    deviceSlug: string,
+    attributeKey: string,
+    value: number | string | boolean | null,
+    assertionId?: number,
+  ): void {
+    const deviceId = this.deviceId(deviceSlug)
+    if (deviceId === undefined) throw new Error(`setDeviceAttribute: dispositivo "${deviceSlug}" inexistente.`)
+    const attr = this.db
+      .prepare(
+        `SELECT ad.id, ad.value_type FROM attribute_definition ad
+         JOIN category c ON c.id = ad.category_id
+         JOIN device d ON d.id = ? AND (c.id = d.category_id OR c.id IN (
+           WITH RECURSIVE anc(cat_id) AS (
+             SELECT d.category_id
+             UNION ALL
+             SELECT c2.parent_id FROM category c2 JOIN anc a ON c2.id = a.cat_id
+           )
+           SELECT cat_id FROM anc WHERE cat_id IS NOT NULL
+         ))
+         WHERE ad.key = ?`,
+      )
+      .get(deviceId, attributeKey) as { id: number; value_type: string } | undefined
+    if (!attr) return // atributo no definido para la categoría → se ignora
+
+    const valueNumber = attr.value_type === 'number' || attr.value_type === 'range' ? (typeof value === 'number' ? value : null) : null
+    const valueText = typeof value === 'string' ? value : typeof value === 'boolean' ? (value ? '1' : '0') : null
+    const valueBool = typeof value === 'boolean' ? (value ? 1 : 0) : attr.value_type === 'bool' && typeof value === 'number' ? (value !== 0 ? 1 : 0) : null
+
+    this.db
+      .prepare(
+        `INSERT INTO device_attribute (device_id, attribute_id, value_number, value_text, value_bool, assertion_id)
+         VALUES (?, ?, ?, ?, ?, ?)
+         ON CONFLICT(device_id, attribute_id) DO UPDATE SET
+           value_number = excluded.value_number,
+           value_text = excluded.value_text,
+           value_bool = excluded.value_bool,
+           assertion_id = COALESCE(excluded.assertion_id, device_attribute.assertion_id)`,
+      )
+      .run(deviceId, attr.id, valueNumber, valueText, valueBool, assertionId ?? null)
+  }
 }

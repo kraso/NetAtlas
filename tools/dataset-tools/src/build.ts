@@ -186,6 +186,11 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
     }
   }
 
+  // ── EAV (§9.4): definiciones y valores derivados de assertions curadas ─────
+  // Las facetas numéricas salen de las claves de assertion existentes en cada
+  // categoría; 'stackable' se deriva de puertos de rol stack/resumen del seed.
+  seedAttributes(dao, seed)
+
   const schemaRow = driver.prepare('SELECT MAX(version) AS v FROM schema_version').get()
   const schemaVersion = Number(schemaRow?.v ?? 0)
   const count = (t: string): number => Number(driver.prepare(`SELECT COUNT(*) AS c FROM ${t}`).get()?.c ?? 0)
@@ -216,5 +221,66 @@ function resolveObjectId(dao: CatalogDao, type: string, slug: string): number | 
       return dao.mediumId(slug, slug.startsWith('smf') || slug.startsWith('mmf') ? 'fibra' : 'inalambrico')
     default:
       return undefined
+  }
+}
+
+/**
+ * EAV (§9.4): puebla attribute_definition + device_attribute a partir de datos
+ * ya curados del seed. Cada assertion numérica de un dispositivo se copia como
+ * valor de atributo de su categoría (faceta numérica). 'stackable' (enum) solo
+ * en familias de switching, derivado del inventario curado (rol stack o resumen).
+ */
+function seedAttributes(
+  dao: CatalogDao,
+  seed: ReturnType<typeof loadSeed>,
+): void {
+  // Metadatos por clave de assertion numérica: label, unidad, regla de comparación.
+  const META: Record<string, { label: string; unit?: string; rule: 'higher-better' | 'lower-better' }> = {
+    throughput_gbps: { label: 'Capacidad de conmutación', unit: 'Gbps', rule: 'higher-better' },
+    switching_capacity_gbps: { label: 'Capacidad de conmutación', unit: 'Gbps', rule: 'higher-better' },
+    poe_budget_w: { label: 'Presupuesto PoE', unit: 'W', rule: 'higher-better' },
+    routing_throughput_mbps: { label: 'Rendimiento de ruteo', unit: 'Mbps', rule: 'higher-better' },
+    firewall_throughput_gbps: { label: 'Rendimiento de firewall', unit: 'Gbps', rule: 'higher-better' },
+    vpn_throughput_gbps: { label: 'Rendimiento VPN', unit: 'Gbps', rule: 'higher-better' },
+    wifi_max_rate_mbps: { label: 'Tasa máxima inalámbrica', unit: 'Mbps', rule: 'higher-better' },
+    power_consumption_w: { label: 'Consumo', unit: 'W', rule: 'lower-better' },
+    mac_table_entries: { label: 'Entradas de tabla MAC', rule: 'higher-better' },
+    sessions_per_sec: { label: 'Sesiones por segundo', rule: 'higher-better' },
+  }
+
+  for (const dev of seed.devices) {
+    for (const assertion of dev.assertions ?? []) {
+      const meta = META[assertion.predicate]
+      if (!meta || typeof assertion.value !== 'number') continue
+      dao.defineAttribute({
+        categoryCode: dev.categoryCode,
+        key: assertion.predicate,
+        labelEs: meta.label,
+        valueType: 'number',
+        unit: meta.unit,
+        isFacet: true,
+        isComparable: true,
+        compareRule: meta.rule,
+      })
+      dao.setDeviceAttribute(dev.slug, assertion.predicate, assertion.value)
+    }
+
+    // Faceta enum 'stackable' en familias de switching (CAT-SWT-*).
+    if (dev.categoryCode.startsWith('CAT-SWT')) {
+      const apilable =
+        (dev.ports ?? []).some((p) => p.role === 'stack') ||
+        /apilab|stackable|\bstack\b/i.test(dev.summary ?? '')
+      dao.defineAttribute({
+        categoryCode: dev.categoryCode,
+        key: 'stackable',
+        labelEs: 'Apilable',
+        valueType: 'enum',
+        enumValues: ['sí', 'no'],
+        isFacet: true,
+        isComparable: true,
+        compareRule: 'set-compare',
+      })
+      dao.setDeviceAttribute(dev.slug, 'stackable', apilable ? 'sí' : 'no')
+    }
   }
 }

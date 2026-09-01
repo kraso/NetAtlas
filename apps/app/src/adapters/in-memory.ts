@@ -49,6 +49,54 @@ export interface InMemoryDataset {
   readonly protocols?: readonly { code: string; name: string; family: string; osiLayer: number }[]
   readonly standards?: readonly { org: string; identifier: string; title: string }[]
   readonly media?: readonly { code: string; kind: string; name: string; maxSpeedMbps?: number }[]
+  /** EAV demo (F3): definiciones de atributo por categoría. */
+  readonly attributeDefinitions?: readonly InMemoryAttributeDefinition[]
+  /** EAV demo (F3): valores por dispositivo. */
+  readonly deviceAttributeValues?: readonly InMemoryDeviceAttributeValue[]
+}
+
+/** Contrato de atributos (EAV §9.4) para las vistas — sin acoplar a @netatlas/data. */
+export interface UiAttributeDefinition {
+  readonly key: string
+  readonly labelEs: string
+  readonly valueType: 'number' | 'text' | 'enum' | 'bool' | 'range'
+  readonly unit?: string
+  readonly enumValues?: readonly string[]
+  readonly isFacet: boolean
+  readonly isComparable: boolean
+  readonly compareRule: 'higher-better' | 'lower-better' | 'set-compare' | 'none'
+}
+
+/** Valor EAV de un dispositivo (pestaña Capacidades). */
+export interface UiDeviceAttributeValue {
+  readonly key: string
+  readonly labelEs: string
+  readonly valueType: UiAttributeDefinition['valueType']
+  readonly unit?: string
+  readonly display: string
+}
+
+/** Conteo de una faceta dinámica (valor → cuántos dispositivos). */
+export interface UiFacetCount {
+  readonly value: string
+  readonly count: number
+}
+
+export interface UiAttributesRepo {
+  attributeDefinitionsByCategory(code: string): Promise<readonly UiAttributeDefinition[]>
+  attributeValuesForDevice(slug: string): Promise<readonly UiDeviceAttributeValue[]>
+  facetCounts(categoryCode: string, key: string): Promise<readonly UiFacetCount[]>
+  filterByFacetValues(categoryCode: string, facets: Readonly<Record<string, readonly string[]>>): Promise<readonly string[]>
+}
+
+export interface InMemoryAttributeDefinition extends UiAttributeDefinition {
+  readonly categoryCode: string
+}
+
+export interface InMemoryDeviceAttributeValue {
+  readonly deviceSlug: string
+  readonly key: string
+  readonly display: string
 }
 
 export class InMemoryDeviceRepository implements DeviceRepository {
@@ -232,6 +280,114 @@ export class InMemorySourcingRepository implements SourcingRepository {
   }
 }
 
+/** Adaptador EAV in-memory (F3): facetas dinámicas y pestaña Capacidades. */
+export class InMemoryAttributesRepository implements UiAttributesRepo {
+  constructor(private readonly data: InMemoryDataset) {}
+
+  async attributeDefinitionsByCategory(code: string): Promise<readonly UiAttributeDefinition[]> {
+    const ancestros = this.ancestors(code)
+    return (this.data.attributeDefinitions ?? []).filter((d) => ancestros.includes(d.categoryCode))
+  }
+
+  async attributeValuesForDevice(slug: string): Promise<readonly UiDeviceAttributeValue[]> {
+    const defs = new Map((this.data.attributeDefinitions ?? []).map((d) => [d.key, d]))
+    return (this.data.deviceAttributeValues ?? [])
+      .filter((v) => v.deviceSlug === slug)
+      .map((v) => {
+        const def = defs.get(v.key)
+        return {
+          key: v.key,
+          labelEs: def?.labelEs ?? v.key,
+          valueType: def?.valueType ?? 'text',
+          unit: def?.unit,
+          display: v.display,
+        }
+      })
+  }
+
+  async facetCounts(categoryCode: string, key: string): Promise<readonly UiFacetCount[]> {
+    const sub = this.subtree(categoryCode)
+    const defs = await this.attributeDefinitionsByCategory(categoryCode)
+    if (!defs.some((d) => d.key === key && d.isFacet)) return []
+    const counts = new Map<string, number>()
+    for (const v of this.data.deviceAttributeValues ?? []) {
+      const dev = this.data.devices.find((d) => d.slug.value === v.deviceSlug)
+      if (!dev || !sub.includes(dev.categoryCode)) continue
+      if (v.key !== key || v.display === '—') continue
+      counts.set(v.display, (counts.get(v.display) ?? 0) + 1)
+    }
+    return [...counts.entries()]
+      .map(([value, count]) => ({ value, count }))
+      .sort((a, b) => b.count - a.count)
+  }
+
+  async filterByFacetValues(
+    categoryCode: string,
+    facets: Readonly<Record<string, readonly string[]>>,
+  ): Promise<readonly string[]> {
+    const sub = this.subtree(categoryCode)
+    const keys = Object.keys(facets).filter((k) => (facets[k]?.length ?? 0) > 0)
+    const porDispositivo = new Map<string, Map<string, Set<string>>>()
+    const defs = new Map((this.data.attributeDefinitions ?? []).map((d) => [d.key, d]))
+    for (const v of this.data.deviceAttributeValues ?? []) {
+      const dev = this.data.devices.find((d) => d.slug.value === v.deviceSlug)
+      if (!dev || !sub.includes(dev.categoryCode)) continue
+      const def = defs.get(v.key)
+      if (def && !def.isFacet) continue
+      let grupo = porDispositivo.get(v.deviceSlug)
+      if (!grupo) {
+        grupo = new Map()
+        porDispositivo.set(v.deviceSlug, grupo)
+      }
+      let vals = grupo.get(v.key)
+      if (!vals) {
+        vals = new Set()
+        grupo.set(v.key, vals)
+      }
+      vals.add(v.display)
+    }
+    const cumple = (grupo: Map<string, Set<string>>): boolean =>
+      keys.every((k) => {
+        const candidatos = grupo.get(k)
+        if (!candidatos || candidatos.size === 0) return false
+        return [...candidatos].some((val) => facets[k]!.includes(val))
+      })
+    return [...porDispositivo.entries()]
+      .filter(([, grupo]) => cumple(grupo))
+      .map(([slug]) => slug)
+      .sort()
+  }
+
+  /** Categoría y todos sus ancestros (para definiciones heredadas). */
+  private ancestors(code: string): string[] {
+    const out: string[] = []
+    let current: string | undefined = code
+    let guard = 0
+    while (current !== undefined && guard++ < 32) {
+      out.push(current)
+      const cat = this.data.categories.find((c) => c.code === current)
+      current = cat?.parentCode
+    }
+    return out
+  }
+
+  /** Categoría y todos sus descendientes (subárbol para facetas). */
+  private subtree(code: string): string[] {
+    const out = [code]
+    const stack = [code]
+    while (stack.length > 0) {
+      const current = stack.pop()!
+      for (const c of this.data.categories) {
+        if (c.parentCode === current) {
+          out.push(c.code)
+          stack.push(c.code)
+        }
+      }
+    }
+    return out
+  }
+}
+
 // ── Fábrica de dataset de demostración (determinista para tests/UI) ──────────
 
 export function buildDemoDataset(): InMemoryDataset {
@@ -370,7 +526,30 @@ export function buildDemoDataset(): InMemoryDataset {
     { code: 'mmf-om3', kind: 'fibra', name: 'Multimodo OM3', maxSpeedMbps: 10000 },
   ]
 
-  return { devices, manufacturers, categories, relationships, assertions, sources, protocols, standards, media }
+  // ── EAV demo (F3): definiciones de atributo y valores por dispositivo ──
+  const atributo = (categoryCode: string, key: string, labelEs: string, valueType: UiAttributeDefinition['valueType'], isFacet: boolean, compareRule: UiAttributeDefinition['compareRule'], unit?: string, enumValues?: readonly string[]): InMemoryAttributeDefinition =>
+    ({ categoryCode, key, labelEs, valueType, isFacet, isComparable: true, compareRule, unit, enumValues })
+  const valor = (deviceSlug: string, key: string, display: string): InMemoryDeviceAttributeValue => ({ deviceSlug, key, display })
+
+  const attributeDefinitions: readonly InMemoryAttributeDefinition[] = [
+    atributo('CAT-SWT-L3', 'switching_capacity_gbps', 'Capacidad de conmutación', 'number', true, 'higher-better', 'Gbps'),
+    atributo('CAT-SWT-L2', 'poe_budget_w', 'Presupuesto PoE', 'number', true, 'higher-better', 'W'),
+    atributo('CAT-SWT-L2', 'stackable', 'Apilable', 'enum', true, 'set-compare', undefined, ['sí', 'no']),
+    atributo('CAT-RTR', 'routing_throughput_mbps', 'Rendimiento de ruteo', 'number', true, 'higher-better', 'Mbps'),
+    atributo('CAT-SEC', 'firewall_throughput_gbps', 'Rendimiento de firewall', 'number', true, 'higher-better', 'Gbps'),
+    atributo('CAT-WLS', 'wifi_max_rate_mbps', 'Tasa máxima Wi-Fi', 'number', true, 'higher-better', 'Mbps'),
+  ]
+  const deviceAttributeValues: readonly InMemoryDeviceAttributeValue[] = [
+    valor('cisco-c9300-48p', 'switching_capacity_gbps', '256'),
+    valor('aruba-6300m-48g', 'switching_capacity_gbps', '176'),
+    valor('aruba-2930f-48g', 'poe_budget_w', '370'),
+    valor('aruba-2930f-48g', 'stackable', 'sí'),
+    valor('mikrotik-ccr1036', 'routing_throughput_mbps', '10000'),
+    valor('fortinet-200f', 'firewall_throughput_gbps', '18'),
+    valor('cisco-9120axi', 'wifi_max_rate_mbps', '2400'),
+  ]
+
+  return { devices, manufacturers, categories, relationships, assertions, sources, protocols, standards, media, attributeDefinitions, deviceAttributeValues }
 }
 
 // Re-export de utilidad para viewmodels

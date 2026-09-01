@@ -5,9 +5,16 @@ import {
   InMemorySearchIndex,
   InMemoryGraphRepository,
   InMemorySourcingRepository,
+  InMemoryAttributesRepository,
   buildDemoDataset,
 } from './adapters/in-memory.js'
 import type { InMemoryDataset } from './adapters/in-memory.js'
+import type {
+  UiAttributeDefinition,
+  UiDeviceAttributeValue,
+  UiFacetCount,
+  UiAttributesRepo,
+} from './adapters/in-memory.js'
 import type { Device, Category, Manufacturer, Assertion, Relationship, SearchResponse, SearchHit, SuggestResult } from '@netatlas/domain'
 import type { Page, DeviceQuery } from '@netatlas/domain'
 
@@ -45,6 +52,10 @@ export interface UiGraphRepo {
   edgesOf(node: { type: string; slug: string }): Promise<readonly Relationship[]>
 }
 
+// Tipos y contrato EAV (§9.4): re-exportados del adaptador in-memory para que
+// las vistas no dependan del motor de datos.
+export type { UiAttributeDefinition, UiDeviceAttributeValue, UiFacetCount, UiAttributesRepo }
+
 export interface UiSourcingRepo {
   assertionsForDevice(slug: string): Promise<readonly Assertion[]>
 }
@@ -55,6 +66,7 @@ export interface AppServices {
   readonly search: UiSearchRepo
   readonly graph: UiGraphRepo
   readonly sourcing: UiSourcingRepo
+  readonly attributes: UiAttributesRepo
   readonly dataset: InMemoryDataset
 }
 
@@ -66,6 +78,7 @@ export function buildServices(dataset?: InMemoryDataset): AppServices {
     search: new InMemorySearchIndex(data),
     graph: new InMemoryGraphRepository(data),
     sourcing: new InMemorySourcingRepository(data),
+    attributes: new InMemoryAttributesRepository(data),
     dataset: data,
   }
 }

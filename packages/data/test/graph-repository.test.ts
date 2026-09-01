@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeAll } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { composeRuntime, disposeRuntime, CatalogDao, NodeSqliteDriver, applyMigrations, loadMigrations } from '../src/index.js'
+import { composeRuntime, disposeRuntime, CatalogDao, NodeSqliteDriver, SqliteGraphRepository, applyMigrations, loadMigrations } from '../src/index.js'
 import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'

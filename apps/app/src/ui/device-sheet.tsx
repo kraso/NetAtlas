@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom'
 import { OsiPanel, ConfidenceBadge, confidenceLabel } from '@netatlas/ui'
 import { useCatalogStore } from '../viewmodels/catalog-store.js'
 import { useServices } from '../composition-root.js'
+import type { UiDeviceAttributeValue } from '../composition-root.js'
 import { Breadcrumbs } from './breadcrumbs.js'
 import { FrontPanel } from './front-panel.js'
 import type { Device } from '@netatlas/domain'
@@ -177,12 +178,37 @@ function useDeviceRelations(device: Device | undefined): {
   return { relaciones, assertions, loading }
 }
 
+/** Carga los valores EAV del dispositivo (F3, pestaña Capacidades). */
+function useDeviceAttributes(device: Device | undefined): {
+  valores: readonly UiDeviceAttributeValue[]
+  loading: boolean
+} {
+  const [valores, setValores] = React.useState<readonly UiDeviceAttributeValue[]>([])
+  const [loading, setLoading] = React.useState(true)
+
+  React.useEffect(() => {
+    if (!device) {
+      setLoading(false)
+      return
+    }
+    void (async () => {
+      const { attributes } = useServices.getState().services
+      const values = await attributes.attributeValuesForDevice(device.slug.value)
+      setValores(values)
+      setLoading(false)
+    })()
+  }, [device])
+
+  return { valores, loading }
+}
+
 const Empty = ({ message }: { message: string }): React.JSX.Element => (
   <p className="empty-state">{message}</p>
 )
 
 function PestanaContent({ device, pestaña }: { device: Device; pestaña: string }): React.JSX.Element {
   const { relaciones, assertions, loading } = useDeviceRelations(device)
+  const { valores: atributos, loading: atributosLoading } = useDeviceAttributes(device)
   if (loading) return <p role="status">Cargando…</p>
 
   const porPredicado = (pred: string): readonly Relationship[] =>
@@ -276,21 +302,48 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
       )
 
     case 'capacidades':
-      return (
+      return atributosLoading ? (
+        <p role="status">Cargando capacidades…</p>
+      ) : (
         <div className="stack">
-          <p>
-            Capacidad total de conmutación:{' '}
-            <span className="mono">
-              {assertionDe('throughput_gbps') ? `${JSON.parse(assertionDe('throughput_gbps')!.valueJson).gbps} Gbps` : '—'}
-            </span>{' '}
-            {assertionDe('throughput_gbps') ? <ConfidenceBadge confidence={assertionDe('throughput_gbps')!.confidence} size="sm" /> : null}
-          </p>
-          <p>
-            Consumo:{' '}
-            <span className="mono">{assertionDe('power_consumption_w') ? `${JSON.parse(assertionDe('power_consumption_w')!.valueJson)} W` : '—'}</span>{' '}
-            {assertionDe('power_consumption_w') ? <ConfidenceBadge confidence={assertionDe('power_consumption_w')!.confidence} size="sm" /> : null}
-          </p>
-          <p className="guia-tecnica">Capacidades por atributo de categoría (EAV) llegan en F2.</p>
+          {atributos.length > 0 ? (
+            <table className="tabla-specs">
+              <thead>
+                <tr>
+                  <th scope="col">Atributo</th>
+                  <th scope="col">Valor</th>
+                  <th scope="col">Unidad</th>
+                </tr>
+              </thead>
+              <tbody>
+                {atributos.map((a) => (
+                  <tr key={a.key}>
+                    <td>{a.labelEs}</td>
+                    <td className="mono">{a.display}</td>
+                    <td className="mono">{a.unit ?? '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          ) : (
+            <p className="empty-state">Sin atributos de categoría curados para este dispositivo (EAV §9.4).</p>
+          )}
+          {assertionDe('throughput_gbps') ? (
+            <p>
+              Capacidad total de conmutación:{' '}
+              <span className="mono">
+                {JSON.parse(assertionDe('throughput_gbps')!.valueJson).gbps} Gbps
+              </span>{' '}
+              <ConfidenceBadge confidence={assertionDe('throughput_gbps')!.confidence} size="sm" />
+            </p>
+          ) : null}
+          {assertionDe('power_consumption_w') ? (
+            <p>
+              Consumo:{' '}
+              <span className="mono">{JSON.parse(assertionDe('power_consumption_w')!.valueJson)} W</span>{' '}
+              <ConfidenceBadge confidence={assertionDe('power_consumption_w')!.confidence} size="sm" />
+            </p>
+          ) : null}
         </div>
       )
 

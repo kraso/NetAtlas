@@ -4,6 +4,7 @@ import {
   SqliteCatalogRepository,
   SqliteGraphRepository,
   SqliteSourcingRepository,
+  SqliteAttributesRepository,
 } from '@netatlas/data'
 import { Fts5SearchIndex } from '@netatlas/search'
 import { fileURLToPath } from 'node:url'
@@ -66,6 +67,7 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
     search,
     graph: new SqliteGraphRepository(driver),
     sourcing: new SqliteSourcingRepository(driver),
+    attributes: new SqliteAttributesRepository(driver),
     dataset: {
       devices: [],
       manufacturers: [],
