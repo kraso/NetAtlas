@@ -120,7 +120,8 @@
 
 - [ ] virtualización >1.500 nodos (agregación por categoría) y modo Canvas >5.000 (ADR-03)
 - [ ] layouts en Web Worker y persistencia de «reordenar» como layout de usuario
-- [ ] **deuda técnica — bundle de Cytoscape**: el chunk principal supera el umbral de 500 kB de Vite (≈754 kB, 241 kB gzip) al incluir cytoscape + cytoscape-svg. Abordar después con: (a) `build.rollupOptions.output.manualChunks` separando `cytoscape`, `cytoscape-svg` y `@netatlas/ui` en chunks propios (winning: paralelismo y cache del SW), o (b) import dinámico de las vistas `/topology/:slug` y `/mapa-global` (carga Cytoscape solo al abrir un diagrama) reduciendo el primer pintado. Verificar SLO §23.2 tras el cambio y re-ejecutar E2E de topologías.
+
+**✅ Deuda técnica resuelta — bundle de Cytoscape**: import dinámico de las rutas de diagramas (`/topology/:slug`, `/mapa-global`, pestaña Diagramas con `React.lazy` + `Suspense`) + `manualChunks` (`cy-vendor` para cytoscape/cytoscape-svg y `react-vendor` para el runtime de React). Resultado: el chunk inicial de la app baja de **753,81 kB (240,66 gzip) a 268,31 kB (84,43 gzip)**; `cy-vendor` (464,82 kB / 149,47 gzip) solo se descarga/evalúa al abrir un diagrama (precacheado por el SW). **Sin warning de >500 kB**. SLO §23.2 re-verificado (<500 ms en chromium y firefox) y E2E de topologías/comparador **28/28** intactos.
 
 ## Estado de la Fase 5 (implementada — comparador, CU-02 aprobado)
 
@@ -151,7 +152,7 @@ data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías (7+4+300 nodos)
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512
+app build:     ✅ vite build — PWA con SW (18 entradas precache) + manifest + icons 192/512; chunks separados: base 268 kB (84 gzip) + cy-vendor 465 kB (149 gzip) solo en diagramas
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
 E2E:           ✅ 28/28 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA + ≤2 clics O3/F3 + topologías F4 + SLO diagramas §23.2 + comparador CU-02 F5)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows

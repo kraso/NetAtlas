@@ -11,9 +11,14 @@ import { ManufacturerSheet } from './ui/manufacturer-sheet.js'
 import { Glossary, GlossaryTermSheet } from './ui/glossary.js'
 import { Comparar } from './ui/comparar.js'
 import { Topologias } from './ui/topologies.js'
-import { TopologySheet } from './ui/topology-sheet.js'
-import { MapaGlobal } from './ui/mapa-global.js'
 import { useCatalogStore } from './viewmodels/catalog-store.js'
+
+// Las vistas con Cytoscape se cargan bajo demanda (solo-diferencias de la
+// fase): cytoscape + cytoscape-svg quedan fuera del chunk inicial de la app.
+const TopologySheet = React.lazy(() => import('./ui/topology-sheet.js').then((m) => ({ default: m.TopologySheet })))
+const MapaGlobal = React.lazy(() => import('./ui/mapa-global.js').then((m) => ({ default: m.MapaGlobal })))
+
+const Suspense = React.Suspense
 
 export function App(): React.JSX.Element {
   const load = useCatalogStore((s) => s.load)
@@ -33,22 +38,24 @@ export function App(): React.JSX.Element {
         </nav>
       </header>
       <main>
-        <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/catalogos" element={<CatalogExplorer />} />
-          <Route path="/device/:slug" element={<DeviceSheet />} />
-          <Route path="/protocolo/:code" element={<ProtocolSheet />} />
-          <Route path="/estandar/:org/:identifier" element={<StandardSheet />} />
-          <Route path="/medio/:code" element={<MediumSheet />} />
-          <Route path="/fabricante/:slug" element={<ManufacturerSheet />} />
-          <Route path="/glosario" element={<Glossary />} />
-          <Route path="/glosario/:slug" element={<GlossaryTermSheet />} />
-          <Route path="/comparar" element={<Comparar />} />
-          <Route path="/topologies" element={<Topologias />} />
-          <Route path="/topology/:slug" element={<TopologySheet />} />
-          <Route path="/mapa-global" element={<MapaGlobal />} />
-        </Routes>
+        <Suspense fallback={<p role="status">Cargando vista…</p>}>
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/catalogos" element={<CatalogExplorer />} />
+            <Route path="/device/:slug" element={<DeviceSheet />} />
+            <Route path="/protocolo/:code" element={<ProtocolSheet />} />
+            <Route path="/estandar/:org/:identifier" element={<StandardSheet />} />
+            <Route path="/medio/:code" element={<MediumSheet />} />
+            <Route path="/fabricante/:slug" element={<ManufacturerSheet />} />
+            <Route path="/glosario" element={<Glossary />} />
+            <Route path="/glosario/:slug" element={<GlossaryTermSheet />} />
+            <Route path="/comparar" element={<Comparar />} />
+            <Route path="/topologies" element={<Topologias />} />
+            <Route path="/topology/:slug" element={<TopologySheet />} />
+            <Route path="/mapa-global" element={<MapaGlobal />} />
+          </Routes>
+        </Suspense>
       </main>
     </div>
   )

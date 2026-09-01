@@ -46,5 +46,16 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     sourcemap: false,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor de los diagramas: cytoscape + cytoscape-svg en un chunk propio
+          // que comparten las rutas lazy (/topology/:slug, /mapa-global, Diagramas).
+          'cy-vendor': ['cytoscape', 'cytoscape-svg'],
+          // Runtime de React separado para mejor cache del SW.
+          'react-vendor': ['react', 'react-dom', 'react-router-dom', 'zustand'],
+        },
+      },
+    },
   },
 })

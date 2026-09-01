@@ -6,8 +6,10 @@ import { useServices } from '../composition-root.js'
 import type { UiDeviceAttributeValue } from '../composition-root.js'
 import { Breadcrumbs } from './breadcrumbs.js'
 import { FrontPanel } from './front-panel.js'
-import { MapaLocal } from './mapa-local.js'
 import { Genealogia } from './genealogia.js'
+
+// El mapa local (Cytoscape) solo se carga al abrir la pestaña Diagramas.
+const MapaLocal = React.lazy(() => import('./mapa-local.js').then((m) => ({ default: m.MapaLocal })))
 import type { Device } from '@netatlas/domain'
 import type { Assertion, Relationship } from '@netatlas/domain'
 
@@ -424,7 +426,11 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
       )
 
     case 'diagramas':
-      return <MapaLocal device={device} />
+      return (
+        <React.Suspense fallback={<p role="status">Cargando mapa local…</p>}>
+          <MapaLocal device={device} />
+        </React.Suspense>
+      )
 
     case 'historia':
       return <Genealogia device={device} />
