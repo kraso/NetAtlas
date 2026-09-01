@@ -1,6 +1,6 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 2 (Catálogo avanzado) — implementada**.
+> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 3 (Relaciones y búsqueda avanzada) — implementada**.
 
 ## Fases
 
@@ -8,8 +8,8 @@
 |---|---|---|---|---|
 | **F0** | Investigación y arquitectura | Plan; spikes SQLite+FTS5; prototipo de esquema; 20 fichas piloto | ADRs firmados; búsqueda <50 ms p95 sobre 10k sintéticos | ✅ **cerrada** |
 | **F1** | MVP | Catálogo + fichas + búsqueda FTS/DSL + vista OSI + fuentes v1 + importación JSON/CSV + seed 300–500 | Criterios 28.1.6 (los 6) | ✅ **cerrada** |
-| **F2** | Catálogo avanzado | Calculadoras, exploradores de catálogos, autocompletado, fabricantes, glosario, panel frontal, migas | 15 macrocategorías pobladas; cobertura fuentes ≥80% | 🔄 **en curso (≈80%)** |
-| **F3** | Relaciones y búsqueda avanzada | Grafo completo, facetas dinámicas, mapa local, genealogía básica | Navegación ≤2 clics verificada en E2E | ⏳ |
+| **F2** | Catálogo avanzado | Calculadoras, exploradores de catálogos, autocompletado, fabricantes, glosario, panel frontal, migas | 15 macrocategorías pobladas; cobertura fuentes ≥80% | ✅ **cerrada** |
+| **F3** | Relaciones y búsqueda avanzada | Grafo completo, facetas dinámicas, mapa local, genealogía básica | Navegación ≤2 clics verificada en E2E | ✅ **cerrada** |
 | **F4** | Diagramas interactivos | Mapa global, topologías, panel frontal, exportación | SLOs de diagramas | ⏳ |
 | **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ⏳ |
 | **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ⏳ |
@@ -83,8 +83,23 @@
 
 ### Pendiente F2 (refinamiento)
 
-- [ ] EAV operativo completo (atributos por categoría en fichas y facetas dinámicas — la tabla `attribute_definition` ya existe en el esquema; NET-HW-034/035)
 - [ ] audit. accesibilidad continua axe en CI (NET-HW-058)
+
+## Estado de la Fase 3 (implementada — grafo y relaciones)
+
+- [x] **Vecindad y caminos acotados por CTE** (NET-HW-029): `vecindadCte` con `WITH RECURSIVE alcanzable` (≤N saltos con dedupe) sobre el mismo tipo de entidad, además de la BFS-JS `neighbors`/`paths` (3 tests nuevos sobre el repositorio SQLite)
+- [x] **EAV operativo** (§9.4, arrastrado de F2): `SqliteAttributesRepository` async (definiciones heredadas por ancestros CTE, valores por dispositivo, `facetCounts` por subárbol, `filterByFacetValues` AND/OR) + contrato `UiAttributesRepo` compartido in-memory/SQLite — sin acoplar vistas al motor
+- [x] **Facetas dinámicas en el explorador**: panel «Filtros dinámicos» por atributo facetado (conteos por valor) que acota los resultados al vuelo (data deriva del seed: 10 definiciones / 52 valores curados)
+- [x] **Capacidades en la ficha**: pestaña con tabla Atributo/Valor/Unidad desde EAV + métricas de assertions (throughput/consumo) como respaldo
+- [x] **Mapa de relaciones local** (NET-HW-030): pestaña Diagramas con Cytoscape.js (vecindad ≤2 saltos, colores por tipo de nodo, aristas etiquetadas con predicado) + filtros por predicado con conteos; mock de cytoscape para jsdom
+- [x] **Genealogía evolves-into + árbol tecnológico** (NET-HW-031): pestaña Historia — árbol evolutivo de dispositivos (antecesores/sucesores a profundidad 8) + cadenas de evolución de tecnologías (PoE 802.3af→at→bt demostrado en el demo)
+- [x] **similar-to + «comparar desde aquí»** (NET-HW-032): lista de similares curados en Compatibilidad con puente a la nueva ruta `/comparar` (fija contendientes a/b; comparativa completa con reglas compareRule en F5)
+- [x] **Criterio O3/F3 — navegación ≤2 clics verificada en E2E**: dispositivo→protocolo (1 clic), dispositivo→antecesor (2), dispositivo→similar (2), explorador→ficha→protocolo (2); spec Playwright nuevo en chromium y firefox
+
+### Pendiente F3 (refinamiento)
+
+- [ ] mapa global del conocimiento con agregación (NET-HW-036, F4)
+- [ ] exportación SVG/PNG de vistas (NET-HW-037, F4)
 
 ## Esfuerzo orientativo (1–2 personas)
 
@@ -95,15 +110,15 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 ## Estado de la suite (2025)
 
 ```
-typecheck:     8 paquetes verdes (tsc --noEmit estricto)
-tests:         172+ (domain 69 · data 20 · importers 11 · search 20 · ui 6 · app 36 · dataset-tools 9 · datagen 4)
+typecheck:     9 paquetes verdes (tsc --noEmit estricto)
+tests:         16 suites con 172+ verdes (domain 69 · data 28 · importers 11 · search 20 · ui 6 · app 52 · dataset-tools 9 · datagen 4)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
-dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions
+dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512 (80 módulos)
+app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 5/5 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA)
+E2E:           ✅ 14/14 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA + navegación ≤2 clics O3/F3)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```

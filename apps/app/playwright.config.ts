@@ -8,7 +8,10 @@ import { defineConfig, devices } from '@playwright/test'
  */
 export default defineConfig({
   testDir: './e2e',
-  fullyParallel: true,
+  fullyParallel: false,
+  // Memoria limitada en el entorno local: un worker a la vez evita OOM de los
+  // navegadores headless (CI puede pasarlo por --workers).
+  workers: 1,
   forbidOnly: !!process.env['CI'],
   retries: process.env['CI'] ? 2 : 0,
   reporter: process.env['CI'] ? 'github' : 'list',
