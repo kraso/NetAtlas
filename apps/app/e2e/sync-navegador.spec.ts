@@ -17,6 +17,11 @@ const TOKEN_E2E = 'token-e2e-netatlas'
 
 test.describe('F8A — sync navegador → servidor real (criterio offline+sync)', () => {
   test('cola local → sincronizar (pull snapshot + push outbox) → réplica poblada', async ({ page }) => {
+    // El servidor e2e es COMPARTIDO entre chromium y firefox; el merge LWW por
+    // entidad descarta revisiones ≤ a las ya aceptadas. Entidad única por
+    // ejecución → cada lote es independiente del navegador que corrió antes.
+    const entidad = `device:sync-e2e-${Date.now().toString(36)}`
+
     await page.goto('/sincronizar')
     await expect(page.getByRole('heading', { level: 1, name: 'Sincronización' })).toBeVisible()
 
@@ -25,7 +30,7 @@ test.describe('F8A — sync navegador → servidor real (criterio offline+sync)'
     await page.getByTestId('server-token').fill(TOKEN_E2E)
 
     // 1) Sin red aún: encolar una nota → aparece en la cola local.
-    await page.getByTestId('entidad-nota').fill('device:cisco-c9300-48p')
+    await page.getByTestId('entidad-nota').fill(entidad)
     await page.getByTestId('encolar-nota').click()
     await expect(page.getByTestId('cola-item')).toBeVisible()
     expect(await page.getByTestId('cola-item').count()).toBeGreaterThanOrEqual(1)
@@ -46,11 +51,12 @@ test.describe('F8A — sync navegador → servidor real (criterio offline+sync)'
   })
 
   test('con token incorrecto el push se rechaza y la cola NO se pierde (seguridad §22.5)', async ({ page }) => {
+    const entidad = `device:sync-bad-${Date.now().toString(36)}`
     await page.goto('/sincronizar')
     await page.getByTestId('server-url').fill(`http://127.0.0.1:${PUERTO_SERVER}`)
     await page.getByTestId('server-token').fill('token-malo')
 
-    await page.getByTestId('entidad-nota').fill('device:aruba-2930f-48g')
+    await page.getByTestId('entidad-nota').fill(entidad)
     await page.getByTestId('encolar-nota').click()
     await expect(page.getByTestId('cola-item')).toBeVisible()
 
