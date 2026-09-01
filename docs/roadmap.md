@@ -1,6 +1,6 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 5 (Comparador de dispositivos) — implementada**.
+> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 6 (Estándares/protocolos/importación pro) — implementada**.
 
 ## Fases
 
@@ -12,9 +12,7 @@
 | **F3** | Relaciones y búsqueda avanzada | Grafo completo, facetas dinámicas, mapa local, genealogía básica | Navegación ≤2 clics verificada en E2E | ✅ **cerrada** |
 | **F4** | Diagramas interactivos | Mapa global, visor de topologías, panel frontal generado, flujo de paquetes, exportación SVG/PNG | SLOs de diagramas (23.2) cumplidos | ✅ **cerrada** |
 | **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ✅ **cerrada** |
-| **F4** | Diagramas interactivos | Mapa global, topologías, panel frontal, exportación | SLOs de diagramas | ⏳ |
-| **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ⏳ |
-| **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ⏳ |
+| **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ✅ **cerrada** |
 | **F7** | IA | RAG + asistente + generación de topologías + eval | 0 alucinaciones de specs | ⏳ |
 | **F8A/B** | Sincronización + web pública | Servidor PostgreSQL, API, auth | offline+sync; API consumible | ⏳ |
 
@@ -137,6 +135,16 @@
 - [ ] PDF descargable directo (jsPDF/window.print con captura) si el flujo de impresión no basta
 - [ ] URL compartible del reporte con veredicto persistido en la querystring (ya compartible por ids)
 
+## Estado de la Fase 6 (implementada — importación pro, criterio F6 aprobado)
+
+- [x] **NET-HW-045 Dedup con scoring + cola de reconciliación con diff**: dominio puro (`dedupScore`, `diffCampos`) con umbrales §19.2-4 — fusión automática solo ≥0.98, candidatos [0.7, 0.98) a revisión; migración `0002` con tabla `reconciliation` (+ `dataset_signature`); el pipeline importa existentes por (fabricante, modelo, sku), reescribe slugs en fusiones y deja los candidatos en la cola con diff lado a lado; `SqliteReconciliationRepository` (pendientes, resolver con autor). Esquema del dataset **v2**
+- [x] **NET-HW-046 Importadores XML/YAML/API**: adaptadores con alias de campos ES/EN (`parseYaml` con `yaml`, `parseXml` con `fast-xml-parser`) conectados al mismo pipeline parse→normaliza→valida→dedup→reconcilia→persiste; `pnpm import --yaml=…|--xml=…` con informe legible (altas/actualizaciones/conflictos/rechazos + diff de los candidatos). La extracción asistida de datasheets se apoya en el flujo de revisión del dashboard (la parte LLM es F7)
+- [x] **NET-HW-047 Dashboard de calidad** (`/calidad`): cobertura de fuentes global y por categoría, distribución de confianza, atributos EAV, dispositivos sin especificaciones, cola de reconciliación con **Aceptar/Rechazar firmados** y manifiesto del dataset (contrato `UiQualityRepo` in-memory y SQLite)
+- [x] **NET-HW-048 Manifiesto firmado + actualización delta**: `dataset:build` genera `netatlas-seed.sqlite.manifest.json` (conteos + SHA-256 + firma Ed25519 con `NETATLAS_SIGN_PRIVATE_KEY`); `data:manifiesto` verifica integridad/firma/compatibilidad; `data:delta --from/--to` genera el diff y `--apply` lo aplica transaccional (altas/actualizaciones/borrados por slug); la app muestra el manifiesto en Calidad
+- [x] **NET-HW-049 Flujo de revisión y publicación**: cola con resolución firmada por revisor en el dashboard; `import-cli` registra conflictos/fusiones y el informe de lote queda legible para el curador
+- [x] **Criterio F6 — lote externo sin SQL a mano** (test de integración): YAML+XML mixtos importados por `ejecutarImportacion` sobre SQLite real → altas + fusión automática (score ≥0.98) + 2 conflictos en cola (0.825/0.817) con diff + 0 rechazos + BD y calidad verificadas sin tocar SQL
+- [x] **Mitigación de OOM del entorno**: pools singleton de Vitest (data/app/importers), heap `NODE_OPTIONS=--max-old-space-size=2048`, `--workspace-concurrency=1` y `workers=1` en Playwright (el diagnóstico confirmó que no hay huérfanos ni falta de RAM física: el límite está en la cuota del contenedor cuando se lanzan muchos procesos)
+
 ## Esfuerzo orientativo (1–2 personas)
 
 F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6 6–8 · F7 8–10 · F8 10–14.
@@ -147,14 +155,14 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     9 paquetes verdes (tsc --noEmit estricto)
-tests:         23 suites con 222 verdes (domain 86 · data 32 · importers 11 · search 20 · ui 6 · app 71 · dataset-tools 9 · datagen 4)
+tests:         26 suites con 260 verdes (domain 93 · data 37 · importers 15 · search 20 · ui 6 · app 74 · dataset-tools 11 · datagen 4)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
-dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías (7+4+300 nodos)
+dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build — PWA con SW (18 entradas precache) + manifest + icons 192/512; chunks separados: base 268 kB (84 gzip) + cy-vendor 465 kB (149 gzip) solo en diagramas
+app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 268 kB (84 gzip) + cy-vendor 465 kB solo diagramas
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 28/28 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA + ≤2 clics O3/F3 + topologías F4 + SLO diagramas §23.2 + comparador CU-02 F5)
+E2E:           ✅ 32/32 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```
