@@ -48,10 +48,10 @@ describe('Ficha de dispositivo — 13 pestañas (§10.5)', () => {
     expect(screen.getAllByRole('link', { name: 'vxlan' }).length).toBeGreaterThanOrEqual(1)
   })
 
-  it('Historia: muestra la relación de sucesión', async () => {
+  it('Historia: muestra el árbol evolutivo con el antecesor', async () => {
     renderApp('/device/aruba-6300m-48g')
     fireEvent.click(await screen.findByRole('tab', { name: 'Historia' }))
-    expect(await screen.findByText(/Sucede a:/i)).toBeDefined()
+    expect(await screen.findByRole('heading', { name: 'Antecesores' })).toBeDefined()
     expect(screen.getByRole('link', { name: 'aruba-2930f-48g' })).toBeDefined()
   })
 

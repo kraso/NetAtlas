@@ -7,6 +7,7 @@ import type { UiDeviceAttributeValue } from '../composition-root.js'
 import { Breadcrumbs } from './breadcrumbs.js'
 import { FrontPanel } from './front-panel.js'
 import { MapaLocal } from './mapa-local.js'
+import { Genealogia } from './genealogia.js'
 import type { Device } from '@netatlas/domain'
 import type { Assertion, Relationship } from '@netatlas/domain'
 
@@ -207,6 +208,45 @@ const Empty = ({ message }: { message: string }): React.JSX.Element => (
   <p className="empty-state">{message}</p>
 )
 
+/**
+ * Similares curados (NET-HW-032): lista de dispositivos similar-to con el
+ * puente «Comparar desde aquí» hacia la ruta /comparar (F5 lo completa).
+ */
+function SimilaresComparar({
+  deviceSlug,
+  similares,
+}: {
+  deviceSlug: string
+  similares: readonly Relationship[]
+}): React.JSX.Element | null {
+  if (similares.length === 0) return null
+  const peers = similares.map((r) =>
+    r.subject.type === 'device' && r.subject.slug === deviceSlug ? r.object.slug : r.subject.slug,
+  )
+  return (
+    <section aria-label="Dispositivos similares">
+      <h3 style={{ fontSize: 'var(--font-size-sm)' }}>Similares curados ({peers.length})</h3>
+      <ul>
+        {peers.map((p) => (
+          <li key={p}>
+            <Link to={`/device/${p}`} className="mono">
+              {p}
+            </Link>{' '}
+            <Link
+              to={`/comparar?a=${deviceSlug}&b=${p}`}
+              className="guia-tecnica"
+              aria-label={`Comparar ${deviceSlug} con ${p}`}
+              style={{ marginLeft: 8 }}
+            >
+              Comparar desde aquí →
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 function PestanaContent({ device, pestaña }: { device: Device; pestaña: string }): React.JSX.Element {
   const { relaciones, assertions, loading } = useDeviceRelations(device)
   const { valores: atributos, loading: atributosLoading } = useDeviceAttributes(device)
@@ -217,9 +257,8 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
   const soportes = porPredicado('supports-protocol')
   const estandares = porPredicado('implements-standard')
   const medios = porPredicado('terminates-medium')
-  const sucesores = porPredicado('succeeds')
-  const reemplaza = porPredicado('replaced-by')
   const compatibles = porPredicado('compatible-with')
+  const similares = porPredicado('similar-to')
 
   const assertionDe = (pred: string): Assertion | undefined => assertions.find((a) => a.predicate === pred)
 
@@ -376,9 +415,11 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
           ) : null}
           {compatibles.length > 0 ? (
             <p>Compatible con: {compatibles.map((r) => r.object.slug).join(', ')}</p>
-          ) : (
-            <Empty message="Compatibilidades curadas pendientes (aristas compatible-with / requires)." />
-          )}
+          ) : null}
+          <SimilaresComparar deviceSlug={device.slug.value} similares={similares} />
+          {compatibles.length === 0 && similares.length === 0 && medios.length === 0 ? (
+            <Empty message="Compatibilidades curadas pendientes (aristas compatible-with / similar-to / requires)." />
+          ) : null}
         </div>
       )
 
@@ -386,24 +427,7 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
       return <MapaLocal device={device} />
 
     case 'historia':
-      return (
-        <div className="stack">
-          {sucesores.length > 0 ? (
-            <p>
-              Sucede a:{' '}
-              {sucesores.map((r) => (
-                <Link key={r.object.slug} to={`/device/${r.object.slug}`}>{r.object.slug}</Link>
-              ))}
-            </p>
-          ) : null}
-          {reemplaza.length > 0 ? (
-            <p>Reemplaza a: {reemplaza.map((r) => r.object.slug).join(', ')}</p>
-          ) : null}
-          {sucesores.length === 0 && reemplaza.length === 0 ? (
-            <Empty message="Genealogía (succeeds/precedes/replaced-by) pendiente de curación (F3)." />
-          ) : null}
-        </div>
-      )
+      return <Genealogia device={device} />
 
     case 'documentacion':
       return <Empty message="Datasheets y documentación de la ficha pendientes (F2)." />

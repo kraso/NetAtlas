@@ -9,6 +9,7 @@ import { MediumSheet } from './ui/medium-sheet.js'
 import { CatalogExplorer } from './ui/catalog-explorer.js'
 import { ManufacturerSheet } from './ui/manufacturer-sheet.js'
 import { Glossary, GlossaryTermSheet } from './ui/glossary.js'
+import { Comparar } from './ui/comparar.js'
 import { useCatalogStore } from './viewmodels/catalog-store.js'
 
 export function App(): React.JSX.Element {
@@ -39,6 +40,7 @@ export function App(): React.JSX.Element {
           <Route path="/fabricante/:slug" element={<ManufacturerSheet />} />
           <Route path="/glosario" element={<Glossary />} />
           <Route path="/glosario/:slug" element={<GlossaryTermSheet />} />
+          <Route path="/comparar" element={<Comparar />} />
         </Routes>
       </main>
     </div>

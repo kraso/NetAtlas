@@ -523,10 +523,10 @@ export function buildDemoDataset(): InMemoryDataset {
   // Relaciones de la ficha: fabricante, categoría, protocoL (soportes), historia, compatibilidad
   const relationships: Relationship[] = []
   let relId = 1
-  const rel = (from: string, predicate: string, toType: string, toSlug: string): void => {
+  const rel = (from: string, predicate: string, toType: string, toSlug: string, fromType = 'device'): void => {
     relationships.push(
       Relationship.create({
-        subject: { type: 'device', slug: from },
+        subject: { type: fromType as GraphNode['type'], slug: from },
         predicate,
         object: { type: toType as GraphNode['type'], slug: toSlug },
         validFrom: '2020-01-01',
@@ -543,6 +543,13 @@ export function buildDemoDataset(): InMemoryDataset {
   rel('aruba-6300m-48g', 'succeeds', 'device', 'aruba-2930f-48g')
   rel('aruba-2930f-48g', 'precedes', 'device', 'aruba-6300m-48g')
   rel('cisco-c9300-48p', 'replaced-by', 'device', 'cisco-9120axi')
+  // Similares (NET-HW-032): el 6300M y el 9300 son competidores de acceso L3
+  rel('aruba-6300m-48g', 'similar-to', 'device', 'cisco-c9300-48p')
+  // Tecnologías transversales (NET-HW-031): evolución PoE usa-technology
+  rel('poe-8023af', 'evolves-into', 'technology', 'poe-8023at', 'technology')
+  rel('poe-8023at', 'evolves-into', 'technology', 'poe-8023bt', 'technology')
+  rel('cisco-c9300-48p', 'uses-technology', 'technology', 'poe-8023at')
+  rel('aruba-2930f-48g', 'uses-technology', 'technology', 'poe-8023at')
   // Soportes de protocolo
   rel('cisco-c9300-48p', 'supports-protocol', 'protocol', 'ospf')
   rel('cisco-c9300-48p', 'supports-protocol', 'protocol', 'bgp')
