@@ -1,12 +1,22 @@
 import React from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { Slug, Topology, TopologyNode, validateLinkCompatibility } from '@netatlas/domain'
-import type { TopologyEdgeProps, TopologyNodeProps, NodeType } from '@netatlas/domain'
+import { Slug, Topology, TopologyNode, validateLinkCompatibility, decidirModoRender, agregarTopologia, UMBRAL_AGREGACION } from '@netatlas/domain'
+import type {
+  TopologyEdgeProps,
+  TopologyNodeProps,
+  NodeType,
+  NodoFuente,
+  AristaFuente,
+  ResolverCategoria,
+  TopologiaAgregada,
+} from '@netatlas/domain'
 import type { Core } from 'cytoscape'
 import { useTopologiesStore } from '../viewmodels/topologies-store.js'
+import { useCatalogStore } from '../viewmodels/catalog-store.js'
 import { useServices } from '../composition-root.js'
 import { CytoscapeCanvas } from './cytoscape-canvas.js'
 import { elementosDeTopologia, capasDe, rutaTopologia, tablaDeTopologia } from './topology-model.js'
+import { calcularLayoutEnWorker } from '../workers/layout-worker-client.js'
 import { Breadcrumbs } from './breadcrumbs.js'
 
 /**
@@ -116,13 +126,15 @@ function VisorTopologia({
 }): React.JSX.Element {
   const navegar = useNavigate()
   const cyRef = React.useRef<Core | undefined>(undefined)
-  const [layoutName, setLayoutName] = React.useState<'preset' | 'breadthfirst'>('preset')
+  const [layoutName, setLayoutName] = React.useState<'preset' | 'capas'>('preset')
   const [capas, setCapas] = React.useState<readonly number[]>(capasDe(topologia))
   const [activas, setActivas] = React.useState<readonly number[]>([])
   const [flujoActivo, setFlujoActivo] = React.useState(false)
   const [origen, setOrigen] = React.useState<string | undefined>()
   const [destino, setDestino] = React.useState<string | undefined>()
   const [ruta, setRuta] = React.useState<readonly string[]>([])
+  const [reordenando, setReordenando] = React.useState(false)
+  const [modoAgregado, setModoAgregado] = React.useState(true)
   const timers = React.useRef<number[]>([])
   // Refs frescas: el handler de Cytoscape se registra una vez y debe leer el
   // estado actual (sin closures obsoletos) al encadenar taps del flujo.
@@ -136,7 +148,70 @@ function VisorTopologia({
     }
   }, [])
 
+  // Resolver de categoría para la vista agregada: mapa síncrono (slug → code)
+  // construido desde el catálogo (demo in-memory o SQLite, mismo contrato).
+  const mapaCategorias = React.useRef<ReadonlyMap<string, string>>(new Map())
+  React.useEffect(() => {
+    void (async () => {
+      const { devices } = useServices.getState().services
+      const mapa = new Map<string, string>()
+      try {
+        const cat = useCatalogStore.getState().categories
+        if (cat.length === 0) return
+        // Carga paginada por categoría raíz (el demo devuelve todo; SQLite igual).
+        const raices = cat.filter((c) => c.parentCode === undefined).map((c) => c.code)
+        const raiz = raices[0] ?? cat[0]!.code
+        const page = await devices.listByCategory(raiz, { limit: 5000 })
+        for (const d of page.items) mapa.set(d.slug.value, d.categoryCode)
+      } catch {
+        // Catálogo no disponible aún: la vista agregada cae a sueltos.
+      }
+      mapaCategorias.current = mapa
+    })()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // Escalado (F4 refinamiento / ADR-03): modo de render según el número de
+  // nodos. >1.500 → agregado por categoría; >5.000 → modo Canvas (ligero).
+  const resolverCategoria: ResolverCategoria = (slug: string): string | undefined =>
+    mapaCategorias.current.get(slug)
+  const agregada: TopologiaAgregada | undefined = React.useMemo(() => {
+    if (topologia.nodes.length < UMBRAL_AGREGACION) return undefined
+    const fuenteNodos: readonly NodoFuente[] = topologia.nodes.map((n) => ({
+      id: n.id,
+      entityType: n.entityType === 'category' ? ('category' as const) : ('device' as const),
+      entitySlug: n.entitySlug,
+      layerHint: n.layerHint,
+    }))
+    const fuenteAristas: readonly AristaFuente[] = topologia.edges.map((e) => ({ from: e.from, to: e.to }))
+    return agregarTopologia(fuenteNodos, fuenteAristas, resolverCategoria)
+  }, [topologia])
+  const modo = decidirModoRender(agregada?.nodosOriginales ?? topologia.nodes.length)
+
   const elementos = React.useMemo(() => {
+    // El usuario puede pedir ver la topología completa incluso si es enorme;
+    // por defecto usamos la vista agregada en los modos de escala.
+    if (modoAgregado && modo !== 'svg' && agregada) {
+      // Vista agregada: supernodos por categoría con conteo.
+      const nodos = agregada.nodos.map((n) => ({
+        data: {
+          id: n.id,
+          label: n.tipo === 'grupo' ? `${n.categoria ?? 'grupo'} (${n.cantidad})` : n.id,
+          tipo: n.tipo === 'grupo' ? 'category' : 'device',
+          layer: n.capa,
+          pos: n.id === 'grupo:CAT-SWT' ? { x: 0, y: 0 } : undefined,
+        },
+      }))
+      const aristas = agregada.aristas.map((e) => ({
+        data: {
+          id: `${e.from}→${e.to}`,
+          source: e.from,
+          target: e.to,
+          label: String(e.cantidad),
+        },
+      }))
+      return [...nodos, ...aristas]
+    }
     const filtrados = activas.length > 0 ? topologia.nodes.filter((n) => n.layerHint === undefined || activas.includes(n.layerHint)) : topologia.nodes
     const conEnRuta = new Set(ruta)
     return elementosDeTopologia(
@@ -156,7 +231,7 @@ function VisorTopologia({
     ).map((el) => ({
       data: { ...el.data, enRuta: conEnRuta.has(String(el.data.id)) },
     }))
-  }, [topologia, activas, ruta])
+  }, [topologia, activas, ruta, modo, agregada, modoAgregado])
 
   const animar = (rutaIds: readonly string[]): void => {
     const cy = cyRef.current
@@ -207,6 +282,36 @@ function VisorTopologia({
     [topologia, navegar],
   )
 
+  const reordenar = async (): Promise<void> => {
+    if (reordenando) return
+    setReordenando(true)
+    try {
+      // F4 refinamiento: el layout se calcula en un Web Worker (nunca bloquea
+      // el hilo principal) y el resultado se persiste como layout de usuario.
+      const nodosLayout = topologia.nodes.map((n) => ({ id: n.id, layerHint: n.layerHint }))
+      const posiciones = await calcularLayoutEnWorker({
+        nodos: nodosLayout,
+        separacionX: 90,
+        separacionY: 130,
+      })
+      const porPos = new Map(posiciones.map((p) => [p.id, { x: p.x, y: p.y }]))
+      const conLayout = topologia.withLayout(
+        topologia.nodes.map((n) => {
+          const pos = porPos.get(n.id) ?? { x: 0, y: (n.layerHint ?? 1) * 130 }
+          return { nodeId: n.id, x: pos.x, y: pos.y }
+        }),
+      )
+      onCambio(conLayout)
+      await useTopologiesStore.getState().saveLayout(
+        topologia.slug.value,
+        conLayout.nodes.map((n) => ({ nodeId: n.id, x: n.x!, y: n.y! })),
+      )
+      setLayoutName('capas')
+    } finally {
+      setReordenando(false)
+    }
+  }
+
   const guardarLayout = (positions: ReadonlyArray<{ id: string; x: number; y: number }>): void => {
     void useTopologiesStore
       .getState()
@@ -245,9 +350,21 @@ function VisorTopologia({
   return (
     <div className="stack">
       <div className="row" role="toolbar" aria-label="Acciones del visor" style={{ flexWrap: 'wrap', gap: 8 }}>
-        <button type="button" onClick={() => setLayoutName((l) => (l === 'preset' ? 'breadthfirst' : 'preset'))}>
-          {layoutName === 'preset' ? 'Reordenar automáticamente' : 'Volver al layout guardado'}
+        <button type="button" onClick={() => void reordenar()} disabled={reordenando}>
+          {reordenando ? 'Reordenando…' : 'Reordenar (layout por capas)'}
         </button>
+        {modo !== 'svg' && agregada ? (
+          <button type="button" onClick={() => setModoAgregado(!modoAgregado)} aria-pressed={modoAgregado}>
+            {modoAgregado
+              ? `${resumenVistaAgregada(agregada)}`
+              : `Vista agregada (${agregada.nodosOriginales.toLocaleString('es')} nodos → ${agregada.nodos.length} entidades)`}
+          </button>
+        ) : null}
+        {modo === 'canvas' ? (
+          <span className="guia-tecnica" role="status">
+            Modo Canvas de alta densidad ({topologia.nodes.length.toLocaleString('es')} nodos): render ligero sin SVG.
+          </span>
+        ) : null}
         <button type="button" onClick={() => exportar('svg')}>Exportar SVG</button>
         <button type="button" onClick={() => exportar('png')}>Exportar PNG</button>
         <button
@@ -574,4 +691,11 @@ function descargarBlob(blob: Blob, nombre: string): void {
   a.download = nombre
   a.click()
   URL.revokeObjectURL(url)
+}
+
+/** Etiqueta del botón cuando la vista agregada está activa (acción = volver a completa). */
+function resumenVistaAgregada(a: { nodosOriginales: number; nodos: readonly { tipo: string }[] }): string {
+  const grupos = a.nodos.filter((n) => n.tipo === 'grupo').length
+  const sueltos = a.nodos.length - grupos
+  return `Vista completa (${a.nodosOriginales.toLocaleString('es')} nodos → ${grupos} grupo${grupos === 1 ? '' : 's'}${sueltos > 0 ? ` + ${sueltos} sueltos` : ''})`
 }

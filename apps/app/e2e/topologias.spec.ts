@@ -79,4 +79,46 @@ test.describe('Topologías (F4)', () => {
     await expect(page.getByText('Switches multilayer')).toBeVisible()
     await expect(page.getByText('Routing')).toBeVisible()
   })
+
+  test('refinamiento F4: topología >1.500 nodos activa el modo agregado (ADR-03)', async ({ page }) => {
+    // Se siembra una topología de usuario con 1.600 nodos en localStorage
+    // (mismo mecanismo que el resto del demo). EntitySlug sintéticos únicos:
+    // el umbral de agregación (≥1.500) se activa y el visor cambia su modo.
+    await page.addInitScript(() => {
+      const nodos = Array.from({ length: 1600 }, (_, i) => ({
+        entityType: 'device' as const,
+        entitySlug: `virt-${String(i).padStart(4, '0')}`,
+        x: (i % 40) * 30,
+        y: Math.floor(i / 40) * 30,
+        layerHint: 2,
+      }))
+      const topologia = {
+        slug: { value: 'escala-1600' },
+        name: 'Escala — 1600 nodos',
+        kind: 'user' as const,
+        nodes: nodos,
+        edges: nodos.slice(1).map((_, i) => ({
+          from: `device:virt-${String(i).padStart(4, '0')}`,
+          to: `device:virt-${String(i + 1).padStart(4, '0')}`,
+        })),
+        metadata: { semillaF4: true },
+      }
+      const previas = localStorage.getItem('netatlas.topologies.user.v1')
+      const lista = previas ? JSON.parse(previas) : []
+      localStorage.setItem('netatlas.topologies.user.v1', JSON.stringify([...lista, topologia]))
+    })
+
+    await page.goto('/topology/escala-1600')
+    // Por defecto entra en modo AGREGADO (1.600 ≥ umbral de 1.500): el botón
+    // muestra el resumen «Vista completa (1600 nodos → …)» (acción para
+    // volver a la vista normal) y el lienzo se mantiene ligero.
+    await expect(page.getByRole('button', { name: /Vista completa \(1\.?600 nodos/ })).toBeVisible()
+    await expect(page.getByRole('button', { name: /Vista completa \(1\.?600 nodos/ })).toHaveAttribute('aria-pressed', 'true')
+
+    // Alternar a la vista completa explícita y volver a la agregada.
+    await page.getByRole('button', { name: /Vista completa \(1\.?600 nodos/ }).click()
+    await expect(page.getByRole('button', { name: /Vista agregada \(1\.?600 nodos →/ })).toBeVisible()
+    // El lienzo Cytoscape sigue presente (render ligero).
+    await expect(page.getByRole('img', { name: /Escala — 1600 nodos/ })).toBeVisible()
+  })
 })

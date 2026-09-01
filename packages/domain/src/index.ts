@@ -106,6 +106,26 @@ export type {
   LinkCompatibilityInput,
   LinkCompatibilityResult,
 } from './topologies/topology.js'
+
+// Escalado de topologías (F4 refinamiento / ADR-03: agregación + modo Canvas)
+export {
+  UMBRAL_AGREGACION,
+  UMBRAL_CANVAS,
+  decidirModoRender,
+  agregarTopologia,
+} from './topologies/escala.js'
+export type {
+  NodoAgregado,
+  AristaAgregada,
+  TopologiaAgregada,
+  NodoFuente,
+  AristaFuente,
+  ResolverCategoria,
+} from './topologies/escala.js'
+
+// Layouts de topología (F4 refinamiento / Web Worker + reordenar persistido)
+export { layoutPorCapas, layoutRadial, aplicarLayout } from './topologies/layout.js'
+export type { NodoLayoutInput, PosicionLayout, NombreLayout } from './topologies/layout.js'
 export type { TopologyRepository, TopologyPosition } from './ports/topology-repository.js'
 
 // Puertos (sección 6.6)

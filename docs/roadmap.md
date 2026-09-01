@@ -117,8 +117,8 @@
 
 ### Pendiente F4 (refinamiento)
 
-- [ ] virtualización >1.500 nodos (agregación por categoría) y modo Canvas >5.000 (ADR-03)
-- [ ] layouts en Web Worker y persistencia de «reordenar» como layout de usuario
+- [x] **virtualización >1.500 nodos (agregación por categoría) y modo Canvas >5.000 (ADR-03)**: módulo puro `topologies/escala.ts` (`decidirModoRender` con umbrales 1.500/5.000 y `agregarTopologia` que colapsa dispositivos en supernodos por categoría con conteo y aristas resumidas); el visor detecta el modo y ofrece «Vista agregada (N nodos → M entidades)» / «Vista completa» con render ligero; E2E `escala-1600` verifica el umbral en chromium y firefox (5 tests dominio)
+- [x] **layouts en Web Worker y persistencia de «reordenar» como layout de usuario**: layout determinista por capas en el dominio (`topologies/layout.ts`, compartido) + Web Worker real (`workers/layout.worker.ts`) con cliente que cae al síncrono en jsdom; el botón «Reordenar (layout por capas)» calcula en el worker y **persiste el resultado vía `saveLayout`** (recargar mantiene las posiciones); 4 tests dominio + 2 app
 
 **✅ Deuda técnica resuelta — bundle de Cytoscape**: import dinámico de las rutas de diagramas (`/topology/:slug`, `/mapa-global`, pestaña Diagramas con `React.lazy` + `Suspense`) + `manualChunks` (`cy-vendor` para cytoscape/cytoscape-svg y `react-vendor` para el runtime de React). Resultado: el chunk inicial de la app baja de **753,81 kB (240,66 gzip) a 268,31 kB (84,43 gzip)**; `cy-vendor` (464,82 kB / 149,47 gzip) solo se descarga/evalúa al abrir un diagrama (precacheado por el SW). **Sin warning de >500 kB**. SLO §23.2 re-verificado (<500 ms en chromium y firefox) y E2E de topologías/comparador **28/28** intactos.
 

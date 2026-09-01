@@ -89,9 +89,22 @@ describe('Visor de topologías (NET-HW-033)', () => {
     expect(screen.getByRole('button', { name: 'Exportar SVG' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Exportar PNG' })).toBeDefined()
     expect(screen.getByRole('button', { name: 'Simular flujo de paquetes' })).toBeDefined()
-    expect(screen.getByRole('button', { name: 'Reordenar automáticamente' })).toBeDefined()
+    expect(screen.getByRole('button', { name: /Reordenar/ })).toBeDefined()
     // dragfree registrado (persistencia al arrastrar)
     expect(typeof cyMock.handlers['dragfree']).toBe('function')
+  })
+
+  it('reordenar con el layout determinista por capas persiste como layout de usuario', async () => {
+    renderApp('/topology/clos-demo')
+    await waitFor(() => expect(cyMock.calls.length).toBeGreaterThan(0))
+    fireEvent.click(await screen.findByRole('button', { name: /Reordenar/ }))
+    // El cálculo es síncrono en jsdom (fallback sin Worker): al terminar, la
+    // topología guardada contiene posiciones deterministas por capa.
+    await waitFor(async () => {
+      const t = await useTopologiesStore.getState().bySlug('clos-demo')
+      const c9300 = t?.nodeById('device:cisco-c9300-48p')
+      expect(c9300?.x).toBeDefined()
+    })
   })
 
   it('flujo de paquetes: dos toques marcan origen/destino y calculan la ruta (NET-HW-035)', async () => {
