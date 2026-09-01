@@ -69,6 +69,12 @@ export function CytoscapeCanvas({
       const pos = n.data('pos')
       if (pos) n.position({ x: pos.x, y: pos.y })
     })
+    // Marca del primer render efectivo (SLO §23.2): cytoscape dibuja en canvas,
+    // así que la única señal DOM del layout+render es su evento 'render'.
+    const inicio = performance.now()
+    cy.one('render', () => {
+      ref.current?.setAttribute('data-cy-render-ms', String(Math.round(performance.now() - inicio)))
+    })
     onReady?.(cy)
     if (onTapNode) {
       cy.on('tap', 'node', (evt) => onTapNode(evt.target.id()))

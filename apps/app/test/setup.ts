@@ -22,6 +22,7 @@ vi.mock('cytoscape', () => {
           on: (evento: string, selector: unknown, cb?: () => void) => {
             cyMockState.handlers[evento] = typeof cb === 'function' ? cb : (selector as () => void)
           },
+          one: () => {},
           destroy: () => {},
           elements: () => ({ removeClass: () => {}, addClass: () => {} }),
           getElementById: () => ({ addClass: () => {} }),

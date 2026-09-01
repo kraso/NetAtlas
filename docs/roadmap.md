@@ -1,6 +1,6 @@
 # Roadmap — NetAtlas
 
-> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 3 (Relaciones y búsqueda avanzada) — implementada**.
+> Fuente normativa: PLAN MAESTRO §27. Estado: **Fase 4 (Diagramas interactivos) — implementada**.
 
 ## Fases
 
@@ -10,6 +10,7 @@
 | **F1** | MVP | Catálogo + fichas + búsqueda FTS/DSL + vista OSI + fuentes v1 + importación JSON/CSV + seed 300–500 | Criterios 28.1.6 (los 6) | ✅ **cerrada** |
 | **F2** | Catálogo avanzado | Calculadoras, exploradores de catálogos, autocompletado, fabricantes, glosario, panel frontal, migas | 15 macrocategorías pobladas; cobertura fuentes ≥80% | ✅ **cerrada** |
 | **F3** | Relaciones y búsqueda avanzada | Grafo completo, facetas dinámicas, mapa local, genealogía básica | Navegación ≤2 clics verificada en E2E | ✅ **cerrada** |
+| **F4** | Diagramas interactivos | Mapa global, visor de topologías, panel frontal generado, flujo de paquetes, exportación SVG/PNG | SLOs de diagramas (23.2) cumplidos | ✅ **cerrada** |
 | **F4** | Diagramas interactivos | Mapa global, topologías, panel frontal, exportación | SLOs de diagramas | ⏳ |
 | **F5** | Comparador | Motor + UI + veredicto + exportación | CU-02 aprobado | ⏳ |
 | **F6** | Estándares/protocolos/importación pro | Exploradores completos, dedup/reconciliación, calidad de fuentes | Lote externo sin SQL a mano | ⏳ |
@@ -101,6 +102,24 @@
 - [ ] mapa global del conocimiento con agregación (NET-HW-036, F4)
 - [ ] exportación SVG/PNG de vistas (NET-HW-037, F4)
 
+## Estado de la Fase 4 (implementada — diagramas interactivos)
+
+- [x] **Módulo de topologías en el dominio** (§13.3): `Topology`/`TopologyNode`/`TopologyEdge` con invariantes del agregado (ids únicos, aristas a nodos existentes, sin bucles de un solo nodo) y `withLayout` inmutable; puerto `TopologyRepository` (list/bySlug/upsert/saveLayout/remove) + `validateLinkCompatibility` (interfaz común por velocidad o compatibilidad curada)
+- [x] **Adaptador SQLite** (`SqliteTopologyRepository`): roundtrip completo de topologías con traducción entity-slug ↔ id (como relationship), persistencia de layout solo de coordenadas y remove transaccional (4 tests)
+- [x] **Siembra de topologías de referencia** en `dataset:build`: `clos-3-etapas` (7 nodos/8 aristas), `sucursal-tipica` (4/3) y `demostracion-300` (300 nodos/311 aristas para el SLO) sobre dispositivos reales del seed
+- [x] **NET-HW-033 Visor de topologías**: `/topologies` + `/topology/:slug` con Cytoscape — posiciones persistidas al arrastrar (`saveLayout`), «Reordenar automáticamente», filtros por capa OSI, click→ficha, alternativa accesible en tabla
+- [x] **NET-HW-034 Laboratorio-editor**: crear topologías de usuario (persistidas en localStorage), añadir/quitar dispositivos por slug, conectar con **validación de compatibilidad** (mensaje concreto al rechazo)
+- [x] **NET-HW-035 Flujo de paquetes animado**: ruta BFS no dirigida entre dos nodos tocados y resaltado por saltos (.enRuta en Cytoscape)
+- [x] **NET-HW-036 Mapa global del conocimiento**: agregación por categoría (nodos con conteo, aristas device↔device entre categorías) en in-memory y SQLite; click→explorador; tabla accesible
+- [x] **NET-HW-037 Exportación SVG/PNG**: botones en el visor (cytoscape PNG + extensión cytoscape-svg), con pie descargable por nombre de topología y fecha
+- [x] **SLO de diagramas (§23.2) verificado en E2E**: `slo-diagramas.spec.ts` mide el primer render real de Cytoscape (evento `render`) en `estres-300` — **chromium 216 ms y firefox 384 ms, ambos < 500 ms**
+- [x] E2E de flujo completo de topologías en chromium y firefox (visor+filtros+exportación, laboratorio con validación y persistencia tras recarga, mapa global): 24/24 verdes
+
+### Pendiente F4 (refinamiento)
+
+- [ ] virtualización >1.500 nodos (agregación por categoría) y modo Canvas >5.000 (ADR-03)
+- [ ] layouts en Web Worker y persistencia de «reordenar» como layout de usuario
+
 ## Esfuerzo orientativo (1–2 personas)
 
 F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6 6–8 · F7 8–10 · F8 10–14.
@@ -111,14 +130,14 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     9 paquetes verdes (tsc --noEmit estricto)
-tests:         16 suites con 172+ verdes (domain 69 · data 28 · importers 11 · search 20 · ui 6 · app 52 · dataset-tools 9 · datagen 4)
+tests:         20 suites con 208 verdes (domain 75 · data 32 · importers 11 · search 20 · ui 6 · app 65 · dataset-tools 9 · datagen 4)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
-dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores
+dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías (7+4+300 nodos)
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
 app build:     ✅ vite build — PWA con SW (12 entradas precache) + manifest + icons 192/512
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 14/14 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA + navegación ≤2 clics O3/F3)
+E2E:           ✅ 24/24 en chromium y firefox (flujo crítico 28.1.6#3 + 404 + offline PWA + navegación ≤2 clics O3/F3 + topologías F4 + SLO diagramas §23.2 <500 ms)
 Tauri:         ✅ build release local (netatlas-desktop.exe) + job CI Windows
 CI:            jobs verify · ui (PWA) · e2e · tauri
 ```
