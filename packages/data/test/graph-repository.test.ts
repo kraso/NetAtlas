@@ -96,4 +96,34 @@ describe('SqliteGraphRepository', () => {
     )
     expect(paths).toHaveLength(0)
   })
+
+  it('vecindadCte alcanza a profundidad 2 (NET-HW-029)', async () => {
+    // cat-2960 →(succeeds)→ cat-2960x →(succeeds)→ cat-9300
+    const graph = ctx.repositories.graph as SqliteGraphRepository
+    const ids = await graph.vecindadCte({ type: 'device', slug: 'cat-2960' }, 2)
+    const slugs = ids.map((id) => graph['slugById']('device', id))
+    expect(slugs).toContain('cat-2960')
+    expect(slugs).toContain('cat-2960x')
+    expect(slugs).toContain('cat-9300')
+  })
+
+  it('vecindadCte respeta la profundidad máxima', async () => {
+    const graph = ctx.repositories.graph as SqliteGraphRepository
+    const ids1 = await graph.vecindadCte({ type: 'device', slug: 'cat-2960' }, 1)
+    const slugs1 = ids1.map((id) => graph['slugById']('device', id))
+    expect(slugs1).toContain('cat-2960x')
+    // cat-9300 solo es alcanzable en el segundo salto
+    expect(slugs1).not.toContain('cat-9300')
+    const ids2 = await graph.vecindadCte({ type: 'device', slug: 'cat-2960' }, 2)
+    const slugs2 = ids2.map((id) => graph['slugById']('device', id))
+    expect(slugs2).toContain('cat-9300')
+  })
+
+  it('vecindadCte filtra por predicado', async () => {
+    const graph = ctx.repositories.graph as SqliteGraphRepository
+    const ids = await graph.vecindadCte({ type: 'device', slug: 'cat-2960' }, 2, ['succeeds'])
+    const slugs = ids.map((id) => graph['slugById']('device', id))
+    expect(slugs).toContain('cat-2960x')
+    expect(slugs).toContain('cat-9300')
+  })
 })

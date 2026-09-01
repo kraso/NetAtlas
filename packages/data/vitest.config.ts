@@ -9,5 +9,10 @@ export default defineConfig({
   test: {
     include: ['test/**/*.test.ts'],
     environment: 'node',
+    // 1 worker para footprint bajo (el sandbox limita procesos/hilos)
+    pool: 'threads',
+    maxWorkers: 1,
+    minWorkers: 1,
+    fileParallelism: false,
   },
 })

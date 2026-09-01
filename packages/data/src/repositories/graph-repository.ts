@@ -142,6 +142,52 @@ export class SqliteGraphRepository implements GraphRepository {
     return results
   }
 
+  /**
+   * Vecindad por CTE recursiva (NET-HW-029) — profundidad N dentro de un mismo
+   * tipo de entidad (p. ej. device→device). La CTE materializa los ids
+   * alcanzables en ≤ maxDepth saltos con deduplicación de paquetes; el caller
+   * resuelve slugs después. Más eficiente que BFS-JS para subgrafos densos.
+   */
+  async vecindadCte(node: GraphNode, maxDepth: number, predicates?: readonly string[]): Promise<readonly number[]> {
+    const start = this.resolveId(node)
+    if (start === undefined || maxDepth < 1) return []
+
+    const predFilter =
+      predicates && predicates.length > 0
+        ? `AND r.predicate IN (${predicates.map(() => '?').join(',')})`
+        : ''
+
+    const rows = this.db
+      .prepare(
+        `WITH RECURSIVE alcanzable(id, tipo, profundidad) AS (
+           SELECT ?, ?, 0
+           UNION
+           SELECT
+             CASE WHEN r.subject_type = a.tipo AND r.subject_id = a.id THEN r.object_id
+                  ELSE r.subject_id END,
+             CASE WHEN r.subject_type = a.tipo AND r.subject_id = a.id THEN r.object_type
+                  ELSE r.subject_type END,
+             a.profundidad + 1
+           FROM relationship r
+           JOIN alcanzable a ON (
+             (r.subject_type = a.tipo AND r.subject_id = a.id)
+             OR (r.object_type = a.tipo AND r.object_id = a.id)
+           )
+           ${predFilter}
+           WHERE a.profundidad < ?
+         )
+         SELECT DISTINCT id, tipo, profundidad FROM alcanzable`,
+      )
+      .all(
+        start,
+        node.type,
+        ...(predicates ?? []),
+        maxDepth,
+      ) as SqlRow[]
+
+    return rows.filter((r) => String(r.tipo) === node.type).map((r) => Number(r.id))
+  }
+
   /** Convierte una fila a Relationship del dominio; invertida = entrante. */
   private rowToRelationship(row: SqlRow, invertida: boolean): Relationship {
     const spec = requirePredicate(String(row.predicate))
