@@ -4,6 +4,7 @@ import { compareDevices, evaluateCompatibilidad } from '@netatlas/domain'
 import type { CompareDeviceInput, ComparisonReport } from '@netatlas/domain'
 import { useServices } from '../composition-root.js'
 import { Breadcrumbs } from './breadcrumbs.js'
+import { generarPdfComparacion } from './exportar-pdf.js'
 import type { Device } from '@netatlas/domain'
 
 /**
@@ -188,11 +189,18 @@ export function Comparar(): React.JSX.Element {
     URL.revokeObjectURL(url)
   }
 
-  const exportarPdf = (): void => {
+  const exportarPdf = async (): Promise<void> => {
+    if (!report) return
     try {
-      window.print()
+      // Descarga directa con jsPDF (NET-HW-042, deuda F5 resuelta).
+      await generarPdfComparacion(report)
     } catch {
-      // Sin soporte (jsdom): se ignora
+      // Fallback: impresión del navegador si jsPDF no puede generar.
+      try {
+        window.print()
+      } catch {
+        // Sin soporte (jsdom): se ignora
+      }
     }
   }
 
@@ -223,7 +231,7 @@ export function Comparar(): React.JSX.Element {
           data-testid="buscar-comparar"
         />
         <button type="button" onClick={exportarCsv}>Exportar CSV</button>
-        <button type="button" onClick={exportarPdf}>Exportar PDF (imprimir)</button>
+        <button type="button" onClick={() => void exportarPdf()}>Exportar PDF</button>
       </div>
       {sugerencias.length > 0 ? (
         <ul aria-label="Sugerencias" style={{ listStyle: 'none', margin: '4px 0', padding: 0 }}>

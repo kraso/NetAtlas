@@ -133,7 +133,7 @@
 
 ### Pendiente F5 (refinamiento)
 
-- [ ] PDF descargable directo (jsPDF/window.print con captura) si el flujo de impresión no basta
+- [x] **PDF descargable directo (jsPDF)**: deuda resuelta — el botón «Exportar PDF» ahora genera y descarga `netatlas-comparacion-YYYY-MM-DD.pdf` con jsPDF (chunk lazy de 390 kB que solo se descarga al exportar; `window.print()` queda como fallback si jsPDF no puede). El contenido del PDF es puro y testeable (`construirContenidoPdf`); el E2E verifica la descarga real en chromium y firefox (antes solo comprobaba que el botón existía porque `window.print()` bloqueaba el diálogo)
 - [ ] URL compartible del reporte con veredicto persistido en la querystring (ya compartible por ids)
 
 ## Estado de la Fase 6 (implementada — importación pro, criterio F6 aprobado)
@@ -198,12 +198,12 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     10 de 11 paquetes verdes (tsc --noEmit estricto; el workspace suma @netatlas/server)
-tests:         55 suites con 347 verdes (domain 138 · data 37 · importers 15 · search 20 · ui 6 · app 84 · dataset-tools 11 · datagen 4 · server 32)
+tests:         56 suites con 351 verdes (domain 138 · data 37 · importers 15 · search 20 · ui 6 · app 88 · dataset-tools 11 · datagen 4 · server 32)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
-app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 131 kB (38 gzip) + react-vendor 165 kB + cy-vendor 465 kB solo diagramas
+app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 131 kB (38 gzip) + react-vendor 165 kB + cy-vendor 465 kB solo diagramas + jspdf 390 kB solo al exportar PDF
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
 E2E:           ✅ 40/40 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7)
 IA:            ✅ data:ia --eval → 134 preguntas · 395 citas · fidelidad 100% · 0 alucinaciones · deploy autorizado (criterio F7)

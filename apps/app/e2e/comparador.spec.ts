@@ -33,9 +33,12 @@ test.describe('Comparador de dispositivos — CU-02 (F5)', () => {
     await expect(page.getByRole('button', { name: /Puertos totales/ })).toHaveCount(0)
     await expect(page.getByRole('button', { name: /Puertos con PoE/ })).toBeVisible()
 
-    // 5) Exportación CSV (descargable) y PDF vía imprimir (diálogo nativo: solo se verifica el botón)
+    // 5) Exportación CSV (descargable) y PDF descargable real con jsPDF
     await page.getByRole('button', { name: 'Exportar CSV' }).click()
-    await expect(page.getByRole('button', { name: 'Exportar PDF (imprimir)' })).toBeVisible()
+    const pdf = page.waitForEvent('download')
+    await page.getByRole('button', { name: 'Exportar PDF' }).click()
+    const descarga = await pdf
+    expect(descarga.suggestedFilename()).toMatch(/^netatlas-comparacion-\d{4}-\d{2}-\d{2}\.pdf$/)
   })
 
   test('añade el tercer candidato desde el buscador del comparador', async ({ page }) => {
