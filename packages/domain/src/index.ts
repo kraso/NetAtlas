@@ -90,6 +90,10 @@ export type {
   ComparisonReport,
 } from './compare/motor.js'
 
+// Enlace compartible con veredicto (F5 refinamiento)
+export { resumenVeredicto, etiquetaVeredicto, etiquetaDeReporte, verificarEtiqueta } from './compare/enlace.js'
+export type { EtiquetaVeredictoResultado } from './compare/enlace.js'
+
 // Topologías (sección 13 / F4)
 export {
   TopologyNode,

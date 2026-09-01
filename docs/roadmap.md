@@ -134,7 +134,7 @@
 ### Pendiente F5 (refinamiento)
 
 - [x] **PDF descargable directo (jsPDF)**: deuda resuelta — el botón «Exportar PDF» ahora genera y descarga `netatlas-comparacion-YYYY-MM-DD.pdf` con jsPDF (chunk lazy de 390 kB que solo se descarga al exportar; `window.print()` queda como fallback si jsPDF no puede). El contenido del PDF es puro y testeable (`construirContenidoPdf`); el E2E verifica la descarga real en chromium y firefox (antes solo comprobaba que el botón existía porque `window.print()` bloqueaba el diálogo)
-- [ ] URL compartible del reporte con veredicto persistido en la querystring (ya compartible por ids)
+- [x] **URL compartible del reporte con veredicto persistido en la querystring**: `v=<hash FNV-1a 8-hex>` del resumen del veredicto (puro en `compare/enlace.ts`, sin node:crypto para la PWA); botón «Copiar enlace del reporte» → `?ids=…&v=…`; al abrirlo el comparador recalcula y **verifica**: misma etiqueta ⇒ insignia «✓ enlace verificado», distinta ⇒ «El dataset ha cambiado…» (3 tests dominio + 3 UI + E2E copiar/verificar en chromium y firefox)
 
 ## Estado de la Fase 6 (implementada — importación pro, criterio F6 aprobado)
 

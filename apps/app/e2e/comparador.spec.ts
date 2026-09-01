@@ -41,6 +41,30 @@ test.describe('Comparador de dispositivos — CU-02 (F5)', () => {
     expect(descarga.suggestedFilename()).toMatch(/^netatlas-comparacion-\d{4}-\d{2}-\d{2}\.pdf$/)
   })
 
+  test('enlace compartible con veredicto: copiar y verificar al recargar (F5 refinamiento)', async ({ page }) => {
+    // Intercepta el portapapeles (compatible chromium+firefox) capturando el
+    // texto que el botón intenta copiar.
+    await page.addInitScript(() => {
+      const original = (navigator.clipboard as unknown as { writeText?: (t: string) => Promise<void> })?.writeText
+      Object.defineProperty(navigator, 'clipboard', {
+        configurable: true,
+        value: { writeText: async (t: string) => { (window as unknown as { __copiada?: string }).__copiada = t } },
+      })
+      void original
+    })
+    await page.goto('/comparar?ids=cisco-c9300-48p,aruba-6300m-48g,aruba-2930f-48g')
+    await expect(page.getByText(/En «Puertos con PoE»/)).toBeVisible()
+
+    await page.getByRole('button', { name: 'Copiar enlace del reporte' }).click()
+    await expect(page.getByText(/Enlace copiado/)).toBeVisible()
+    const url = await page.evaluate(() => (window as unknown as { __copiada?: string }).__copiada ?? '')
+    expect(url).toMatch(/v=[0-9a-f]{8}/)
+
+    // Abrir el enlace copiado: insignia de verificación tras recalcular.
+    await page.goto(url)
+    await expect(page.getByText(/enlace verificado/)).toBeVisible()
+  })
+
   test('añade el tercer candidato desde el buscador del comparador', async ({ page }) => {
     await page.goto('/comparar?ids=cisco-c9300-48p,aruba-6300m-48g')
     await expect(page.getByText(/En «Puertos con PoE»/)).toBeVisible()

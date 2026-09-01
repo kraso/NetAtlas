@@ -1,6 +1,6 @@
 import React from 'react'
 import { useSearchParams, Link, useNavigate } from 'react-router-dom'
-import { compareDevices, evaluateCompatibilidad } from '@netatlas/domain'
+import { compareDevices, evaluateCompatibilidad, etiquetaDeReporte, verificarEtiqueta } from '@netatlas/domain'
 import type { CompareDeviceInput, ComparisonReport } from '@netatlas/domain'
 import { useServices } from '../composition-root.js'
 import { Breadcrumbs } from './breadcrumbs.js'
@@ -28,6 +28,13 @@ export function Comparar(): React.JSX.Element {
   const [expandidas, setExpandidas] = React.useState<ReadonlySet<string>>(new Set())
   const [busqueda, setBusqueda] = React.useState('')
   const [sugerencias, setSugerencias] = React.useState<readonly { slug: string; label: string }[]>([])
+  // Enlace compartible (F5 refinamiento): etiqueta del veredicto en `v=`.
+  const etiquetaUrl = params.get('v')
+  const [etiquetaReporte, setEtiquetaReporte] = React.useState<string | undefined>()
+  const [enlaceCopiado, setEnlaceCopiado] = React.useState(false)
+  // ¿El enlace recibido verifica contra el reporte recalculado?
+  const enlaceVerificado =
+    report !== null && etiquetaUrl !== null && etiquetaReporte !== undefined && etiquetaUrl === etiquetaReporte
 
   const slugsRaw = params.get('ids') ?? ''
   const slugs = React.useMemo(() => {
@@ -132,14 +139,18 @@ export function Comparar(): React.JSX.Element {
 
       const informe = compareDevices({ devices: inputs, curatedCompatible: curadas })
       // Adhiere las incompatibilidades declarativas al reporte como notas
-      setReport({
+      const completo: ComparisonReport = {
         ...informe,
         compatibilidades: [
           ...informe.compatibilidades,
           ...declarativos.map((d) => ({ a: d.a, b: d.b, compatible: false, note: d.res.note })),
         ],
         veredicto: [...declarativos.map((d) => `Incompatibilidad declarada: ${d.res.note}`), ...informe.veredicto],
-      })
+      }
+      setReport(completo)
+      // Etiqueta del veredicto: si el enlace trae `v=`, se verifica contra el
+      // reporte recalculado (detecta cambios de datos entre generación y vista).
+      setEtiquetaReporte(etiquetaDeReporte(completo).hash)
       setCargando(false)
     })()
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -204,6 +215,18 @@ export function Comparar(): React.JSX.Element {
     }
   }
 
+  const copiarEnlace = (): void => {
+    if (!report || !etiquetaReporte) return
+    const url = new URL(window.location.href)
+    url.searchParams.set('ids', slugs.join(','))
+    url.searchParams.set('v', etiquetaReporte)
+    void navigator.clipboard?.writeText(url.toString()).catch(() => {
+      // Sin portapapeles (jsdom): el enlace queda en la URL visible.
+    })
+    setEnlaceCopiado(true)
+    window.setTimeout(() => setEnlaceCopiado(false), 2000)
+  }
+
   const toggleFila = (key: string): void => {
     setExpandidas((prev) => {
       const next = new Set(prev)
@@ -232,6 +255,18 @@ export function Comparar(): React.JSX.Element {
         />
         <button type="button" onClick={exportarCsv}>Exportar CSV</button>
         <button type="button" onClick={() => void exportarPdf()}>Exportar PDF</button>
+        <button type="button" onClick={copiarEnlace} disabled={report === null}>
+          {enlaceCopiado ? 'Enlace copiado ✓' : 'Copiar enlace del reporte'}
+        </button>
+        {enlaceVerificado ? (
+          <span className="mono guia-tecnica" data-testid="enlace-verificado" role="status">
+            ✓ enlace verificado (mismo veredicto)
+          </span>
+        ) : etiquetaUrl !== null && report !== null ? (
+          <span className="empty-state" data-testid="enlace-cambiado" role="status">
+            El dataset ha cambiado desde que se generó este enlace: el veredicto puede diferir.
+          </span>
+        ) : null}
       </div>
       {sugerencias.length > 0 ? (
         <ul aria-label="Sugerencias" style={{ listStyle: 'none', margin: '4px 0', padding: 0 }}>

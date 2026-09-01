@@ -9,8 +9,8 @@ import type { ComparisonReport } from '@netatlas/domain'
 
 const report: ComparisonReport = {
   devices: [
-    { slug: 'cisco-c9300-48p', name: 'Cisco Catalyst 9300-48P' },
-    { slug: 'aruba-2930f-48g', name: 'Aruba 2930F 48G PoE+' },
+    { slug: 'cisco-c9300-48p', name: 'Cisco Catalyst 9300-48P', categoryCode: 'CAT-SWT-L3', categoryName: 'Switches multilayer' },
+    { slug: 'aruba-2930f-48g', name: 'Aruba 2930F 48G PoE+', categoryCode: 'CAT-SWT-L2', categoryName: 'Switches capa 2' },
   ],
   rows: [
     {
