@@ -13,11 +13,14 @@
     "lint": "tsc --noEmit",
     "data:lint": "tsx src/lint-cli.ts",
     "dataset:build": "tsx src/build-cli.ts",
+    "data:manifiesto": "tsx src/manifiesto-cli.ts",
+    "data:delta": "tsx src/delta-cli.ts",
     "gen-assist": "tsx src/assisted-gen.ts"
   },
   "dependencies": {
     "@netatlas/data": "workspace:*",
-    "@netatlas/domain": "workspace:*"
+    "@netatlas/domain": "workspace:*",
+    "@netatlas/import-cli": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

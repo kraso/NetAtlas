@@ -1,7 +1,7 @@
 import type { RawRecord } from './raw-record.js'
-import type { SqliteDriver } from '@netatlas/data'
+import type { SqliteDriver, SqlRow } from '@netatlas/data'
 import { CatalogDao } from '@netatlas/data'
-import { isLifecycleStatus, isConfidence, findPredicate } from '@netatlas/domain'
+import { isLifecycleStatus, isConfidence, findPredicate, dedupScore, UMBRAL_CANDIDATO } from '@netatlas/domain'
 
 /**
  * Pipeline de importación (§19.2): parse → normaliza → valida → dedup →
@@ -24,6 +24,14 @@ export interface Reconciliation {
   readonly detail?: string
 }
 
+/** Candidato a revisión humana: par entrante/existente con scoring y diff (F6). */
+export interface ConflictoDetalle {
+  readonly entradaSlug: string
+  readonly existenteSlug: string
+  readonly score: number
+  readonly diff: readonly { campo: string; entrante: string; existente: string }[]
+}
+
 export interface BatchReport {
   readonly total: number
   readonly altas: number
@@ -33,6 +41,7 @@ export interface BatchReport {
   readonly sinCambio: number
   readonly validaciones: readonly ValidationIssue[]
   readonly reconciliaciones: readonly Reconciliation[]
+  readonly conflictosDetalle: readonly ConflictoDetalle[]
 }
 
 export interface ImportDeps {
@@ -136,26 +145,111 @@ export function agruparDuplicados(records: readonly RawRecord[]): Map<string, Ra
   return mapa
 }
 
-/** ETAPA 5 — reconcilia con el estado persistido (por slug). */
+export interface ReconciliarResultado {
+  readonly reconciliaciones: Reconciliation[]
+  readonly nuevos: RawRecord[]
+  /** Fusión automática (score ≥ 0.98): slug entrante → slug existente. */
+  readonly reescritura: ReadonlyMap<string, string>
+  /** Candidatos a revisión (0.7–0.98) con score y diff. */
+  readonly conflictos: readonly ConflictoDetalle[]
+}
+
+/** Estado persistido de los dispositivos para el dedup (manufacturer+model+sku). */
+interface Existente {
+  readonly slug: string
+  readonly manufacturerSlug: string
+  readonly model: string
+  readonly sku: string
+  readonly name: string
+}
+
+export interface ReconciliarOpciones {
+  /** Notifica cada candidato a revisión (el CLI lo inserta en reconciliation). */
+  readonly onConflicto?: (c: ConflictoDetalle) => void
+}
+
+/** ETAPA 5 — reconcilia con el estado persistido: clave exacta + dedup con scoring. */
 export function reconciliar(
   records: readonly RawRecord[],
   deps: ImportDeps,
-): { reconciliaciones: Reconciliation[]; nuevos: RawRecord[] } {
+  opciones?: ReconciliarOpciones,
+): ReconciliarResultado {
   const dao = new CatalogDao(deps.driver)
   const reconciliaciones: Reconciliation[] = []
   const nuevos: RawRecord[] = []
-  for (const r of records) {
-    const slug = r.device.slug!
-    const row = dao.deviceId(slug)
-    if (row === undefined) {
-      reconciliaciones.push({ status: 'nuevo', slug })
-      nuevos.push(r)
-    } else {
-      reconciliaciones.push({ status: 'actualizacion', slug })
-      nuevos.push(r) // Fase 1: upsert; el diff real llega con entity_history (F6)
+  const reescritura = new Map<string, string>()
+  const conflictos: ConflictoDetalle[] = []
+
+  // Índice de existentes (manufacturer|model → lista) para el scoring.
+  const existentes = new Map<string, Existente[]>()
+  const rows = deps.driver
+    .prepare("SELECT d.slug AS slug, m.slug AS manufacturer_slug, COALESCE(d.model, '') AS model, COALESCE(d.sku, '') AS sku, d.name AS name FROM device d JOIN manufacturer m ON m.id = d.manufacturer_id")
+    .all() as SqlRow[]
+  for (const r of rows) {
+    const e: Existente = {
+      slug: String(r.slug),
+      manufacturerSlug: String(r.manufacturer_slug),
+      model: String(r.model).trim().toLowerCase(),
+      sku: String(r.sku).trim(),
+      name: String(r.name),
     }
+    const k = `${e.manufacturerSlug}|${e.model}`
+    const lista = existentes.get(k) ?? []
+    lista.push(e)
+    existentes.set(k, lista)
   }
-  return { reconciliaciones, nuevos }
+
+  for (const r of records) {
+    const d = r.device
+    const slug = d.slug!
+
+    // 1) Clave natural exacta (slug) → actualización directa.
+    if (dao.deviceId(slug) !== undefined) {
+      reconciliaciones.push({ status: 'actualizacion', slug })
+      nuevos.push(r)
+      continue
+    }
+
+    // 2) Dedup por (fabricante, modelo) contra existentes con scoring (§19.2-4).
+    const modelo = (d.model ?? d.name).trim().toLowerCase()
+    const candidatos = existentes.get(`${d.manufacturerSlug}|${modelo}`) ?? []
+    if (candidatos.length > 0) {
+      let mejor: { e: Existente; score: number } | undefined
+      for (const e of candidatos) {
+        const eval_ = dedupScore(
+          { manufacturerSlug: d.manufacturerSlug, name: d.name, model: d.model, sku: d.sku, categoryCode: d.categoryCode },
+          { manufacturerSlug: e.manufacturerSlug, name: e.name, model: e.model, sku: e.sku || undefined },
+        )
+        if (!mejor || eval_.score > mejor.score) mejor = { e, score: eval_.score }
+      }
+      if (mejor && mejor.score >= 0.98) {
+        // Fusión automática: los datos entrantes se persisten sobre el existente.
+        reconciliaciones.push({ status: 'actualizacion', slug, detail: `fusión automática con ${mejor.e.slug} (score ${mejor.score})` })
+        reescritura.set(slug, mejor.e.slug)
+        nuevos.push(r)
+        continue
+      }
+      if (mejor && mejor.score >= UMBRAL_CANDIDATO) {
+        const conflicto: ConflictoDetalle = {
+          entradaSlug: slug,
+          existenteSlug: mejor.e.slug,
+          score: mejor.score,
+          diff: [
+            { campo: 'name', entrante: d.name, existente: mejor.e.name },
+            ...(d.model && mejor.e.model && d.model.trim().toLowerCase() !== mejor.e.model.trim().toLowerCase() ? [{ campo: 'model', entrante: d.model, existente: mejor.e.model }] : []),
+          ],
+        }
+        conflictos.push(conflicto)
+        opciones?.onConflicto?.(conflicto)
+        reconciliaciones.push({ status: 'conflicto', slug, detail: `candidato a revisión contra ${mejor.e.slug} (score ${mejor.score.toFixed(3)})` })
+        continue
+      }
+    }
+
+    reconciliaciones.push({ status: 'nuevo', slug })
+    nuevos.push(r)
+  }
+  return { reconciliaciones, nuevos, reescritura, conflictos }
 }
 
 export interface PersistResult {
@@ -169,30 +263,40 @@ export function persistir(
   validos: readonly RawRecord[],
   reconciliaciones: readonly Reconciliation[],
   deps: ImportDeps,
+  reescritura?: ReadonlyMap<string, string>,
+  conflictos?: readonly ConflictoDetalle[],
 ): PersistResult {
   const dao = new CatalogDao(deps.driver)
+  const conflictosDetalle = conflictos ?? []
   const report: BatchReport = {
     total: records.length,
     altas: 0,
     actualizaciones: 0,
-    conflictos: 0,
+    conflictos: conflictosDetalle.length,
     rechazos: records.length - validos.length,
     sinCambio: 0,
     validaciones: [],
     reconciliaciones: [...reconciliaciones],
+    conflictosDetalle,
   }
   const acumulado = { altas: 0, actualizaciones: 0 }
 
-  if (validos.length === 0) return { report, persisted: 0 }
+  const excluir = new Set(conflictosDetalle.map((c) => c.entradaSlug))
+  const reescribir = reescritura ?? new Map<string, string>()
+  const validosSinConflicto = validos.filter((r) => !excluir.has(r.device.slug!))
+
+  if (validosSinConflicto.length === 0) return { report, persisted: 0 }
 
   const now = new Date().toISOString()
   deps.driver.transaction(() => {
-    for (const r of validos) {
+    for (const r of validosSinConflicto) {
       const d = r.device
-      const existing = dao.deviceId(d.slug!)
-      const status = reconciliaciones.find((x) => x.slug === d.slug)?.status ?? 'nuevo'
+      const slugEntrante = d.slug!
+      const slugReal = reescribir.get(slugEntrante) ?? slugEntrante
+      const existing = dao.deviceId(slugReal)
+      const status = reconciliaciones.find((x) => x.slug === slugEntrante)?.status ?? 'nuevo'
       dao.upsertDevice({
-        slug: d.slug!,
+        slug: slugReal,
         name: d.name,
         manufacturerSlug: d.manufacturerSlug,
         categoryCode: d.categoryCode,
@@ -201,10 +305,10 @@ export function persistir(
         summary: d.summary,
       })
       // Puertos: reemplazo completo (idempotente)
-      const deviceId = dao.deviceId(d.slug!)!
-      dao.clearPorts(d.slug!)
+      const deviceId = dao.deviceId(slugReal)!
+      dao.clearPorts(slugReal)
       for (const p of d.ports ?? []) {
-        dao.addPort({ deviceSlug: d.slug!, interfaceCode: p.interfaceCode, label: p.label, quantity: p.quantity, speedsMbps: p.speedsMbps, poeStandard: p.poeStandard, role: p.role })
+        dao.addPort({ deviceSlug: slugReal, interfaceCode: p.interfaceCode, label: p.label, quantity: p.quantity, speedsMbps: p.speedsMbps, poeStandard: p.poeStandard, role: p.role })
       }
       // Assertions → relación supports-protocol (assertion_id enlazado)
       for (const a of d.assertions ?? []) {
@@ -245,17 +349,19 @@ export function persistir(
     }
   })
 
-  return { report: { ...report, altas: acumulado.altas, actualizaciones: acumulado.actualizaciones }, persisted: validos.length }
+  return { report: { ...report, altas: acumulado.altas, actualizaciones: acumulado.actualizaciones }, persisted: validosSinConflicto.length }
 }
+
+export interface RunImportOpciones extends ReconciliarOpciones {}
 
 /**
  * Pipeline completo sobre un driver migrado: normaliza→valida→reconcilia→persiste.
- * El parse lo hace el llamante (parseJson/parseCsv).
+ * El parse lo hace el llamante (parseJson/parseCsv/parseYaml/parseXml).
  */
-export function runImport(records: readonly RawRecord[], deps: ImportDeps): BatchReport {
+export function runImport(records: readonly RawRecord[], deps: ImportDeps, opciones?: RunImportOpciones): BatchReport {
   const normalizados = normalizar(records)
   const { validos, issues } = validar(normalizados, deps)
-  const { reconciliaciones } = reconciliar(validos, deps)
-  const { report } = persistir(normalizados, validos, reconciliaciones, deps)
+  const { reconciliaciones, reescritura, conflictos } = reconciliar(validos, deps, opciones)
+  const { report } = persistir(normalizados, validos, reconciliaciones, deps, reescritura, conflictos)
   return { ...report, validaciones: issues }
 }

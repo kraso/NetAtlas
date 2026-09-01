@@ -6,7 +6,7 @@ import { loadMigrations, applyMigrations, NodeSqliteDriver, CatalogDao } from '.
 const here = dirname(fileURLToPath(import.meta.url))
 const migrationsDir = resolve(here, '..', 'migrations')
 
-describe('Migraciones (0001_init)', () => {
+describe('Migraciones (0001_init + 0002_reconciliation)', () => {
   let driver: NodeSqliteDriver
 
   beforeAll(() => {
@@ -14,11 +14,12 @@ describe('Migraciones (0001_init)', () => {
     const migrations = loadMigrations(migrationsDir)
     const result = applyMigrations(driver, migrations)
     expect(result.applied).toContain(1)
+    expect(result.applied).toContain(2)
   })
 
-  it('aplica la migración y registra la versión', () => {
+  it('aplica las migraciones y registra la última versión', () => {
     const row = driver.prepare('SELECT MAX(version) AS v FROM schema_version').get()
-    expect(Number(row?.v)).toBe(1)
+    expect(Number(row?.v)).toBe(2)
   })
 
   it('re-aplicar es idempotente (skipped, sin error)', () => {
@@ -26,6 +27,7 @@ describe('Migraciones (0001_init)', () => {
     const second = applyMigrations(driver, migrations)
     expect(second.applied).toHaveLength(0)
     expect(second.skipped).toContain(1)
+    expect(second.skipped).toContain(2)
   })
 
   it('crea todas las tablas núcleo del modelo', () => {

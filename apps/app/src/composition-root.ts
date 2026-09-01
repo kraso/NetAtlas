@@ -7,6 +7,7 @@ import {
   InMemorySourcingRepository,
   InMemoryAttributesRepository,
   InMemoryTopologyRepository,
+  InMemoryQualityRepository,
   buildDemoDataset,
 } from './adapters/in-memory.js'
 import type { InMemoryDataset } from './adapters/in-memory.js'
@@ -19,6 +20,7 @@ import type {
   UiGraphEdge,
   UiGraphSubgraph,
   UiTopologyRepo,
+  UiQualityRepo,
 } from './adapters/in-memory.js'
 import type { Device, Category, Manufacturer, Assertion, Relationship, SearchResponse, SearchHit, SuggestResult } from '@netatlas/domain'
 import type { Page, DeviceQuery } from '@netatlas/domain'
@@ -66,6 +68,9 @@ export interface UiGraphRepo {
 /** Contrato de topologías (F4 §13.3) — re-exportado del adaptador in-memory. */
 export type { Topology as UiTopology, TopologyNode as UiTopologyNode, TopologyEdge as UiTopologyEdge } from '@netatlas/domain'
 
+// Calidad y reconciliación (F6 §19.3 / NET-HW-045/047/049)
+export type { UiQualityReport, UiCoberturaCategoria, UiReconciliationRow, UiQualityRepo } from './adapters/in-memory.js'
+
 // Tipos y contrato EAV (§9.4): re-exportados del adaptador in-memory para que
 // las vistas no dependan del motor de datos.
 export type { UiAttributeDefinition, UiDeviceAttributeValue, UiFacetCount, UiAttributesRepo, UiGraphNode, UiGraphEdge, UiGraphSubgraph, UiTopologyRepo }
@@ -82,6 +87,7 @@ export interface AppServices {
   readonly sourcing: UiSourcingRepo
   readonly attributes: UiAttributesRepo
   readonly topologies: UiTopologyRepo
+  readonly quality: UiQualityRepo
   readonly dataset: InMemoryDataset
 }
 
@@ -95,6 +101,7 @@ export function buildServices(dataset?: InMemoryDataset): AppServices {
     sourcing: new InMemorySourcingRepository(data),
     attributes: new InMemoryAttributesRepository(data),
     topologies: new InMemoryTopologyRepository(data),
+    quality: new InMemoryQualityRepository(data),
     dataset: data,
   }
 }

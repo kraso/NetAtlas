@@ -1,0 +1,19 @@
+{
+  "format": "netatlas-dataset",
+  "name": "netatlas-seed",
+  "version": "netatlas-seed-2026-09-01-r1",
+  "schemaVersion": 2,
+  "publishedOn": "2026-09-01",
+  "counts": {
+    "dispositivos": 330,
+    "relaciones": 1123,
+    "assertions": 1114,
+    "protocolos": 118,
+    "categorias": 26,
+    "topologias": 3
+  },
+  "sha256": "8ee32ec3b09d31079ca0ddc12816dd502d67cedddda3f7c9a36d42620aaaa2a3",
+  "changelog": [
+    "dataset:build regenerado (2026-09-01)"
+  ]
+}

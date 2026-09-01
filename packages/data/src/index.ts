@@ -18,8 +18,15 @@ export { SqliteSourcingRepository } from './repositories/sourcing-repository.js'
 export { SqliteAttributesRepository } from './repositories/attributes-repository.js'
 export type { AttributeDefinitionRow, DeviceAttributeRow, FacetCount } from './repositories/attributes-repository.js'
 export { SqliteTopologyRepository } from './repositories/topology-repository.js'
+export { SqliteReconciliationRepository } from './repositories/reconciliation-repository.js'
+export type { ReconciliationRow, ReconciliationStatus, DiffField } from './repositories/reconciliation-repository.js'
+export { SqliteQualityRepository } from './repositories/quality-repository.js'
+export type { QualityReport, CoberturaCategoria } from './repositories/quality-repository.js'
+export { ManifestRepository, canonicalJson } from './repositories/manifest-repository.js'
+export { applyDelta, diffDatasets } from './delta.js'
+export type { DeltaApplyResult } from './delta.js'
 export { composeRuntime, disposeRuntime } from './composition-root.js'
 export type { RuntimeContext, CompositionOptions } from './composition-root.js'
 
 /** Versión de esquema del dataset que esta app soporta (sección 19.4). */
-export const DATASET_SCHEMA_VERSION = 1
+export const DATASET_SCHEMA_VERSION = 2

@@ -30,6 +30,8 @@ export interface DeviceRow {
   readonly lifecycleStatus: string
   readonly osiProfileJson?: string
   readonly summary?: string
+  readonly model?: string
+  readonly sku?: string
 }
 
 export interface PortRow {
@@ -128,8 +130,6 @@ export class CatalogDao {
 
   // ── Dispositivos ───────────────────────────────────────────────
   upsertDevice(row: DeviceRow): number {
-    const existing = this.db.prepare('SELECT id FROM device WHERE slug = ?').get(row.slug)
-    if (existing) return Number(existing.id)
     const manufacturerId = this.manufacturerId(row.manufacturerSlug)
     if (manufacturerId === undefined) {
       throw new Error(`Device "${row.slug}": fabricante desconocido "${row.manufacturerSlug}".`)
@@ -138,12 +138,23 @@ export class CatalogDao {
     if (categoryId === undefined) {
       throw new Error(`Device "${row.slug}": categoría desconocida "${row.categoryCode}".`)
     }
+    const existing = this.db.prepare('SELECT id FROM device WHERE slug = ?').get(row.slug) as { id: number } | undefined
+    if (existing) {
+      // Actualización (delta/importación): refresca los campos esenciales del catálogo.
+      this.db
+        .prepare(
+          `UPDATE device SET name = ?, manufacturer_id = ?, category_id = ?, lifecycle_status = ?,
+                   osi_profile_json = ?, summary = ?, model = ?, sku = ?, updated_at = ? WHERE id = ?`,
+        )
+        .run(row.name, manufacturerId, categoryId, row.lifecycleStatus, row.osiProfileJson ?? null, row.summary ?? null, row.model ?? null, row.sku ?? null, new Date().toISOString(), Number(existing.id))
+      return Number(existing.id)
+    }
     const now = new Date().toISOString()
     const res = this.db
       .prepare(
         `INSERT INTO device (slug, name, manufacturer_id, category_id, lifecycle_status,
-                             osi_profile_json, summary, created_at, updated_at)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+                             osi_profile_json, summary, model, sku, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       )
       .run(
         row.slug,
@@ -153,6 +164,8 @@ export class CatalogDao {
         row.lifecycleStatus,
         row.osiProfileJson ?? null,
         row.summary ?? null,
+        row.model ?? null,
+        row.sku ?? null,
         now,
         now,
       )
@@ -162,6 +175,20 @@ export class CatalogDao {
   deviceId(slug: string): number | undefined {
     const row = this.db.prepare('SELECT id FROM device WHERE slug = ?').get(slug)
     return row ? Number(row.id) : undefined
+  }
+
+  /** Borra un dispositivo con todo su rastro (puertos, atributos, relaciones, assertions). */
+  eliminarDeviceCompleto(slug: string): boolean {
+    const id = this.deviceId(slug)
+    if (id === undefined) return false
+    // Sin transacción propia: el caller (applyDelta/lote) aporta atomicidad.
+    this.db.prepare("DELETE FROM assertion WHERE subject_type = 'device' AND subject_id = ?").run(id)
+    this.db
+      .prepare("DELETE FROM relationship WHERE (subject_type = 'device' AND subject_id = ?) OR (object_type = 'device' AND object_id = ?)")
+      .run(id, id)
+    // Puertos/atributos/roles usan ON DELETE CASCADE; device lo confirma.
+    this.db.prepare('DELETE FROM device WHERE id = ?').run(id)
+    return true
   }
 
   /** Convierte una lista de dispositivos en masa (p. ej. sintéticos). */

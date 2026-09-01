@@ -1,7 +1,7 @@
-import { NodeSqliteDriver, CatalogDao, loadMigrations, applyMigrations } from '@netatlas/data'
+import { NodeSqliteDriver, CatalogDao, loadMigrations, applyMigrations, ManifestRepository } from '@netatlas/data'
 import { loadSeed } from './lint.js'
-import { findPredicate } from '@netatlas/domain'
-import type { TopologyNodeProps, TopologyEdgeProps } from '@netatlas/domain'
+import { findPredicate, versionDelArchivo } from '@netatlas/domain'
+import type { DatasetManifest, TopologyNodeProps, TopologyEdgeProps } from '@netatlas/domain'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { rmSync } from 'node:fs'
@@ -205,8 +205,37 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
     manufacturers: count('manufacturer'),
     categories: count('category'),
   }
+  const topologiasCount = count('topology')
   driver.close()
   // Cierra WAL dejando un archivo único portable (checkpoint + delete).
+  rmSync(`${outPath}-wal`, { force: true })
+  rmSync(`${outPath}-shm`, { force: true })
+
+  // ── Manifiesto del dataset (NET-HW-048, §19.4) ──────────────────────────────
+  const publishedOn = new Date().toISOString().slice(0, 10)
+  const baseManifest: Omit<DatasetManifest, 'signature' | 'signatureValid'> = {
+    format: 'netatlas-dataset',
+    name: 'netatlas-seed',
+    version: versionDelArchivo('netatlas-seed', publishedOn, 1),
+    schemaVersion,
+    publishedOn,
+    counts: {
+      dispositivos: seed.devices.length,
+      relaciones: relationshipCount,
+      assertions: assertionCount,
+      protocolos: catalogCounts.protocols,
+      categorias: catalogCounts.categories,
+      topologias: topologiasCount,
+    },
+    sha256: ManifestRepository.hashArchivo(outPath),
+    changelog: [`dataset:build regenerado (${publishedOn})`],
+  }
+  let manifest: DatasetManifest = baseManifest
+  const clavePrivada = process.env.NETATLAS_SIGN_PRIVATE_KEY
+  if (clavePrivada) {
+    manifest = { ...baseManifest, signature: ManifestRepository.firmar(baseManifest, clavePrivada), signatureValid: true }
+  }
+  new ManifestRepository().escribir(`${outPath}.manifest.json`, manifest)
   rmSync(`${outPath}-wal`, { force: true })
   rmSync(`${outPath}-shm`, { force: true })
 

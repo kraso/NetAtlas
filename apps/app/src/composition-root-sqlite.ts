@@ -6,12 +6,16 @@ import {
   SqliteSourcingRepository,
   SqliteAttributesRepository,
   SqliteTopologyRepository,
+  SqliteQualityRepository,
+  SqliteReconciliationRepository,
+  ManifestRepository,
 } from '@netatlas/data'
 import { Fts5SearchIndex } from '@netatlas/search'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { buildSubgraph } from './adapters/in-memory.js'
-import type { AppServices, UiSearchRepo, UiGraphRepo } from './composition-root.js'
+import type { AppServices, UiSearchRepo, UiGraphRepo, UiQualityRepo } from './composition-root.js'
+import type { UiReconciliationRow } from './adapters/in-memory.js'
 import type { GraphNode, Relationship } from '@netatlas/domain'
 import type { InMemoryDataset } from './adapters/in-memory.js'
 
@@ -72,6 +76,7 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
     sourcing: new SqliteSourcingRepository(driver),
     attributes: new SqliteAttributesRepository(driver),
     topologies: new SqliteTopologyRepository(driver),
+    quality: new SqliteUiQuality(driver, dbPath),
     dataset: {
       devices: [],
       manufacturers: [],
@@ -85,6 +90,33 @@ export function buildSqliteServices(dbPath = DB_PATH): AppServices {
 
 // Re-export del builder para tests que quieran el driver
 export { NodeSqliteDriver }
+
+/** Calidad + cola de reconciliación sobre SQLite (+ manifiesto del dataset). */
+class SqliteUiQuality implements UiQualityRepo {
+  private readonly calidad: SqliteQualityRepository
+  private readonly cola: SqliteReconciliationRepository
+
+  constructor(private readonly db: NodeSqliteDriver, private readonly dbPath: string) {
+    this.calidad = new SqliteQualityRepository(db)
+    this.cola = new SqliteReconciliationRepository(db)
+  }
+
+  async report(): Promise<ReturnType<SqliteQualityRepository['qualityReport']>> {
+    return this.calidad.qualityReport()
+  }
+
+  async reconciliacionesPendientes(): Promise<readonly UiReconciliationRow[]> {
+    return this.cola.pendientes()
+  }
+
+  async resolverReconciliacion(id: number, decision: 'accepted' | 'rejected', autor: string): Promise<void> {
+    await this.cola.resolver(id, decision, autor)
+  }
+
+  async manifiesto(): Promise<Record<string, unknown> | undefined> {
+    return new ManifestRepository().leer(`${this.dbPath}.manifest.json`) as Record<string, unknown> | undefined
+  }
+}
 
 /** Grafo UI sobre SQLite: vecindad multi-salto + predicados + mapa global (NET-HW-030/036). */
 class SqliteUiGraph extends SqliteGraphRepository implements UiGraphRepo {
