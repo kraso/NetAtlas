@@ -113,6 +113,18 @@ export type { DeviceRepository, CatalogRepository, DeviceQuery, Page } from './p
 export type { GraphRepository, NeighborsQuery, Path } from './ports/graph-repository.js'
 export type { SourcingRepository } from './ports/sourcing-repository.js'
 
+// Sincronización (F8A, §23.4 / NET-HW-063)
+export { crearOutboxEntry, sincronizar } from './sync/index.js'
+export type {
+  OutboxEntry,
+  CrearOutboxInput,
+  OutboxRepository,
+  SyncServer,
+  SyncDevice,
+  ReplicaRepository,
+  SyncResultado,
+} from './sync/index.js'
+
 // IA (sección 21 / F7)
 export {
   HERRAMIENTAS,

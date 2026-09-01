@@ -1,0 +1,27 @@
+{
+  "name": "@netatlas/server",
+  "version": "0.0.0",
+  "private": true,
+  "description": "NetAtlas — servidor de sincronización (F8A): API REST + auth OIDC + adaptador PostgreSQL, sin tocar dominio ni vistas (§6.7)",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "tsc --noEmit",
+    "server": "tsx src/cli.ts"
+  },
+  "dependencies": {
+    "@netatlas/data": "workspace:*",
+    "@netatlas/domain": "workspace:*",
+    "@netatlas/search": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}
