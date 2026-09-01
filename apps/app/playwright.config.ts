@@ -19,12 +19,25 @@ export default defineConfig({
     baseURL: 'http://127.0.0.1:4173',
     trace: 'on-first-retry',
   },
-  webServer: {
-    command: 'pnpm --filter @netatlas/app preview --host 127.0.0.1 --port 4173',
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: !process.env['CI'],
-    timeout: 60_000,
-  },
+  webServer: [
+    {
+      command: 'pnpm --filter @netatlas/app preview --host 127.0.0.1 --port 4173',
+      url: 'http://127.0.0.1:4173',
+      reuseExistingServer: !process.env['CI'],
+      timeout: 60_000,
+    },
+    {
+      // Backend real de sincronización (F8A): copia temporal del seed + token
+      // fijo para que el E2E navegador (cola local → sync) pueda autenticarse.
+      command: 'pnpm --filter @netatlas/server server:e2e',
+      url: 'http://127.0.0.1:8787/api/health',
+      reuseExistingServer: !process.env['CI'],
+      timeout: 60_000,
+      env: {
+        NETATLAS_E2E_PORT: '8787',
+      },
+    },
+  ],
   projects: [
     { name: 'chromium', use: { ...devices['Desktop Chrome'] } },
     { name: 'firefox', use: { ...devices['Desktop Firefox'] } },

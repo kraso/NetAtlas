@@ -19,6 +19,7 @@
     "@netatlas/data": "workspace:*",
     "@netatlas/domain": "workspace:*",
     "@netatlas/search": "workspace:*",
+    "@netatlas/server": "workspace:^",
     "@netatlas/ui": "workspace:*",
     "@tauri-apps/api": "^2.1.1",
     "cytoscape": "^3.30.4",

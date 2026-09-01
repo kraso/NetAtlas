@@ -111,6 +111,20 @@ export function crearServidor(
 
   return async (req, res) => {
     const url = new URL(req.url ?? '/', 'http://localhost')
+
+    // CORS para clientes web (F8B: la PWA/terceros consumen la API).
+    const origen = req.headers.origin
+    if (origen) {
+      res.setHeader('access-control-allow-origin', '*')
+      res.setHeader('access-control-allow-methods', 'GET, POST, DELETE, OPTIONS')
+      res.setHeader('access-control-allow-headers', 'authorization, content-type, x-api-key')
+    }
+    if (req.method === 'OPTIONS') {
+      res.writeHead(204)
+      res.end()
+      return
+    }
+
     const partes = url.pathname.split('/').filter(Boolean)
     let ruta: RutaRegistrada | undefined
     let params: readonly string[] = []

@@ -9,7 +9,7 @@ export class HttpSyncServer implements SyncServer {
   constructor(
     private readonly baseUrl: string,
     private readonly token?: string,
-    private readonly fetchImpl: typeof fetch = fetch,
+    private readonly fetchImpl: typeof fetch = fetch.bind(globalThis) as typeof fetch,
   ) {}
 
   async serverVersion(): Promise<number> {
