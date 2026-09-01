@@ -205,7 +205,7 @@ bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)
 7 canónicas:   ✅ < 500 ms (tests permanentes)
 app build:     ✅ vite build — PWA con SW (18 entradas precache); chunks: base 131 kB (38 gzip) + react-vendor 165 kB + cy-vendor 465 kB solo diagramas + jspdf 390 kB solo al exportar PDF
 UI-SQLite:     ✅ tests de integración sobre netatlas-seed.sqlite (Fase C)
-E2E:           ✅ 44/44 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7 + escala F4 + enlace F5)
+E2E:           ✅ 56/56 en chromium y firefox (crítico + 404 + offline + ≤2 clics + topologías + SLO §23.2 + comparador CU-02 + calidad F6 + asistente F7 + escala F4 + enlace F5 + axe F2)
 IA:            ✅ data:ia --eval → 134 preguntas · 395 citas · fidelidad 100% · 0 alucinaciones · deploy autorizado (criterio F7)
 F8A servidor:  ✅ API REST + auth OIDC (JWT RS256) + adaptadores SQLite/PostgreSQL + criterio offline+sync
 F8B API púb.:  ✅ /v1 con clave na_… + OpenAPI 3.1 (/openapi.json) + rate limit 429 + auditoría + favoritos/perfil (criterio F8B)

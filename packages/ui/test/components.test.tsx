@@ -49,9 +49,11 @@ describe('OsiPanel', () => {
   it('resalta capas terminadas y lista alternativa accesible', () => {
     const perfil = { terminate: [1, 2, 3], transparent: [4, 5, 6, 7], primary: 3 }
     const { container } = render(<OsiPanel profile={perfil} />)
-    // Los items con role=status son los que terminan
-    const statuses = container.querySelectorAll('[role="status"]')
-    expect(statuses.length).toBeGreaterThanOrEqual(2) // capa 1 y 2 terminadas al menos
+    // Las filas con aria-label describen el estado por capa (termina/transparente)
+    const filas = container.querySelectorAll('div[aria-label^="Capa"]')
+    expect(filas.length).toBe(7)
+    expect(container.querySelector('div[aria-label="Capa 2 Enlace de datos — termina (principal)"]')).toBeDefined()
+    expect(container.querySelector('div[aria-label="Capa 4 Transporte — transparente"]')).toBeDefined()
     // Alternativa textual (sr-only) lista las capas
     expect(screen.getByText(/Capas que termina/i)).toBeDefined()
     cleanup()
@@ -60,9 +62,9 @@ describe('OsiPanel', () => {
   it('respeta la selección de capas para la consulta inversa', () => {
     const perfil = { terminate: [1, 2], transparent: [3, 4, 5, 6, 7], primary: 2 }
     const { container } = render(<OsiPanel profile={perfil} selected={[2]} />)
-    // El borde de la capa seleccionada usa el token de foco
-    const items = container.querySelectorAll('li div[style]')
-    expect(items.length).toBe(7)
+    // La capa seleccionada usa el token de foco en su borde
+    const seleccionada = container.querySelector('div[aria-label="Capa 2 Enlace de datos — termina (principal)"]')
+    expect(seleccionada?.getAttribute('style')).toContain('var(--focus-ring)')
     cleanup()
   })
 })
