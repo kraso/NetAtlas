@@ -157,7 +157,7 @@ export type {
 } from './public/index.js'
 
 // Sincronización (F8A, §23.4 / NET-HW-063)
-export { crearOutboxEntry, sincronizar } from './sync/index.js'
+export { crearOutboxEntry, sincronizar, mergeLWWporEntidad } from './sync/index.js'
 export type {
   OutboxEntry,
   CrearOutboxInput,
@@ -200,6 +200,7 @@ export {
   crearClienteIA,
   ejecutarPlan,
   contextoDesdeResultados,
+  crearComprenderLLM,
 } from './ia/index.js'
 export type {
   AssistantPort,
@@ -228,6 +229,7 @@ export type {
   HechoAfirmado,
   EvalResultado,
   ClienteIAOptions,
+  ComprenderLLMOptions,
 } from './ia/index.js'
 
 // Calculadoras (sección 28 / NET-HW-028)

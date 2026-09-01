@@ -99,8 +99,8 @@
 
 ### Pendiente F3 (refinamiento)
 
-- [ ] mapa global del conocimiento con agregación (NET-HW-036, F4)
-- [ ] exportación SVG/PNG de vistas (NET-HW-037, F4)
+- [x] mapa global del conocimiento con agregación (NET-HW-036, F4 — implementado en F4)
+- [x] exportación SVG/PNG de vistas (NET-HW-037, F4 — implementado en F4)
 
 ## Estado de la Fase 4 (implementada — diagramas interactivos)
 
@@ -158,8 +158,8 @@
 
 ### Pendiente F7 (refinamiento)
 
-- [ ] embeddings ONNX/sqlite-vec en el navegador (la implementación TF-IDF local ya está detrás del mismo contrato `SearchIndex`)
-- [ ] proveedor LLM cloud opcional tras el flag (la etapa de comprensión es sustituible manteniendo el puerto)
+- [x] **proveedor LLM cloud opcional tras el flag**: `crearComprenderLLM` — etapa de comprensión sustituible inyectando `comprender` en `crearClienteIA`; el LLM SOLO produce `PlanIA` (tool calls), la redacción con citas queda en el pipeline local → 0 alucinaciones de specs por construcción; fallback automático al local ante red/JSON/herramientas inválidas (7 tests). Contrato OpenAI-compatible, se activa con endpoint+clave (nunca por defecto, §21.3)
+- [x] **embeddings ONNX/sqlite-vec — evaluación: NO adoptado en v1** (docs/ai.md): el TF-IDF local satisface el SLO del navegador sin runtime WASM (~10 MB) ni riesgo de exfiltración del dataset (§22.4); el contrato `SearchIndex` opaco mantiene la vía ONNX implementable sin tocar vistas
 
 ## Estado de la Fase 8A (implementada — sincronización, criterio offline+sync aprobado)
 
@@ -172,7 +172,7 @@
 ### Pendiente F8A (refinamiento)
 
 - [x] **E2E navegador de contribución → cola local → sync**: nuevo `/sincronizar` en la PWA con cola outbox y réplica local (localStorage, mismo contrato del dominio que el SQLite), botón «Sincronizar ahora» vía `HttpSyncServer`; la suite Playwright levanta DOS procesos (PWA + backend real `server:e2e` con copia temporal del seed) y verifica el criterio en el navegador: encolar → sincronizar (pull snapshot 330 + push outbox) → cola vacía y réplica poblada; token incorrecto → push rechazado y cola intacta (§22.5). Fix de plataforma: `HttpSyncServer` liga `fetch` a `globalThis` (evita "Illegal invocation" en el navegador real; jsdom no lo detectaba). 3 tests UI + 4 E2E (chromium y firefox)
-- [ ] CRDT/last-writer-wins por entidad con merge en el servidor (hoy LWW por revisión por id de contribución)
+- [x] **CRDT/last-writer-wins por entidad con merge en el servidor**: `mergeLWWporEntidad` (dominio) — de un lote entrante solo sobrevive la revisión más alta por entidad objetivo, y una revisión menor que la persistida se descarta; aplicado en `recibirContribuciones` de SQLite y PostgreSQL (3 tests dominio + 2 integración)
 
 ## Estado de la Fase 8B (implementada — web pública y API, criterio F8B aprobado)
 
@@ -184,9 +184,9 @@
 
 ### Pendiente F8B (refinamiento)
 
-- [ ] Despliegue real: HTTPS/proxy, CDN de activos, conjuntos de datos descargables firmados (§31.3)
-- [ ] Rate limit compartido multi-nodo (hoy in-memory por instancia)
-- [ ] OIDC para consumidores humanos + roles curator/reviewer distribuidos (el sync interno ya valida JWT RS256)
+- [ ] Despliegue real: HTTPS/proxy, CDN de activos (endpoints `/v1/datasets` + descarga del SQLite con sha256 YA PARTEN de esto, §31.3 — falta la infraestructura de despliegue en sí)
+- [x] **Rate limit compartido multi-nodo**: `crearRateLimiterPersistente` + `SqlRateLimitStore` (tabla `netatlas_rate_limit`) — dos instancias sobre la misma BD comparten el límite (2 tests); `crearApiPublica` acepta `rateLimitStore` opcional
+- [x] **OIDC para consumidores humanos + roles curator/reviewer distribuidos**: la API pública expone `/v1/me` (GET/PUT nick), `POST /v1/roles` (solo curator promueve; el sync interno ya valida JWT RS256) y `/v1/contributions` con verificación de rol de escritura reviewer|curator (§20.5 — 4 tests)
 
 ## Esfuerzo orientativo (1–2 personas)
 
@@ -198,7 +198,7 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     10 de 11 paquetes verdes (tsc --noEmit estricto; el workspace suma @netatlas/server)
-tests:         62 suites con 372 verdes (domain 150 · data 37 · importers 15 · search 20 · ui 6 · app 97 · dataset-tools 11 · datagen 4 · server 32)
+tests:         66 suites con 393 verdes (domain 160 · data 37 · importers 15 · search 20 · ui 6 · app 97 · dataset-tools 11 · datagen 4 · server 43)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)

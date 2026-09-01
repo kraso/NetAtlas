@@ -8,8 +8,11 @@
  */
 import type { SqliteDriver } from '@netatlas/data'
 import type { SearchIndex } from '@netatlas/domain'
-import type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, SqlExecutor } from './store.js'
+import { mergeLWWporEntidad } from '@netatlas/domain'
+import type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, SqlExecutor, DatasetPublico } from './store.js'
 import type { OutboxEntry } from '@netatlas/domain'
+import { readFileSync, existsSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 
 const SQL_META = `
   CREATE TABLE IF NOT EXISTS netatlas_catalog_version (
@@ -47,7 +50,33 @@ export class SqliteServidorStore implements ServidorStore {
     private readonly db: SqliteDriver,
     private readonly executor: SqliteExecutor,
     private readonly indiceBusqueda: SearchIndex,
+    /** Ruta real del archivo SQLite (para servir el dataset firmado, §31.3). */
+    private readonly dbPath?: string,
   ) {}
+
+  /** Conjuntos de datos descargables firmados (§31.3 / F8B futuro). */
+  async conjuntosDeDatos(): Promise<readonly DatasetPublico[]> {
+    if (!this.dbPath || !existsSync(this.dbPath)) return []
+    const buffer = readFileSync(this.dbPath)
+    const sha256 = createHash('sha256').update(buffer).digest('hex')
+    const manifiestoPath = `${this.dbPath}.manifest.json`
+    let manifiesto: Record<string, unknown> = { sha256 }
+    if (existsSync(manifiestoPath)) {
+      try {
+        manifiesto = JSON.parse(readFileSync(manifiestoPath, 'utf8')) as Record<string, unknown>
+      } catch {
+        // Sin manifiesto legible: se sirve el hash calculado igualmente.
+      }
+    }
+    return [
+      {
+        nombre: 'netatlas-seed',
+        manifiesto,
+        blob: new Blob([buffer], { type: 'application/x-sqlite3' }),
+        sha256,
+      },
+    ]
+  }
 
   async describe(slug: string): Promise<ServerDevice | undefined> {
     const rows = await this.executor.query<{
@@ -136,12 +165,17 @@ export class SqliteServidorStore implements ServidorStore {
   }
 
   async recibirContribuciones(entradas: readonly OutboxEntry[]): Promise<readonly string[]> {
+    // Merge last-writer-wins POR ENTIDAD (§31.5 / F8A futuro): si un lote trae
+    // varias revisiones de la misma entidad, solo sobrevive la más alta; y si
+    // el servidor ya tiene una revisión mayor de esa entidad, la entrante se
+    // descarta (de id a id, la revisión del mismo id gana).
+    const dedupe = mergeLWWporEntidad(entradas)
     const aceptadas: string[] = []
-    for (const e of entradas) {
-      // LWW por revision: si ya existe una revisión mayor, se rechaza.
+    for (const e of dedupe) {
+      // LWW por entidad: si ya existe una revisión mayor de la entidad, se rechaza.
       const existente = await this.executor.query<{ revision: number }>(
-        'SELECT revision FROM netatlas_contribuciones WHERE id = ?',
-        [e.id],
+        'SELECT revision FROM netatlas_contribuciones WHERE entidad = ?',
+        [e.entidad],
       )
       if (existente[0] && Number(existente[0].revision) >= e.revision) continue
       await this.executor.exec(

@@ -47,6 +47,27 @@ X-Api-Key: na_AbCdEf123456
 Cada petición autenticada se registra (`netatlas_api_audit`): prefijo de clave,
 endpoint y estado. La auditoría nunca tira la petición por fallo de registro.
 
+## Conjuntos de datos firmados (§31.3 / futuro resuelto)
+
+- `GET /v1/datasets` → `{datasets:[{nombre, sha256, tamanoBytes, manifiesto}]}`.
+- `GET /v1/datasets/:nombre` → descarga del SQLite (`content-disposition`,
+  `x-content-sha256`); `manifiesto.sha256` debe coincidir con el blob (integridad).
+
+## Roles y gestión (futuro resuelto, §20.5)
+
+| Endpoint | Rol requerido | Descripción |
+|---|---|---|
+| `GET /v1/me` | cualquiera | Perfil + rol |
+| `PUT /v1/me` | cualquiera | Actualiza el nick (nunca el rol) |
+| `POST /v1/roles` | `curator` | Promueve/demueve a otro consumidor |
+| `POST /v1/contributions` | `reviewer` o `curator` | Escritura gobernada (las contribuciones son validadas) |
+
+## Rate limit compartido multi-nodo (futuro resuelto)
+
+`crearApiPublica({ rateLimitStore })` persiste el contador en
+`netatlas_rate_limit`: varias instancias sobre la misma BD comparten el límite
+(déjalo vacío para el modo in-memory de un solo nodo).
+
 ## Ejemplo (curl)
 
 ```bash
@@ -61,14 +82,15 @@ curl http://127.0.0.1:8787/v1/devices/cisco-catalyst-9300-48p \
 curl -X POST http://127.0.0.1:8787/v1/favorites \
      -H 'Authorization: Bearer na_…' -H 'content-type: application/json' \
      -d '{"entidad":"device:cisco-catalyst-9300-48p"}'
+
+# 4. Descargar el dataset firmado
+curl http://127.0.0.1:8787/v1/datasets/netatlas-seed \
+     -H 'Authorization: Bearer na_…' -o netatlas-seed.sqlite
 ```
 
 ## Frontera (F8B puro, futuro)
 
-- Despliegue real: HTTPS + proxy, CDN de activos y conjuntos de datos firmados
-  descargables.
-- Rate limit compartido multi-nodo (hoy in-memory por instancia).
-- AuthN OIDC para consumidores humanos + roles curator/reviewer (hoy el sync
-  interno ya valida JWT RS256).
+- Despliegue real: HTTPS + proxy y CDN de activos (los endpoints de datasets
+  firmados ya están listos).
 - Perfiles y favoritos sincronizados desde la PWA vía `/v1/favorites` con el
   cluso de F8A (el contrato de datos en el dominio es el mismo).

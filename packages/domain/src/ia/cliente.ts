@@ -13,6 +13,8 @@ import type { ContextoRecuperado, HechoIA } from './rag.js'
 export interface ClienteIAOptions {
   /** Modo explicación: marca las respuestas como "explicación generada". */
   readonly explicaciones?: boolean
+  /** Etapa de comprensión alternativa (p. ej. LLM cloud, F7 futuro). */
+  readonly comprender?: (texto: string, resolverSlug?: (t: string) => Promise<string | undefined>) => Promise<PlanIA>
 }
 
 /**
@@ -21,9 +23,10 @@ export interface ClienteIAOptions {
  * citada. Sustituible por un adaptador LLM cloud manteniendo el puerto.
  */
 export function crearClienteIA(ctx: ToolContext, opts?: ClienteIAOptions): AssistantPort {
+  const comprenderEtapa = opts?.comprender ?? comprender
   return {
     async ask(pregunta: PreguntaIA): Promise<RespuestaIA> {
-      const plan = await comprender(pregunta.texto, ctx.resolverEntidad?.bind(ctx))
+      const plan = await comprenderEtapa(pregunta.texto, ctx.resolverEntidad?.bind(ctx))
       const resultados = await ejecutarPlan(plan, ctx)
       const contexto = contextoDesdeResultados(resultados, plan)
 

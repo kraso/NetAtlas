@@ -75,10 +75,21 @@ aplicación: cero acceso directo a la BD desde el dominio.
   = 0. `pnpm data:ia --eval` solo autoriza si los cumple.
 - Comando de consola: `pnpm data:ia "pregunta"` para consultar el seed real.
 
-## Frontera (futuro)
+## Frontera (futuro) — decisiones de hoy
 
-- Embeddings ONNX/sqlite-vec en el navegador (el contrato `SearchIndex` ya es
-  opaco; el ranking híbrido TF-IDF actual es la implementación local).
-- Proveedor LLM cloud opcional tras el flag (la etapa [1] de comprensión es
-  sustituible manteniendo el puerto).
+- **Proveedor LLM cloud opcional** (`crearComprenderLLM`, reporte F7): la etapa
+  [1] de comprensión ya es **sustituible** manteniendo el puerto — inyecta la
+  etapa LLM via `crearClienteIA(ctx, { comprender })`. El LLM SOLO produce
+  `PlanIA` (tool calls); la redacción con citas sigue en `responderConContexto`,
+  con lo que **0 alucinaciones de specs se mantiene por construcción** aunque
+  se use un modelo externo. Cualquier fallo (red, JSON, herramientas inválidas)
+  cae al adaptador local determinista. Contrato OpenAI-compatible
+  (`POST /v1/chat/completions`, `response_format: json_object`); se activa con
+  endpoint+clave (env/localStorage), nunca por defecto (§21.3).
+- **Embeddings ONNX/sqlite-vec — evaluación: NO adoptado en v1.** El ranking
+  híbrido TF-IDF local (`IndiceVectorialTFIDF` + `rankingHibrido`) cumple el
+  SLO del navegador (p95 < 50 ms) sin añadir un runtime WASM (~10 MB) ni abrir
+  la puerta a envío de datos del dataset a terceros (§22.4). El contrato
+  `SearchIndex` es opaco: la vía ONNX queda implementable sin tocar vistas
+  cuando haya despliegue web con catálogo grande (>100k).
 - Extracción asistida de datasheets con human-in-the-loop (§19, F6→F7).

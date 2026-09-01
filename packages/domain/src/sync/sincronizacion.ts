@@ -75,6 +75,26 @@ export interface OutboxRepository {
   ultimaModificacionEntidad(entidad: string): Promise<string | undefined>
 }
 
+/**
+ * Merge last-writer-wins por ENTIDAD (§31.5 / F8A futuro): dado un lote de
+ * contribuciones entrantes, resuelve la revisión más alta por entidad objetivo
+ * y devuelve las que deben persistirse (las revisiones inferiores a la máxima
+ * de su entidad se descartan — el cliente cree id empírico, revisión monotónica).
+ *
+ * Puro y testeable: un adaptador del servidor puede delegar la decisión aquí.
+ */
+export function mergeLWWporEntidad(entradas: readonly OutboxEntry[]): readonly OutboxEntry[] {
+  const mejorPorEntidad = new Map<string, OutboxEntry>()
+  for (const e of entradas) {
+    const previa = mejorPorEntidad.get(e.entidad)
+    if (!previa || e.revision > previa.revision) mejorPorEntidad.set(e.entidad, e)
+  }
+  // Salida determinista: orden por entidad (no por orden de llegada).
+  return [...mejorPorEntidad.entries()]
+    .sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0))
+    .map(([, e]) => e)
+}
+
 /** El servidor remoto visto desde el cliente (contrato de transporte). */
 export interface SyncServer {
   /** Versión actual del catálogo en el servidor. */

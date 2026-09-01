@@ -43,7 +43,7 @@ async function main(): Promise<void> {
 
   const driver = new NodeSqliteDriver(dbPath)
   const search = new Fts5SearchIndex(driver)
-  const store = new SqliteServidorStore(driver, new SqliteExecutor(driver), search)
+  const store = new SqliteServidorStore(driver, new SqliteExecutor(driver), search, dbPath)
   const publicStore = new SqlitePublicStore(driver)
   const base = crearServidor(store, new StaticBearerVerifier(TOKEN_E2E), '0.2.0-e2e')
   const api = crearApiPublica({ store, publicStore, base, limitePorMinuto: 10_000 })

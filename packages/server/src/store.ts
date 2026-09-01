@@ -36,6 +36,19 @@ export interface ServidorStore {
   version(): Promise<number>
   /** Recibe contribuciones (outbox del cliente) y devuelve las aceptadas. */
   recibirContribuciones(entradas: readonly OutboxEntry[]): Promise<readonly string[]>
+  /** Conjuntos de datos descargables firmados (§31.3 / F8B futuro). */
+  conjuntosDeDatos(): Promise<readonly DatasetPublico[]>
+}
+
+/** Conjunto de datos descargable: manifiesto firmado + blob del SQLite. */
+export interface DatasetPublico {
+  readonly nombre: string
+  /** Manifiesto del dataset (conteos + SHA-256 + firma Ed25519 si existe). */
+  readonly manifiesto: Record<string, unknown>
+  /** Blob del archivo SQLite (para descarga directa). */
+  readonly blob: Blob
+  /** SHA-256 del blob (debe coincidir con manifiesto.sha256). */
+  readonly sha256: string
 }
 
 /** Fila de snapshot: datos planos de dispositivos + versión de cambio. */

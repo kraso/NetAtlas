@@ -59,7 +59,7 @@ async function almacen(): Promise<{ store: ServidorStore; publicStore: SqlitePub
     applyMigrations(driver, loadMigrations(migrationsDir))
   }
   const search = new Fts5SearchIndex(driver)
-  const store = new SqliteServidorStore(driver, new SqliteExecutor(driver), search)
+  const store = new SqliteServidorStore(driver, new SqliteExecutor(driver), search, dbPath)
   return {
     store,
     publicStore: new SqlitePublicStore(driver),

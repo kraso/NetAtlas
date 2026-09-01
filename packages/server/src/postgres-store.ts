@@ -9,7 +9,8 @@
  * real en CI (doble de test) y conectarse a uno en despliegue.
  */
 
-import type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow } from './store.js'
+import type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, DatasetPublico } from './store.js'
+import { mergeLWWporEntidad } from '@netatlas/domain'
 import type { OutboxEntry } from '@netatlas/domain'
 
 export interface PgRow {
@@ -149,13 +150,15 @@ export class PostgresServidorStore implements ServidorStore {
 
   async recibirContribuciones(entradas: readonly OutboxEntry[]): Promise<readonly string[]> {
     await this.ensureSchema()
+    // Merge LWW por entidad (§31.5) igual que el adaptador SQLite.
+    const dedupe = mergeLWWporEntidad(entradas)
     const aceptadas: string[] = []
-    for (const e of entradas) {
+    for (const e of dedupe) {
       const existente = await this.pg.query<{ revision: number }>(
         traducirParametros(
-          `SELECT revision FROM ${this.schema}.netatlas_contribuciones WHERE id = $1`,
+          `SELECT revision FROM ${this.schema}.netatlas_contribuciones WHERE entidad = $1`,
         ),
-        [e.id],
+        [e.entidad],
       )
       if (existente[0] && Number(existente[0].revision) >= e.revision) continue
       await this.pg.query(
@@ -170,5 +173,10 @@ export class PostgresServidorStore implements ServidorStore {
       aceptadas.push(e.id)
     }
     return aceptadas
+  }
+
+  /** Sin archivo local: PostgreSQL no sirve datasets descargables (§31.3). */
+  async conjuntosDeDatos(): Promise<readonly DatasetPublico[]> {
+    return []
   }
 }

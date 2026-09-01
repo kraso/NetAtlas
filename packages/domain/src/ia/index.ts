@@ -18,3 +18,5 @@ export { evaluarConjuntoOro, hechosDeRespuesta, cubreHechosEsperados, umbralDepl
 export type { HechoEsperado, PreguntaOro, OracleHechos, HechoAfirmado, EvalResultado } from './evaluador.js'
 export { crearClienteIA, ejecutarPlan, contextoDesdeResultados } from './cliente.js'
 export type { ClienteIAOptions } from './cliente.js'
+export { crearComprenderLLM } from './comprender-llm.js'
+export type { ComprenderLLMOptions } from './comprender-llm.js'

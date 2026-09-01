@@ -17,8 +17,8 @@ export { SqlitePublicStore } from './public-store.js'
 export { crearApiPublica } from './api-publica.js'
 export type { ApiPublicaOptions } from './api-publica.js'
 export { documentoOpenApi, rutaAbierta } from './openapi.js'
-export { crearRateLimiter } from './rate-limiter.js'
-export type { RateLimiter } from './rate-limiter.js'
+export { crearRateLimiter, crearRateLimiterPersistente, SqlRateLimitStore } from './rate-limiter.js'
+export type { RateLimiter, RateLimiterAsync, RateLimitStore } from './rate-limiter.js'
 export {
   generarClaveApi,
   hashClaveApi,

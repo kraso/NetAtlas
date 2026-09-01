@@ -4,6 +4,7 @@
 export {
   crearOutboxEntry,
   sincronizar,
+  mergeLWWporEntidad,
 } from './sincronizacion.js'
 export type {
   OutboxEntry,
