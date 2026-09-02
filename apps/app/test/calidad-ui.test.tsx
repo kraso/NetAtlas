@@ -36,7 +36,9 @@ describe('Dashboard de calidad (F6)', () => {
 
     // Métricas del demo: dispositivos, cobertura y confianza
     expect(screen.getAllByText('Dispositivos').length).toBeGreaterThanOrEqual(1)
-    expect(screen.getByText('67%')).toBeDefined() // cobertura de fuentes del demo
+    // Cobertura del demo: los 6 dispositivos tienen ≥1 assertion (incluidas las
+    // de arquitectura interna curadas en F2) → 100%.
+    expect(screen.getAllByText('100%').length).toBeGreaterThanOrEqual(1) // cobertura de fuentes del demo
     const filas = screen.getAllByRole('row')
     expect(filas.length).toBeGreaterThan(2) // cabecera + categorías
     // Distribución de confianza presente (official/third-party del demo)

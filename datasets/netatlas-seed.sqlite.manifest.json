@@ -7,12 +7,12 @@
   "counts": {
     "dispositivos": 330,
     "relaciones": 1123,
-    "assertions": 1114,
+    "assertions": 1143,
     "protocolos": 118,
     "categorias": 26,
     "topologias": 3
   },
-  "sha256": "8ee32ec3b09d31079ca0ddc12816dd502d67cedddda3f7c9a36d42620aaaa2a3",
+  "sha256": "3e262e0052035fcacea4a6c9eb1c6ba485f7fee643983110531dde0e01d67064",
   "changelog": [
     "dataset:build regenerado (2026-09-01)"
   ]

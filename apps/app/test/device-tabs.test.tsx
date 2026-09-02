@@ -63,10 +63,13 @@ describe('Ficha de dispositivo — 13 pestañas (§10.5)', () => {
     expect(screen.getAllByText('Oficial').length).toBeGreaterThanOrEqual(1)
   })
 
-  it('pestañas pendientes muestran empty-state curado (sin inventar)', async () => {
-    renderApp('/device/cisco-c9300-48p')
+  it('pestañas sin dato curado muestran empty-state honesto (sin inventar)', async () => {
+    // El demo no tiene ningún dispositivo sin arquitectura (todos curados);
+    // el caso «pendiente» se verifica sobre el SQLite real con un generado.
+    renderApp('/device/mikrotik-ccr1036')
     fireEvent.click(await screen.findByRole('tab', { name: 'Arquitectura' }))
-    expect(await screen.findByText(/pendiente/i)).toBeDefined()
+    // El CCR1036 del demo SÍ tiene arquitectura curada (many-core TILE-Gx36).
+    expect((await screen.findAllByText(/TILE-Gx36/)).length).toBeGreaterThanOrEqual(1)
   })
 
   it('Arquitectura curada: el FortiGate 200F del demo muestra CPU/SoC/CP/NP/almacenamiento con fuente', async () => {

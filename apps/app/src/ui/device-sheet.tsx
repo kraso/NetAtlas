@@ -408,10 +408,14 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
     case 'arquitectura': {
       const arq = assertionDe('internal-architecture')
       if (!arq) {
-        return <Empty message="Arquitectura interna (ASIC, CPU, memoria) pendiente de curación (F2)." />
+        // Para entidades sin electrónica interna (medios pasivos) el empty-state
+        // es honesto: «no aplica» en vez de «pendiente de curación».
+        const sinArquitectura = device.categoryCode.startsWith('CAT-PAS')
+        return <Empty message={sinArquitectura ? 'Sin arquitectura interna aplicable (elemento pasivo/medio de transmisión).' : 'Arquitectura interna (ASIC, CPU, memoria) pendiente de curación (F2).'} />
       }
       const v = JSON.parse(arq.valueJson) as {
         cpu?: string
+        ram?: string
         soc?: { family?: string; note?: string }
         contentProcessors?: readonly string[]
         networkProcessors?: readonly string[]
@@ -424,6 +428,7 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
           <table className="tabla-specs">
             <tbody>
               {v.cpu ? <tr><th scope="row">CPU</th><td className="mono">{v.cpu}</td></tr> : null}
+              {v.ram ? <tr><th scope="row">Memoria</th><td className="mono">{v.ram}</td></tr> : null}
               {v.soc?.family ? <tr><th scope="row">SoC</th><td className="mono">{v.soc.family}{v.soc.note ? ` — ${v.soc.note}` : ''}</td></tr> : null}
               {v.contentProcessors && v.contentProcessors.length > 0 ? (
                 <tr><th scope="row">Procesadores de contenido</th><td className="mono">{v.contentProcessors.join(' + ')}</td></tr>

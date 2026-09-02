@@ -22,7 +22,20 @@
     "assertions": [
       { "predicate": "throughput_gbps", "value": 176, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official", "note": "Switching capacity 176 Gbps" },
       { "predicate": "poe_budget_w", "value": 370, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" },
-      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" }
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU de la plataforma Catalyst 2960-X (integrada en el switch ASIC)",
+          "ram": "512 MB DRAM",
+          "storage": { "type": "Flash", "capacityGB": 0.128 },
+          "soc": { "family": "Switch SoC Catalyst 2960-X", "note": "FlexStack-Plus y uplinks SFP+ en el mismo chip de conmutación" },
+          "summary": "Switch de acceso con conmutación a wire-rate en el SoC (CPU integrada), 512 MB de DRAM y flash de 128 MB; el uplink 10G y el apilamiento FlexStack-Plus van soportados por la misma plataforma."
+        },
+        "sourceSlug": "cisco-cat2960x-datasheet",
+        "confidence": "official",
+        "note": "Datos públicos estables del datasheet 2960-X (DRAM/flash estándar del modelo 48LPD-L)."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" },
@@ -51,7 +64,18 @@
       { "predicate": "throughput_gbps", "value": 176, "sourceSlug": "aruba-2930f-datasheet", "confidence": "official" },
       { "predicate": "poe_budget_w", "value": 370, "sourceSlug": "aruba-2930f-datasheet", "confidence": "official" },
       { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "aruba-2930f-datasheet", "confidence": "official" },
-      { "predicate": "supports-protocol", "value": "vxlan", "sourceSlug": "aruba-2930f-datasheet", "confidence": "official", "note": "VXLAN en variantes posteriores de firmware" }
+      { "predicate": "supports-protocol", "value": "vxlan", "sourceSlug": "aruba-2930f-datasheet", "confidence": "official", "note": "VXLAN en variantes posteriores de firmware" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU de gestión de la plataforma 2930F (plano de control)",
+          "soc": { "family": "SoC de conmutación Aruba 2930F", "note": "Plano de datos a wire-rate en el switch SoC; CPU separada para el plano de control (datasheet)" },
+          "summary": "Switch de acceso ArubaOS-Switch: el plano de datos corre a wire-rate en el SoC de conmutación (con 176 Gbps de capacidad) y la CPU de gestión atiende el plano de control (IP services L2/L3-Lite)."
+        },
+        "sourceSlug": "aruba-2930f-datasheet",
+        "confidence": "official",
+        "note": "Arquitectura SoC + CPU de gestión del datasheet oficial 2930F; DRAM/flash concretas no publicadas."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" },
@@ -77,7 +101,18 @@
       { "label": "2x SFP+", "interfaceCode": "sfp-plus", "quantity": 2, "speedsMbps": [10000], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "throughput_gbps", "value": 144, "sourceSlug": "aruba-2930f-datasheet", "confidence": "derived" }
+      { "predicate": "throughput_gbps", "value": 144, "sourceSlug": "aruba-2930f-datasheet", "confidence": "derived" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU de gestión de la plataforma Aruba 2920 (plano de control)",
+          "soc": { "family": "SoC de conmutación Aruba 2920", "note": "Serie predecesora del 2930F con la misma arquitectura de switch SoC + CPU de gestión" },
+          "summary": "Switch de acceso ArubaOS-Switch (serie 2920, predecesor del 2930F): plano de datos a wire-rate en el SoC de conmutación y CPU de gestión para el plano de control L2."
+        },
+        "sourceSlug": "aruba-2930f-datasheet",
+        "confidence": "derived",
+        "note": "Arquitectura derivada de la serie 2920/2930F (misma plataforma ArubaOS-Switch)."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -105,7 +140,20 @@
     "assertions": [
       { "predicate": "routing_throughput_mbps", "value": 100, "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
       { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
-      { "predicate": "supports-protocol", "value": "bgp", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" }
+      { "predicate": "supports-protocol", "value": "bgp", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU multi-núcleo Cisco (plataforma 4000 series ISR)",
+          "ram": "4 GB",
+          "storage": { "type": "Flash", "capacityGB": 4 },
+          "soc": { "family": "Plataforma Cisco 4000 series ISR", "note": "El ISR 4321 integra la plataforma de servicios unificados (routing + servicios en una sola CPU)" },
+          "summary": "Router de servicios integrados sobre la plataforma 4000 series: una CPU multinúcleo ejecuta routing y servicios (VPN, WAN, streaming telemetry), con 4 GB de DRAM y almacenamiento flash."
+        },
+        "sourceSlug": "cisco-isr4321-datasheet",
+        "confidence": "official",
+        "note": "Datos estructurales del datasheet oficial (4 GB DRAM / 4 GB flash estándar del 4321)."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
@@ -128,7 +176,19 @@
       { "label": "1x SFP", "interfaceCode": "sfp", "quantity": 1, "speedsMbps": [1000], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "routing_throughput_mbps", "value": 1000, "sourceSlug": "wi-fi-6-alliance", "confidence": "third-party", "note": "Rendimiento medido por comunidad, no oficial" }
+      { "predicate": "routing_throughput_mbps", "value": 1000, "sourceSlug": "wi-fi-6-alliance", "confidence": "third-party", "note": "Rendimiento medido por comunidad, no oficial" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "MediaTek MT7621A (doble núcleo @ 880 MHz, 4 hilos)",
+          "ram": "256 MB",
+          "storage": { "type": "Flash", "capacityGB": 0.016 },
+          "soc": { "family": "MT7621A", "note": "SoC de router con switch Gigabit integrado" },
+          "summary": "Router de doble núcleo sobre el SoC MediaTek MT7621A con 256 MB de RAM y 16 MB de flash; el switch Ethernet de 5 puertos + SFP va integrado en el SoC."
+        },
+        "sourceSlug": "mikrotik-hex-s-spec",
+        "confidence": "official"
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
@@ -151,7 +211,18 @@
     ],
     "assertions": [
       { "predicate": "wifi_standard", "value": "802.11ax", "sourceSlug": "wi-fi-6-alliance", "confidence": "official" },
-      { "predicate": "max_clients", "value": 512, "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party" }
+      { "predicate": "max_clients", "value": 512, "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU de plataforma Wi-Fi 6 de Aruba (Qualcomm) — especificación interna no publicada",
+          "soc": { "family": "SoC Wi-Fi 6 4x4:4", "note": "AP empresarial Wi-Fi 6 con radio 4x4:4 y procesamiento de RF/seguridad en el SoC" },
+          "summary": "Punto de acceso empresarial Wi-Fi 6: el SoC integra el procesamiento de las radios 4x4:4 (2.4/5 GHz), la agilidad de RF y los servicios de red; los detalles de CPU/RAM no se publican en el datasheet."
+        },
+        "sourceSlug": "aruba-2930f-datasheet",
+        "confidence": "experimental",
+        "note": "SoC no publicado por Aruba; la arquitectura Wi-Fi 6 4x4:4 es oficial pero la electrónica interna no."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" },
@@ -176,7 +247,18 @@
       { "label": "2x FXS (POTS)", "interfaceCode": "fxs", "quantity": 2, "speedsMbps": [], "role": "access" }
     ],
     "assertions": [
-      { "predicate": "standard_acceso", "value": "gpon", "sourceSlug": "ieee-8023-2018", "confidence": "derived" }
+      { "predicate": "standard_acceso", "value": "gpon", "sourceSlug": "ieee-8023-2018", "confidence": "derived" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "SoC de línea GPON (routing-type ONT) — modelo concreto no publicado",
+          "soc": { "family": "SoC GPON (plataforma Huawei EchoLife)", "note": "ONT GPON routing-type con 4 GE + 2 POTS + Wi-Fi; el datasheet no publica CPU/RAM" },
+          "summary": "Terminal óptico GPON con SoC de línea (routing): gestión del enlace G.984.3, 4 puertos Gigabit, 2 líneas POTS y Wi-Fi; la electrónica interna concreta (CPU/RAM) no se publica."
+        },
+        "sourceSlug": "netatlas-assist",
+        "confidence": "experimental",
+        "note": "Arquitectura de ONT routing-type según datasheet Huawei HG8245H; CPU/RAM no publicadas."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -199,7 +281,18 @@
       { "label": "1x F-connector", "interfaceCode": "coaxial", "quantity": 1, "speedsMbps": [], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "docsis_version", "value": "3.0", "sourceSlug": "usrobotics-56k-manual", "confidence": "third-party" }
+      { "predicate": "docsis_version", "value": "3.0", "sourceSlug": "usrobotics-56k-manual", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Procesador de señal (SoC DOCSIS 3.0 de banda ancha) — modelo no publicado",
+          "soc": { "family": "SoC DOCSIS 3.0 (4x4)", "note": "Sintonizador con entrada de hasta 1 GHz downstream; SoC de módem cable por cable" },
+          "summary": "Módem DOCSIS 3.0 con SoC de banda ancha 4x4 (4 canales aguas abajo / 4 aguas arriba), sintonizador de hasta 1 GHz y un puerto Gigabit Ethernet; el SoC integra CPU y capa MAC/PHY del módem."
+        },
+        "sourceSlug": "motorola-sb6121-datasheet",
+        "confidence": "third-party",
+        "note": "El datasheet documenta DOCSIS 3.0 4x4 y el sintonizador de 1 GHz; el modelo exacto del SoC no se publica."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -222,7 +315,18 @@
       { "label": "1x línea telefónica RJ-11", "interfaceCode": "rj11", "quantity": 1, "speedsMbps": [], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "max_speed_mbps", "value": 0.056, "sourceSlug": "usrobotics-56k-manual", "confidence": "official", "note": "56 kbit/s (V.90)" }
+      { "predicate": "max_speed_mbps", "value": 0.056, "sourceSlug": "usrobotics-56k-manual", "confidence": "official", "note": "56 kbit/s (V.90)" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "DSP de módem V.90 (procesador de señal digital) + controlador",
+          "soc": { "family": "Arquitectura módem 56K (DSP + controlador UART)", "note": "El DSP ejecuta la modulación/demodulación en software de señal; el controlador maneja la interfaz RS-232" },
+          "summary": "Módem dial-up con DSP de señal (modulación V.90/V.92) y controlador de interfaz serie: el DSP procesa la señal telefónica y el controlador arbitra la comunicación con el host por RS-232."
+        },
+        "sourceSlug": "usrobotics-56k-historical",
+        "confidence": "historical",
+        "note": "Arquitectura típica de la era 56K (DSP + controlador); el chipset concreto del USR5630 no se documenta en fuentes digitales fiables."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -246,7 +350,19 @@
     ],
     "assertions": [
       { "predicate": "firewall_throughput_gbps", "value": 20, "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party", "note": "Dato pendiente de fuente oficial" },
-      { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "aruba-2930f-datasheet", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU integrada en el SoC4 (el plano de datos se descarga al NP6XLite)",
+          "soc": { "family": "SoC4", "note": "El 100F usa el SoC4 completo: CPU + NP6XLite + CP9XLite (a diferencia del 200F, que usa CPU x86 externa y dos CP9)" },
+          "contentProcessors": ["CP9XLite"],
+          "networkProcessors": ["NP6XLite"],
+          "summary": "Un único SoC (SOC4) integra el procesador de contenido CP9XLite y el procesador de red NP6XLite; todo el tráfico entre interfaces de datos puede descargarse al hardware."
+        },
+        "sourceSlug": "fortinet-fg100f-docs",
+        "confidence": "official"
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "4" }
@@ -269,7 +385,18 @@
       { "label": "8x 10BASE-T RJ-45", "interfaceCode": "rj45", "quantity": 8, "speedsMbps": [10], "role": "access" }
     ],
     "assertions": [
-      { "predicate": "max_speed_mbps", "value": 10, "sourceSlug": "3com-hub-editorial", "confidence": "historical" }
+      { "predicate": "max_speed_mbps", "value": 10, "sourceSlug": "3com-hub-editorial", "confidence": "historical" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Sin CPU de plano de datos (repetidor multipuerto 10BASE-T)",
+          "soc": { "family": "Repetidor Ethernet 10BASE-T", "note": "Hub de capa 1: todos los puertos comparten el mismo dominio de colisión" },
+          "summary": "Hub Ethernet de capa 1: funciona como repetidor multipuerto que retransmite las tramas a todos los puertos (CSMA/CD, un único dominio de colisión); no hay conmutación ni CPU de plano de datos."
+        },
+        "sourceSlug": "kalpana-eifo-historical",
+        "confidence": "historical",
+        "note": "Arquitectura de hub 10BASE-T estándar de la época (IEEE 802.3); el repetidor no requiere CPU de reenvío."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" }
@@ -291,7 +418,18 @@
     "ports": [],
     "assertions": [
       { "predicate": "reach_m", "value": 300, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" },
-      { "predicate": "wavelength_nm", "value": 850, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" }
+      { "predicate": "wavelength_nm", "value": 850, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "official" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Electrónica de módulo óptico gestionado (EEPROM de gestión; sin CPU de propósito general)",
+          "soc": { "family": "SFP+ 10GBASE-SR (VCSEL 850 nm)", "note": "Láser VCSEL multimodo, driver, TIA y monitor + memoria de gestión (DDM)" },
+          "summary": "Módulo óptico SFP+ con láser VCSEL de 850 nm (multimodo), electrónica de driver/receptor y memoria de gestión con telemetría digital (DDM); la funcionalidad de red se delega al puerto del equipo anfitrión."
+        },
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet",
+        "confidence": "official",
+        "note": "Arquitectura del módulo según datasheet de módulos 10GBASE SFP+ de Cisco."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" },
@@ -312,7 +450,18 @@
     "ports": [],
     "assertions": [
       { "predicate": "reach_m", "value": 10000, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" },
-      { "predicate": "wavelength_nm", "value": 1310, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" }
+      { "predicate": "wavelength_nm", "value": 1310, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Electrónica de módulo óptico gestionado (EEPROM de gestión; sin CPU de propósito general)",
+          "soc": { "family": "SFP+ 10GBASE-LR (DFB 1310 nm)", "note": "Láser DFB monomodo, driver, TIA y monitor + memoria de gestión (DDM)" },
+          "summary": "Módulo óptico SFP+ con láser DFB de 1310 nm (monomodo, hasta 10 km), electrónica de driver/receptor y gestión digital (DDM); la funcionalidad de red se delega al equipo anfitrión."
+        },
+        "sourceSlug": "fs-sfp-10g-lr-datasheet",
+        "confidence": "official",
+        "note": "Arquitectura del módulo según datasheet FS SFP-10GLR-31 (DFB 1310 nm, 10 km)."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "1" },
@@ -368,7 +517,19 @@
     "osiProfile": { "terminate": [1, 2, 3, 4], "transparent": [5, 6, 7], "primary": 2 },
     "ports": [],
     "assertions": [
-      { "predicate": "throughput_gbps", "value": 2560, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "historical" }
+      { "predicate": "throughput_gbps", "value": 2560, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "historical" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Supervisor Engine (procesador del módulo de control, p. ej. Sup720/Sup2T)",
+          "soc": { "family": "Arquitectura modular Catalyst 6500", "note": "Plano de datos en el switch fabric + PFC (feature card) del supervisor; plano de control en la CPU del supervisor" },
+          "networkProcessors": ["Switch fabric + PFC (Supervisor)"],
+          "summary": "Chasis modular: el Supervisor Engine aloja la CPU del plano de control, el switch fabric encamina el tráfico entre módulos de línea y la PFC (policy feature card) acelera ACL/QoS. La capacidad y la memoria son variables según supervisor y módulos."
+        },
+        "sourceSlug": "cisco-cat6500-datasheet",
+        "confidence": "official",
+        "note": "Arquitectura de supervisor/fabric del datasheet oficial; valores concretos según configuración del chasis."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" },
@@ -388,7 +549,19 @@
     "summary": "Chasis modular de campus — hito de la capa 3 en switching.",
     "osiProfile": { "terminate": [1, 2, 3], "transparent": [4, 5, 6, 7], "primary": 3 },
     "ports": [],
-    "assertions": [],
+    "assertions": [
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Supervisor Engine (p. ej. Sup6-E/Sup7-E)",
+          "soc": { "family": "Arquitectura modular Catalyst 4500", "note": "ASIC de reenvío en el supervisor; capacidades variables según modelo" },
+          "summary": "Chasis modular de campus: el Supervisor Engine integra la CPU del plano de control y el ASIC de reenvío; la capacidad de conmutación y la memoria dependen del supervisor y de los módulos de línea instalados."
+        },
+        "sourceSlug": "cisco-cat4000-datasheet",
+        "confidence": "official",
+        "note": "Arquitectura de supervisor del datasheet oficial de la serie 4000/4500."
+      }
+    ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
     ]
@@ -407,7 +580,18 @@
     "osiProfile": { "terminate": [1, 2], "transparent": [3, 4, 5, 6, 7], "primary": 2 },
     "ports": [],
     "assertions": [
-      { "predicate": "supports-protocol", "value": "ethernet", "sourceSlug": "3com-hub-editorial", "confidence": "historical" }
+      { "predicate": "supports-protocol", "value": "ethernet", "sourceSlug": "3com-hub-editorial", "confidence": "historical" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Controlador de conmutación de la era Kalpana (no documentado; la conmutación era por hardware ASIC simple)",
+          "soc": { "family": "Conmutador MAC EIFO (1990)", "note": "Primer switch Ethernet: segmentación de colisión por puerto con reenvío MAC" },
+          "summary": "El Kalpana EtherSwitch fue el primer switch Ethernet comercial que dividió los dominios de colisión puerto a puerto; su arquitectura interna conmutaba tramas por dirección MAC en hardware. La CPU/especificaciones internas detalladas no se conservan en fuentes públicas."
+        },
+        "sourceSlug": "kalpana-eifo-historical",
+        "confidence": "historical",
+        "note": "Ficha histórica documental; no hay datasheet digital conservado (1990)."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -431,7 +615,19 @@
     "assertions": [
       { "predicate": "routing_throughput_mbps", "value": 1000000, "sourceSlug": "cisco-isr4321-datasheet", "confidence": "third-party", "note": "Throughput agregado; pendiente datasheet oficial" },
       { "predicate": "supports-protocol", "value": "bgp", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
-      { "predicate": "supports-protocol", "value": "mpls", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" }
+      { "predicate": "supports-protocol", "value": "mpls", "sourceSlug": "cisco-isr4321-datasheet", "confidence": "official" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "RP (route processor) del NCS 5500 con CPU x86 para el plano de control",
+          "soc": { "family": "Arquitectura NCS 5500 (Jericho/NP de línea)", "note": "Los routers NCS 5500 usan ASIC de reenvío de línea (clase Jericho) para el data plane y una RP x86 para el control plane" },
+          "networkProcessors": ["ASIC de reenvío (Jericho)"],
+          "summary": "Router de operador: plano de datos en los ASIC de reenvío de las line cards (clase Jericho) con tablas de enrutamiento a escala, y plano de control en la route processor x86 corriendo IOS-XR."
+        },
+        "sourceSlug": "cisco-ncs5500-datasheet",
+        "confidence": "official",
+        "note": "Arquitectura RP + ASIC de reenvío del datasheet oficial NCS 5500."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" },
@@ -454,7 +650,19 @@
     ],
     "assertions": [
       { "predicate": "max_speed_mbps", "value": 100000, "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party", "note": "Dato de puerto mensual; pendiente fuente oficial" },
-      { "predicate": "supports-protocol", "value": "roce", "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "roce", "sourceSlug": "cisco-cat2960x-datasheet", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "SmartNIC con núcleos ARM integrados para offload programable (Ascend/DPU class)",
+          "soc": { "family": "ASIC ConnectX-6 Dx", "note": "Adaptador inteligente 100GbE con offload NVMe-oF, RoCE y criptografía; ARMs integrados para servicios en línea de datos" },
+          "networkProcessors": ["ASIC ConnectX-6 Dx"],
+          "summary": "SmartNIC 100GbE: el ASIC ConnectX-6 Dx acelera el tráfico (RoCE, NVMe-oF, VxLAN, IPsec) y los núcleos ARM integrados ejecutan servicios programables sin tocar la CPU del host."
+        },
+        "sourceSlug": "nvidia-connectx6-dx-datasheet",
+        "confidence": "third-party",
+        "note": "Arquitectura SmartNIC del datasheet NVIDIA ConnectX-6 Dx; capacidades de RAM locales no publicadas."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -479,7 +687,19 @@
     "assertions": [
       { "predicate": "throughput_gbps", "value": 256, "sourceSlug": "3com-hub-editorial", "confidence": "third-party", "note": "Switching capacity aprox.; validar con datasheet oficial en F2" },
       { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
-      { "predicate": "supports-protocol", "value": "vxlan-evpn", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "vxlan-evpn", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU multi-núcleo integrada en el plano de control del Catalyst 9000",
+          "soc": { "family": "ASIC UADP 2.0", "note": "El Catalyst 9300 usa el ASIC UADP 2.0 para el plano de datos + StackWise virtual" },
+          "networkProcessors": ["UADP 2.0 ASIC"],
+          "summary": "Arquitectura Catalyst 9000: ASIC UADP 2.0 para el reenvío a wire-rate, CPU multinúcleo para el plano de control y lógica de apilamiento StackWise integrada. (Memoria/flash según SKU; los datos estructurales son oficiales del datasheet.)"
+        },
+        "sourceSlug": "cisco-cat9300-datasheet",
+        "confidence": "official",
+        "note": "Arquitectura UADP 2.0 y plano de control del datasheet oficial; DRAM/flash concretas del SKU pendientes de verificación."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
@@ -502,7 +722,20 @@
     ],
     "assertions": [
       { "predicate": "supports-protocol", "value": "bgp", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
-      { "predicate": "supports-protocol", "value": "vxlan-evpn", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "vxlan-evpn", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU x86 de alto rendimiento",
+          "ram": "Hasta 8 GB DRAM",
+          "storage": { "type": "Flash", "capacityGB": 4 },
+          "soc": { "family": "ASIC de conmutación 7050X", "note": "Con Dynamic Buffer Allocation: hasta 6.7 MB de memoria de paquetes por puerto sobre un buffer compartido de 12 MB" },
+          "networkProcessors": ["ASIC 7050X"],
+          "summary": "Arquitectura dual: switch ASIC (7050X) para el plano de datos a wire-rate con buffer compartido de 12 MB y DBA, y una CPU x86 de alto rendimiento con hasta 8 GB DRAM y 4 GB flash para el plano de control (EOS multi-proceso, estado en memoria compartida)."
+        },
+        "sourceSlug": "arista-7050sx-datasheet",
+        "confidence": "official"
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
@@ -562,7 +795,20 @@
     ],
     "assertions": [
       { "predicate": "supports-protocol", "value": "ipsec", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
-      { "predicate": "supports-protocol", "value": "dhcp", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "dhcp", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "SoC Qualcomm de la familia IPQ (ARM Cortex-A53 quad-core) — per spec técnico de Ubiquiti",
+          "ram": "4 GB",
+          "storage": { "type": "SSD", "capacityGB": 128 },
+          "soc": { "family": "Qualcomm IPQ (platforma UniFi)", "note": "Gateway 10G con NVR: el SoC integra el switch 1G + SFP+ 10G y la CPU gestiona router/firewall/NVR" },
+          "summary": "Gateway todo-en-uno UniFi: SoC Qualcomm (CPU ARM) ejecuta router, firewall y NVR; 4 GB de RAM y disco SSD de 128 GB para las grabaciones del NVR integrado."
+        },
+        "sourceSlug": "ubiquiti-techspecs",
+        "confidence": "experimental",
+        "note": "Especificaciones internas de Ubiquiti documentadas por la comunidad (techspecs.ui.com); el modelo de SoC exacto no se publica oficialmente."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
@@ -584,7 +830,19 @@
     ],
     "assertions": [
       { "predicate": "wifi_standard", "value": "802.11ax", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
-      { "predicate": "terminates-medium", "value": "wifi-6", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "terminates-medium", "value": "wifi-6", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "SoC Qualcomm de la familia IPQ (AP Wi-Fi 6, ARM)",
+          "ram": "512 MB",
+          "soc": { "family": "Qualcomm IPQ (plataforma UniFi 6)", "note": "Radio 4x4 dual banda (2.4/5 GHz, 802.11ax) con procesamiento Wi-Fi en el SoC" },
+          "summary": "Punto de acceso Wi-Fi 6 de largo alcance: el SoC Qualcomm integra las radios 4x4 (2.4/5 GHz AX) y la CPU ARM procesa el plano de control Wi-Fi; 512 MB de RAM según especificación de plataforma."
+        },
+        "sourceSlug": "ubiquiti-techspecs",
+        "confidence": "experimental",
+        "note": "SoC de la plataforma UniFi 6 documentado por la comunidad (techspecs.ui.com); Ubiquiti no publica el modelo exacto del SoC."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -606,7 +864,19 @@
       { "label": "4x 10G SFP+", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [10000], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "supports-protocol", "value": "802.1q", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "802.1q", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Marvell 98DX3236 (ARM 32-bit, 1 núcleo @ 800 MHz)",
+          "ram": "512 MB",
+          "storage": { "type": "Flash", "capacityGB": 0.016 },
+          "soc": { "family": "98DX3236", "note": "Procesador de conmutación (switch chip) con CPU ARM integrada" },
+          "summary": "Switch gestionable con el procesador de conmutación Marvell 98DX3236 (switch chip + CPU ARM integrada), 512 MB de RAM y 16 MB de flash; el plano de datos corre en el switch chip."
+        },
+        "sourceSlug": "mikrotik-crs328-spec",
+        "confidence": "official"
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -628,7 +898,18 @@
       { "label": "4x 10G SFP+", "interfaceCode": "sfp-plus", "quantity": 4, "speedsMbps": [10000], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU integrada en el Packet Forwarding Engine (ASIC); el modelo no se publica",
+          "soc": { "family": "ASIC-based PFE", "note": "Juniper no publica CPU/RAM del EX2300 en el datasheet" },
+          "summary": "Motor de reenvío de paquetes basado en ASIC (PFE) con CPU integrada: el plano de datos llega a wire-rate en ASIC y el plano de control corre en la CPU integrada."
+        },
+        "sourceSlug": "juniper-ex2300-datasheet",
+        "confidence": "official",
+        "note": "CPU/RAM concretas no publicadas por Juniper; la arquitectura PFE ASIC + CPU integrada es oficial."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
@@ -651,7 +932,18 @@
     ],
     "assertions": [
       { "predicate": "supports-protocol", "value": "ospf", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
-      { "predicate": "supports-protocol", "value": "vxlan", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "vxlan", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU de gestión de la plataforma ArubaOS-CX (plano de control)",
+          "soc": { "family": "SoC de conmutación Aruba 6300 (ASIC de reenvío + CPU)", "note": "Serie AOS-CX con uplinks SFP56 50G y VSF; el datasheet no publica el modelo del ASIC" },
+          "summary": "Switch de acceso/apilado ArubaOS-CX: plano de datos a wire-rate en el ASIC de conmutación (con uplinks 50G SFP56 y stacking VSF) y CPU de gestión para el plano de control L2/L3."
+        },
+        "sourceSlug": "aruba-2930f-datasheet",
+        "confidence": "experimental",
+        "note": "Arquitectura AOS-CX (ASIC + CPU de gestión); modelo del ASIC no publicado."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" }
@@ -673,7 +965,19 @@
       { "label": "1x WAN 1G", "interfaceCode": "rj45", "quantity": 1, "speedsMbps": [1000], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "wifi_standard", "value": "802.11ax", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "wifi_standard", "value": "802.11ax", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "Qualcomm IPQ5018 (IPQ0518) — doble núcleo ARM Cortex-A53 @ 1 GHz con NPU dedicada",
+          "ram": "512 MB",
+          "soc": { "family": "Qualcomm IPQ5018 + QCN6102", "note": "IPQ0518 para la banda de 2.4 GHz; QCN6102 radio de 5 GHz (v1 según comunidad; la página oficial confirma chipset Qualcomm y 512 MB RAM)" },
+          "summary": "Router Wi-Fi 6 con SoC Qualcomm IPQ5018 (doble núcleo A53 + NPU), 512 MB de RAM y radio 5 GHz QCN6102; soporte de 160 MHz y 1024-QAM."
+        },
+        "sourceSlug": "tplink-archer-ax55-spec",
+        "confidence": "third-party",
+        "note": "El SoC exacto (IPQ5018/QCN6102) lo documenta la comunidad; la página oficial de TP-Link confirma chipset Qualcomm avanzado y 512 MB RAM."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "3" },
@@ -695,7 +999,19 @@
       { "label": "24x 10/100/1000", "interfaceCode": "rj45", "quantity": 24, "speedsMbps": [1000], "poeStandard": "802.3at", "role": "access" },
       { "label": "2x 1G SFP", "interfaceCode": "sfp", "quantity": 2, "speedsMbps": [1000], "role": "uplink" }
     ],
-    "assertions": [],
+    "assertions": [
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU de gestión del switch smart (no publicada por Netgear)",
+          "soc": { "family": "SoC de conmutación Smart Managed (GS3xx)", "note": "Switch smart managed 24x PoE+ con 2x SFP; la electrónica interna no se publica" },
+          "summary": "Switch smart managed Netgear S350: plano de datos a wire-rate en el switch SoC (24 puertos PoE+ + 2 SFP) con CPU de gestión para la administración; las especificaciones internas no se documentan."
+        },
+        "sourceSlug": "netgear-gs324tp-spec",
+        "confidence": "experimental",
+        "note": "Arquitectura de switch smart general; CPU/RAM no publicadas por Netgear."
+      }
+    ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }
     ]
@@ -716,7 +1032,18 @@
       { "label": "2x 100FX", "interfaceCode": "fibra", "quantity": 2, "speedsMbps": [100], "role": "uplink" }
     ],
     "assertions": [
-      { "predicate": "supports-protocol", "value": "profinet", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" }
+      { "predicate": "supports-protocol", "value": "profinet", "sourceSlug": "3com-hub-editorial", "confidence": "third-party" },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "cpu": "CPU de gestión industrial (no publicada por Siemens)",
+          "soc": { "family": "Switch SoC industrial (SCALANCE XC)", "note": "Switch industrial no gestionado con 6x 10/100 + 2x 100FX, PROFINET-ready; la electrónica interna no se publica" },
+          "summary": "Switch industrial SCALANCE XC206-2: conmutación capa 2 a wire-rate en el SoC, 6 puertos copper 10/100 y 2 puertos fibra 100FX para entornos industriales (−20…60 °C); las especificaciones internas no se documentan."
+        },
+        "sourceSlug": "siemens-scalance-xc206-2-datasheet",
+        "confidence": "experimental",
+        "note": "Arquitectura de switch industrial genérica; CPU/RAM no publicadas por Siemens."
+      }
     ],
     "relationships": [
       { "predicate": "operates-at-layer", "objectType": "layer", "objectSlug": "2" }

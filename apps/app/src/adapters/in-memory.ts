@@ -921,6 +921,64 @@ export function buildDemoDataset(): InMemoryDataset {
       'demo-datasheet',
       'official',
     ),
+    makeAssertion(
+      'cisco-c9300-48p',
+      'internal-architecture',
+      {
+        cpu: 'CPU multi-núcleo del plano de control Catalyst 9000',
+        soc: { family: 'ASIC UADP 2.0', note: 'Plano de datos a wire-rate en el ASIC UADP 2.0 + StackWise' },
+        networkProcessors: ['UADP 2.0 ASIC'],
+        summary: 'Arquitectura Catalyst 9000: ASIC UADP 2.0 para el reenvío a wire-rate y CPU multinúcleo para el plano de control y gestión.',
+      },
+      'demo-datasheet',
+      'official',
+    ),
+    makeAssertion(
+      'aruba-2930f-48g',
+      'internal-architecture',
+      {
+        cpu: 'CPU de gestión de la plataforma ArubaOS-Switch',
+        soc: { family: 'SoC de conmutación Aruba 2930F', note: 'Plano de datos a wire-rate en el switch SoC' },
+        summary: 'Switch de acceso ArubaOS-Switch: plano de datos a wire-rate en el SoC de conmutación y CPU de gestión para el plano de control L2/L3-Lite.',
+      },
+      'demo-datasheet',
+      'official',
+    ),
+    makeAssertion(
+      'aruba-6300m-48g',
+      'internal-architecture',
+      {
+        cpu: 'CPU de gestión de la plataforma ArubaOS-CX',
+        soc: { family: 'SoC de conmutación Aruba 6300 (ASIC + CPU)', note: 'Uplinks SFP56 50G y stacking VSF' },
+        summary: 'Switch de acceso/apilado ArubaOS-CX: plano de datos a wire-rate en el ASIC con uplinks 50G y CPU de gestión para el plano de control L2/L3.',
+      },
+      'demo-datasheet',
+      'official',
+    ),
+    makeAssertion(
+      'mikrotik-ccr1036',
+      'internal-architecture',
+      {
+        cpu: '36 núcleos (Tillera/TILE-Gx) @ 1.2 GHz',
+        ram: '8 GB',
+        storage: { type: 'Flash', capacityGB: 0.512 },
+        soc: { family: 'Tile-Gx (36 núcleos)', note: 'CCR1036 usa el procesador many-core TILE-Gx36' },
+        summary: 'Router many-core: el TILE-Gx36 con 36 núcleos reparte el procesamiento de paquetes (RouterOS) a alta velocidad; 8 GB de RAM y flash de 512 MB.',
+      },
+      'demo-editorial',
+      'third-party',
+    ),
+    makeAssertion(
+      'cisco-9120axi',
+      'internal-architecture',
+      {
+        cpu: 'CPU de plataforma Wi-Fi 6 (ARM)',
+        soc: { family: 'SoC Wi-Fi 6 (802.11ax) 4x4:4', note: 'AP Catalyst 9120 con radio Wi-Fi 6 4x4:4 y 8 radios de escaneo' },
+        summary: 'Punto de acceso Wi-Fi 6 4x4:4: el SoC integra las radios 802.11ax (2.4/5 GHz) y los servicios (RLDP, CleanAir); la electrónica concreta no se publica.',
+      },
+      'demo-datasheet',
+      'official',
+    ),
   ]
   // Enlaza assertions a los ids de subject del índice
   void assertId

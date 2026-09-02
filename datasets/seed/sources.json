@@ -101,5 +101,177 @@
     "url": "https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture",
     "retrievedOn": "2025-11-12",
     "authorityLevel": 1
+  },
+  {
+    "slug": "fortinet-fg100f-docs",
+    "kind": "datasheet",
+    "publisher": "Fortinet",
+    "title": "FortiGate 100F and 101F fast path architecture (FortiOS 7.6.7)",
+    "url": "https://docs.fortinet.com/document/fortigate/7.6.7/hardware-acceleration/47902/fortigate-100f-and-101f-fast-path-architecture",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "mikrotik-hex-s-spec",
+    "kind": "datasheet",
+    "publisher": "MikroTik",
+    "title": "hEX S (RB760iGS) — Product specifications",
+    "url": "https://mikrotik.com/product/hex_s",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "mikrotik-crs328-spec",
+    "kind": "datasheet",
+    "publisher": "MikroTik",
+    "title": "CRS328-24P-4S+RM — Product specifications",
+    "url": "https://mikrotik.com/product/crs328_24p_4s_rm",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "juniper-ex2300-datasheet",
+    "kind": "datasheet",
+    "publisher": "Juniper Networks",
+    "title": "EX2300 Ethernet Switch Datasheet",
+    "url": "https://www.juniper.net/gb/en/products/switches/ex-series/ex2300-ethernet-switch-datasheet.html",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "arista-7050sx-datasheet",
+    "kind": "datasheet",
+    "publisher": "Arista Networks",
+    "title": "Arista 7050SX Series Datasheet (7050SX-64)",
+    "url": "https://www.arista.com/assets/data/pdf/Datasheets/7050SX-128_64_Datasheet.pdf",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "tplink-archer-ax55-spec",
+    "kind": "datasheet",
+    "publisher": "TP-Link",
+    "title": "Archer AX55 — AX3000 Wi-Fi 6 Router specs",
+    "url": "https://www.tp-link.com/us/home-networking/wifi-router/archer-ax55/",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "motorola-sb6121-datasheet",
+    "kind": "datasheet",
+    "publisher": "Motorola (ARRIS)",
+    "title": "SURFboard SB6121 DOCSIS 3.0 Cable Modem — Data Sheet",
+    "url": "https://gditechnology.com/manuals/Motorola-SB6121_Data_Sheet.pdf",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "ubiquiti-techspecs",
+    "kind": "web-oficial",
+    "publisher": "Ubiquiti",
+    "title": "Ubiquiti Tech Specs — UniFi Cloud Gateways y Access Points",
+    "url": "https://techspecs.ui.com/",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "nvidia-connectx6-dx-datasheet",
+    "kind": "datasheet",
+    "publisher": "NVIDIA",
+    "title": "NVIDIA ConnectX-6 Dx — SmartNIC datasheet",
+    "url": "https://www.nvidia.com/en-us/networking/ethernet-adapters/connectx-6-dx/",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "cisco-cat9300-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco Catalyst 9300 Series Switches Data Sheet (UADP 2.0 ASIC)",
+    "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-9300-series-switches/datasheet-c78-742519.html",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "cisco-cat6500-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco Catalyst 6500 Series Switches Data Sheet (Supervisor Engine)",
+    "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-6500-series-switches/product_data_sheet0900aecd804a85b4.html",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "cisco-cat4000-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco Catalyst 4000 Series Switches Data Sheet (Supervisor Engine)",
+    "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-4000-series-switches/product_data_sheet0900aecd80192b01.html",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "cisco-ncs5500-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco NCS 5500 Series Data Sheet (Silicon One / Jericho)",
+    "url": "https://www.cisco.com/c/en/us/products/collateral/routers/network-convergence-system-5500-series/datasheet-c78-737226.html",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "kalpana-eifo-historical",
+    "kind": "editorial",
+    "publisher": "Archivo técnico (Kalpana / Wayback)",
+    "title": "Kalpana EtherSwitch EIFO-8+ — primer switch Ethernet (1990), arquitectura del conmutador",
+    "url": "https://en.wikipedia.org/wiki/Ethernet_switch",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 4
+  },
+  {
+    "slug": "usrobotics-56k-historical",
+    "kind": "manual",
+    "publisher": "U.S. Robotics",
+    "title": "Sportster 56K Voice Faxmodem — arquitectura módem (DSP + controlador)",
+    "url": null,
+    "publishedOn": "1997-01-01",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 2
+  },
+  {
+    "slug": "cisco-sfp-10g-sr-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco 10GBASE SFP+ Modules Data Sheet",
+    "url": "https://www.cisco.com/c/en/us/products/collateral/interfaces-modules/transceiver-modules/datasheet-c78-455693.html",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "fs-sfp-10g-lr-datasheet",
+    "kind": "datasheet",
+    "publisher": "FS.com",
+    "title": "FS SFP-10GLR-31 — 10GBASE-LR SFP+ transceiver datasheet",
+    "url": "https://www.fs.com/products/100032.html",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "netgear-gs324tp-spec",
+    "kind": "datasheet",
+    "publisher": "Netgear",
+    "title": "Netgear S350 GS324TP — 24-Port PoE+ Smart Switch datasheet",
+    "url": "https://www.netgear.com/business/wired/switches/smart-switches/gigabit-plus/gs324tp/",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "siemens-scalance-xc206-2-datasheet",
+    "kind": "datasheet",
+    "publisher": "Siemens",
+    "title": "Siemens SCALANCE XC206-2 — Industrial Ethernet Switch data sheet",
+    "url": "https://support.industry.siemens.com/cs/document/109740669/scalance-xc-206-2",
+    "retrievedOn": "2025-11-12",
+    "authorityLevel": 1
   }
 ]

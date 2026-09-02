@@ -85,6 +85,7 @@
 ### Pendiente F2 (refinamiento)
 
 - [x] **auditoría de accesibilidad continua axe en CI (NET-HW-058)**: spec E2E `a11y-axe.spec.ts` recorre dashboard, explorador (con filtro), ficha (con pestaña), catálogos y calidad ejecutando axe-core (WCAG 2.2 A/AA) sobre el build real en chromium y firefox — **0 violaciones**. Los fixes de a11y: tokens de contraste AA en ambos temas (`--text-muted` 4.5+:1), enlaces dentro de bloques de texto siempre subrayados (`link-in-text-block`), `role="combobox"` + `aria-haspopup="listbox"` en la búsqueda (ARIa APG) y el panel OSI sin roles ARIA mixtos. Complementa la a11y jsdom de NET-HW-026 con verificación en el navegador real; bloquea el job `e2e` de CI
+- [x] **curación de arquitectura interna (ASIC/CPU/memoria)**: la pestaña Arquitectura pasó de placeholder estático a renderizar la assertion `internal-architecture` (CPU, RAM, SoC, procesadores de contenido/red, almacenamiento, summary, fuente con confianza y «pendiente revisión»). Curadas **29/31 fichas del seed** con fuentes oficiales verificadas (Fortinet 100F/200F, MikroTik hEX S/CRS328, Cisco 2960X/ISR4321/6500/4000/9300/NCS-5500, Juniper EX2300, Arista 7050SX, TP-Link AX55, Aruba 2930F/2920, Motorola SB6121, transceivers SFP/SFP+, histórico Kalpana/hub/56K, Ubiquiti, NVIDIA ConnectX-6, Netgear, Siemens); los pasivos (UTP/fibra) muestran «no aplica» y los generados «pendiente de curación» (nunca inventar con `experimental`+nota si falta fuente oficial)
 
 ## Estado de la Fase 3 (implementada — grafo y relaciones)
 
@@ -198,7 +199,7 @@ F0 4–6 sem · F1 12–16 · F2 6–8 · F3 6–8 · F4 6–8 · F5 4–6 · F6
 
 ```
 typecheck:     10 de 11 paquetes verdes (tsc --noEmit estricto; el workspace suma @netatlas/server)
-tests:         67 suites con 395 verdes (domain 160 · data 37 · importers 15 · search 20 · ui 6 · app 99 · dataset-tools 11 · datagen 4 · server 43)
+tests:         67 suites con 396 verdes (domain 160 · data 37 · importers 15 · search 20 · ui 6 · app 100 · dataset-tools 11 · datagen 4 · server 43)
 data:lint:     0 avisos / 0 errores sobre 330 dispositivos
 dataset:build: 330 dispositivos · 118 protocolos · 101 estándares · 31 medios · 39 fabricantes · 26 categorías · 1123 aristas · 1114 assertions · 10 definiciones EAV / 52 valores · 3 topologías · esquema v2 + manifiesto firmado
 bench:         p95 ≈ 2 ms sobre 10k sintéticos (criterio F0)

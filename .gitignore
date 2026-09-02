@@ -12,6 +12,8 @@ dist/
 build/
 out/
 coverage/
+# Vite PWA emit en modo dev (workbox)
+dev-dist/
 
 # SQLite datasets generados
 datasets/**/*.sqlite

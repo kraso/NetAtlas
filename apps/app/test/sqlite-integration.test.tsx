@@ -79,4 +79,17 @@ describe('UI sobre SQLite real (Fase C)', () => {
     expect(screen.getByText(/FortiGate 200F Series Data Sheet/)).toBeDefined()
     expect(screen.getAllByText('Oficial').length).toBeGreaterThanOrEqual(1)
   })
+
+  it('un dispositivo generado sin curación muestra el empty-state honesto (no inventar)', async () => {
+    // Un generado del seed (299 sintéticos) no tiene assertion de arquitectura:
+    // la pestaña debe mostrar «pendiente de curación», nunca un dato falso.
+    renderApp('/device/moxa-cat-swt-128')
+    fireEvent.click(await screen.findByRole('tab', { name: 'Arquitectura' }))
+    expect(await screen.findByText(/pendiente de curación/i)).toBeDefined()
+    // Y el pasivo hereda el empty-state «no aplica».
+    cleanup()
+    renderApp('/device/utp-cat6a')
+    fireEvent.click(await screen.findByRole('tab', { name: 'Arquitectura' }))
+    expect(await screen.findByText(/no aplica|pasivo/i)).toBeDefined()
+  })
 })

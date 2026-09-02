@@ -11,8 +11,9 @@ test.describe('Dashboard de calidad (F6)', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Calidad del dataset' })).toBeVisible()
     await expect(page.getByText('Cobertura de fuentes por categoría')).toBeVisible()
     await expect(page.getByText('Distribución de confianza')).toBeVisible()
-    // El demo: 6 dispositivos, cobertura 67%
-    await expect(page.getByText('67%')).toBeVisible()
+    // El demo: 6 dispositivos, cobertura 100% (todos con ≥1 assertion, incluidas
+    // las de arquitectura interna curadas en F2).
+    await expect(page.getByText('100%').first()).toBeVisible()
     await expect(page.getByTestId('confianza-official')).toBeVisible()
   })
 

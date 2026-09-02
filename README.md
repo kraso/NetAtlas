@@ -1,7 +1,7 @@
 # NetAtlas
 
 > **Enciclopedia técnica interactiva y sistema de conocimiento sobre hardware de redes de comunicaciones.**
-> Estado: **Fase 0 — Investigación y arquitectura** (ver `docs/roadmap.md`).
+> Estado: **F1-F9 cerradas** — MVP completo con PWA offline + escritorio Tauri + servidor de sincronización (ver `docs/roadmap.md`).
 
 NetAtlas no es una wiki ni un catálogo CRUD: es un **grafo de conocimiento técnico navegable** en el que dispositivos, fabricantes, familias, componentes, interfaces, protocolos, estándares, medios de transmisión, capas OSI/TCP-IP, tecnologías, topologías y evolución histórica son entidades de primera clase conectadas por relaciones tipadas, versionadas y respaldadas por fuentes.
 
@@ -44,12 +44,32 @@ docs/           # Documentación viva + ADRs
 
 ## Comandos
 
+> Guía completa de instalación y prueba (Windows y Linux, instaladores
+> `.msi`/`.exe` y `.deb`/`.rpm`/`.AppImage`) en **[`docs/INSTALL.md`](docs/INSTALL.md)**.
+
 ```bash
 pnpm install          # instalar dependencias del monorepo
 pnpm typecheck        # tsc --noEmit en todos los paquetes
 pnpm test             # tests unitarios (Vitest)
 pnpm data:lint        # validación de invariantes del dataset seed
-pnpm bench            # benchmark FTS5 sobre 10k dispositivos sintéticos (criterio de salida F0)
+pnpm bench            # benchmark FTS5 sobre 10k dispositivos sintéticos
+
+# Aplicación web (PWA offline) — http://localhost:5173
+pnpm --filter @netatlas/app dev
+# Build de producción + preview — http://127.0.0.1:4173
+pnpm --filter @netatlas/app build
+pnpm --filter @netatlas/app preview
+
+# Escritorio (Tauri v2) — requiere Rust toolchain
+pnpm --filter @netatlas/app tauri dev
+pnpm --filter @netatlas/app tauri build   # instaladores por plataforma
+
+# Servidor de sincronización (F8A): API /api + /v1 pública, puerto 8787
+pnpm --filter @netatlas/server server        # necesita NETATLAS_SERVER_TOKEN (o OIDC)
+pnpm --filter @netatlas/server server:e2e    # backend de pruebas (copia temporal del seed)
+
+# Suites E2E (Playwright, chromium + firefox; levanta PWA y backend)
+pnpm --filter @netatlas/app test:e2e
 ```
 
 ## Criterio de salida de la Fase 0
