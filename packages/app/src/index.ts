@@ -132,3 +132,8 @@ export { dslTerminos, searchDevices, type SearchDevicesInput, type SearchDevices
 export { suggestGrouped } from './casos/suggest-grouped.js'
 export { compareDevicesUseCase, type CompareInput } from './casos/compare-devices.js'
 export { manageFavorites, type FavoritesAction } from './casos/manage-favorites.js'
+export { buildLocalGraph, type BuildLocalGraphInput, type BuildLocalGraphOutput } from './casos/build-local-graph.js'
+export { buildGlobalGraph, type GlobalMapInput, type BuildGlobalGraphOutput } from './casos/build-global-graph.js'
+
+// ── Proyecciones UI ────────────────────────────────────────────────────────────
+export { buildSubgraph, dedup, type UiGraphSubgraph, type UiGraphNode, type UiGraphEdge } from './projections/subgraph.js'
