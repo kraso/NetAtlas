@@ -53,10 +53,12 @@ const CON_COMPATIBILIDAD: readonly string[] = ['CAT-OPT', 'CAT-IFC']
 
 const THROUGHPUT_RE = /_?throughput_|^throughput_/
 
-/** ¿Applying throughput a esta categoría? Switches/routers/firewalls/NIC. */
+/** ¿Applying throughput a esta categoría? Switches/router/firewalls/NIC (no hubs). */
 function esperaThroughput(categoria: string): boolean {
   if (PASIVAS.includes(categoria)) return false
   if (CON_COMPATIBILIDAD.includes(categoria)) return false
+  // El hub es un repetidor de capa 1: no tiene throughput de conmutación.
+  if (categoria.startsWith('CAT-SWT-HUB')) return false
   return categoria.startsWith('CAT-SWT') || categoria.startsWith('CAT-RTR') || categoria.startsWith('CAT-SEC') || categoria.startsWith('CAT-IFC') || categoria.startsWith('CAT-DCN')
 }
 
