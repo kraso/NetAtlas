@@ -27,6 +27,11 @@ export function Calidad(): React.JSX.Element {
     { label: 'Sin especificaciones EAV', valor: String(report.dispositivosSinEAV) },
     { label: 'Relaciones', valor: String(report.relaciones) },
   ]
+  const critica = report.coberturaCritica
+  // Threshold del plan maestro (§F2): cobertura ≥80% en datos críticos.
+  const cumpleCritica = critica.porcentaje >= 80
+  const faltantesPorTipo = (tipo: string): number =>
+    critica.items.filter((i) => i.faltan.includes(tipo as 'throughput' | 'protocolos' | 'compatibilidades')).length
 
   return (
     <section aria-labelledby="titulo-calidad">
@@ -42,6 +47,23 @@ export function Calidad(): React.JSX.Element {
           </div>
         ))}
       </div>
+
+      <section aria-label="Cobertura de datos críticos" className="card" style={{ marginTop: 16 }}>
+        <h2 style={{ fontSize: 'var(--font-size-md)', marginTop: 0 }}>
+          Datos críticos curados (throughput · protocolos · compatibilidades)
+        </h2>
+        <p className="guia-tecnica">
+          Umbral del plan maestro (§F2): cobertura ≥80% en datos críticos. Hoy:{' '}
+          <span className="mono" data-testid="cobertura-critica">{critica.porcentaje}%</span>{' '}
+          ({critica.curados}/{critica.elegibles} dispositivos con electrónica){' '}
+          {cumpleCritica ? '— ✔ cumple' : '— ⚠ por debajo del umbral'}
+        </p>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 8 }}>
+          <p className="guia-tecnica" style={{ margin: 0 }}>Sin throughput: <span className="mono">{faltantesPorTipo('throughput')}</span></p>
+          <p className="guia-tecnica" style={{ margin: 0 }}>Sin protocolos: <span className="mono">{faltantesPorTipo('protocolos')}</span></p>
+          <p className="guia-tecnica" style={{ margin: 0 }}>Sin compatibilidades: <span className="mono">{faltantesPorTipo('compatibilidades')}</span></p>
+        </div>
+      </section>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginTop: 20 }}>
         <section aria-label="Cobertura por categoría">

@@ -43,6 +43,9 @@ describe('Dashboard de calidad (F6)', () => {
     expect(filas.length).toBeGreaterThan(2) // cabecera + categorías
     // Distribución de confianza presente (official/third-party del demo)
     expect(screen.getByTestId('confianza-official')).toBeDefined()
+    // Tarjeta de datos críticos (F2): siempre presente con su % y el umbral ≥80%.
+    expect(screen.getByTestId('cobertura-critica')).toBeDefined()
+    expect(screen.getByText(/Datos críticos curados/)).toBeDefined()
   })
 
   it('resuelve un candidato de la cola con diff: aceptar la vacía y rechazar limpia', async () => {

@@ -1,4 +1,6 @@
 import type { SqliteDriver } from '../driver.js'
+import { calcularCoberturaCritica } from '@netatlas/domain'
+import type { CoberturaCriticaResultado } from '@netatlas/domain'
 
 /**
  * Dashboard de calidad del dataset (NET-HW-047, §19.3): cobertura de fuentes
@@ -17,6 +19,7 @@ export interface QualityReport {
   readonly dispositivos: number
   readonly conAssertions: number
   readonly coberturaFuentes: number // % global
+  readonly coberturaCritica: CoberturaCriticaResultado // % datos críticos (F2)
   readonly distribucionConfianza: readonly { confianza: string; n: number }[]
   readonly atributosEAV: number
   readonly dispositivosSinEAV: number
@@ -69,10 +72,31 @@ export class SqliteQualityRepository {
       this.db.prepare("SELECT COUNT(*) AS c FROM reconciliation WHERE status = 'pending'").get()?.c ?? 0,
     )
 
+    // Cobertura de datos críticos (F2): por dispositivo, predicados de
+    // assertion y relaciones → métrica pura del dominio.
+    const criticoRows = this.db
+      .prepare(
+        `SELECT d.slug, c.code AS categoria
+         FROM device d JOIN category c ON d.category_id = c.id
+         WHERE c.code NOT IN ('CAT-PAS')`,
+      )
+      .all() as { slug: string; categoria: string }[]
+    const porDispositivo = criticoRows.map((r) => {
+      const assertionPredicates = (this.db
+        .prepare('SELECT DISTINCT predicate FROM assertion WHERE subject_type = ? AND subject_id = (SELECT id FROM device WHERE slug = ?)')
+        .all('device', r.slug) as { predicate: string }[]).map((x) => x.predicate)
+      const relationshipPredicates = (this.db
+        .prepare('SELECT DISTINCT predicate FROM relationship WHERE (subject_type = ? AND subject_id = (SELECT id FROM device WHERE slug = ?)) OR (object_type = ? AND object_id = (SELECT id FROM device WHERE slug = ?))')
+        .all('device', r.slug, 'device', r.slug) as { predicate: string }[]).map((x) => x.predicate)
+      return { slug: r.slug, categoryCode: r.categoria, assertionPredicates, relationshipPredicates }
+    })
+    const coberturaCritica = calcularCoberturaCritica(porDispositivo)
+
     return {
       dispositivos,
       conAssertions,
       coberturaFuentes: dispositivos > 0 ? Math.round((conAssertions / dispositivos) * 100) : 0,
+      coberturaCritica,
       distribucionConfianza,
       atributosEAV,
       dispositivosSinEAV,

@@ -260,3 +260,12 @@ export type {
   SuggestResult,
 } from './ports/search-index.js'
 export type { Clock, IdGen, Logger } from './ports/clock.js'
+
+// Calidad del dataset (F2 / NET-HW-047): métricas puras de cobertura
+export { calcularCoberturaCritica, PASIVAS } from './quality/index.js'
+export type {
+  DatoCritico,
+  DispositivoCriticoInput,
+  CoberturaCriticaItem,
+  CoberturaCriticaResultado,
+} from './quality/index.js'

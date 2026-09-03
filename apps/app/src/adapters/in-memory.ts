@@ -30,6 +30,8 @@ import type {
   Relationship as RelationshipType,
 } from '@netatlas/domain'
 import type { Speed, Confidence } from '@netatlas/domain'
+import { calcularCoberturaCritica, PASIVAS } from '@netatlas/domain'
+import type { CoberturaCriticaResultado } from '@netatlas/domain'
 
 /**
  * Adaptadores in-memory de los puertos del dominio para la UI.
@@ -406,6 +408,12 @@ export class InMemorySourcingRepository implements SourcingRepository {
     return this.assertionsFor('device', i + 1)
   }
 
+  /** Slug del dispositivo dueno de una assertion (subjectId = índice+1). */
+  private slugDeAssertion(a: Assertion): string | undefined {
+    if (a.subjectType !== 'device') return undefined
+    return this.data.devices[a.subjectId - 1]?.slug.value
+  }
+
   async assertionsFor(subjectType: string, subjectId: number): Promise<readonly Assertion[]> {
     return this.data.assertions.filter(
       (a) => a.subjectType === subjectType && a.subjectId === subjectId,
@@ -657,6 +665,7 @@ export interface UiQualityReport {
   readonly dispositivos: number
   readonly conAssertions: number
   readonly coberturaFuentes: number
+  readonly coberturaCritica: CoberturaCriticaResultado
   readonly distribucionConfianza: readonly { confianza: string; n: number }[]
   readonly atributosEAV: number
   readonly dispositivosSinEAV: number
@@ -708,10 +717,26 @@ export class InMemoryQualityRepository implements UiQualityRepo {
       porCat.set(d.categoryCode, e)
     }
 
+    // Cobertura de datos críticos (F2): assertions y relaciones del demo con la
+    // misma métrica pura del dominio que el SQLite real.
+    const slugDeAssertion = (a: Assertion): string | undefined =>
+      a.subjectType === 'device' ? this.data.devices[a.subjectId - 1]?.slug.value : undefined
+    const coberturaCritica = calcularCoberturaCritica(
+      this.data.devices
+        .filter((d) => !PASIVAS.includes(d.categoryCode))
+        .map((d) => ({
+          slug: d.slug.value,
+          categoryCode: d.categoryCode,
+          assertionPredicates: this.data.assertions.filter((a) => slugDeAssertion(a) === d.slug.value).map((a) => a.predicate),
+          relationshipPredicates: this.data.relationships.filter((r) => r.subject.slug === d.slug.value || r.object.slug === d.slug.value).map((r) => r.predicate),
+        })),
+    )
+
     return {
       dispositivos,
       conAssertions,
       coberturaFuentes: dispositivos > 0 ? Math.round((conAssertions / dispositivos) * 100) : 0,
+      coberturaCritica,
       distribucionConfianza: [...confianza.entries()].map(([confianza, n]) => ({ confianza, n })).sort((a, b) => b.n - a.n),
       atributosEAV,
       dispositivosSinEAV,
