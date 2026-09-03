@@ -102,7 +102,24 @@ export interface AppServices {
   readonly dataset: InMemoryDataset
 }
 
-export function buildServices(dataset?: InMemoryDataset): AppServices {
+/**
+ * Resuelve los servicios de la app según el entorno (hexagonal §6):
+ * - Browser/PWA (F1): dataset demo en memoria (offline, 0 dependencias Node).
+ * - Desktop (Electron/Tauri, F1-late): dataset real vía SQLite (wa-sqlite o node:sqlite).
+ *
+ * El flag `VITE_DATASET=sqlite` activa el backend real; por defecto se usa memoria.
+ */
+export function resolveServices(): AppServices {
+  if (typeof import.meta !== 'undefined' && (import.meta.env as Record<string, unknown>).VITE_DATASET === 'sqlite') {
+    // Lazy require: node:sqlite no existe en browser, por lo que el import
+    // de composition-root-sqlite sólo se evalúa en entornos con Node runtime.
+    // En desktop se resuelve a node:sqlite; en PWA el flag no se activa jamás.
+    return buildSqliteServices()
+  }
+  return buildServices()
+}
+
+function buildServices(dataset?: InMemoryDataset): AppServices {
   const data = dataset ?? buildDemoDataset()
   return {
     devices: new InMemoryDeviceRepository(data),
@@ -123,7 +140,7 @@ interface ServiceStore {
 }
 
 export const useServices = create<ServiceStore>(() => ({
-  services: buildServices(),
+  services: resolveServices(),
 }))
 
 /** Permite a los tests inyectar un dataset controlado o el motor SQLite real. */

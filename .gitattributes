@@ -1,0 +1,19 @@
+# Text files: force LF line endings (prevents esbuild CRLF crashes on Windows)
+# §GIT-ATTR-001 — NetAtlas
+* text=auto eol=lf
+
+*.ts  text eol=lf
+*.tsx text eol=lf
+*.js  text eol=lf
+*.json        text eol=lf
+*.md  text eol=lf
+*.mdx text eol=lf
+*.yaml  text eol=lf
+*.yml   text eol=lf
+*.sh  text eol=lf
+
+*.sqlite binary
+*.png    binary
+*.jpg    binary
+*.webp   binary
+*.woff2  binary
