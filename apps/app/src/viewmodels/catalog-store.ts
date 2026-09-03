@@ -10,7 +10,9 @@ import type { Device, Category } from '@netatlas/domain'
 interface CatalogState {
   categories: readonly Category[]
   loading: boolean
-  load: () => Promise<void>
+  /** Última revisión del dataset (invalida el cache cuando el warmezo HTTP reemplaza services). */
+  revisionVisto: number
+  load: (force?: boolean) => Promise<void>
   deviceBySlug: (slug: string) => Promise<Device | undefined>
   devicesByCategory: (code: string) => Promise<readonly Device[]>
 }
@@ -18,9 +20,11 @@ interface CatalogState {
 export const useCatalogStore = create<CatalogState>((set, get) => ({
   categories: [],
   loading: false,
-  load: async () => {
-    if (get().categories.length > 0) return
-    set({ loading: true })
+  revisionVisto: 0,
+  load: async (force = false) => {
+    const revision = useServices.getState().revision
+    if (!force && get().categories.length > 0 && get().revisionVisto === revision) return
+    set({ loading: true, revisionVisto: revision })
     const { catalog } = useServices.getState().services
     const categories = await catalog.listCategories()
     set({ categories, loading: false })

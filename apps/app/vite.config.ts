@@ -3,6 +3,10 @@ import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  optimizeDeps: {
+    exclude: ['@netatlas/server'],
+  },
+  ssr: { noExternal: [] },
   plugins: [
     react(),
     VitePWA({
@@ -47,6 +51,12 @@ export default defineConfig({
     outDir: 'dist',
     sourcemap: false,
     rollupOptions: {
+      external: [
+        // Desktop-only packages (node:sqlite, rusqlite, pg) — no browser.
+        '@netatlas/data',
+        /^node:/,
+        /^pg$/,
+      ],
       output: {
         manualChunks: {
           // Vendor de los diagramas: cytoscape + cytoscape-svg en un chunk propio

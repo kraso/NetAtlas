@@ -11,6 +11,7 @@ import {
   buildDemoDataset,
   UiAssistantRepoDemo,
 } from './adapters/in-memory.js'
+import { HttpUiRepos } from './adapters/http-ui.js'
 import type { InMemoryDataset } from './adapters/in-memory.js'
 import type {
   UiAttributeDefinition,
@@ -114,12 +115,34 @@ export function resolveServices(): AppServices {
     // Lazy require: node:sqlite no existe en browser, por lo que el import
     // de composition-root-sqlite sólo se evalúa en entornos con Node runtime.
     // En desktop se resuelve a node:sqlite; en PWA el flag no se activa jamás.
-    return buildSqliteServices()
+    // Dynamic import para que Vite no bundle @netatlas/data en browser (F1-baseline).
+    void import('./composition-root-sqlite.js').then((mod) => mod.buildSqliteServices())
+    return buildServices()
   }
   return buildServices()
 }
 
-function buildServices(dataset?: InMemoryDataset): AppServices {
+/** Adaptador HTTP API server (F8B): si VITE_API está configurado, warmeza un
+ * pull a /api/snapshot en background. El dataset remoto (330 dispositivos)
+ * reemplaza al demo (6) en el store reactivo cuando llega. Si falla la red,
+ * el adapter cae al demo (offline-first F8A). */
+let httpWarmer: Promise<void> | null = null
+export function warmezaHttpSiDisponible(): Promise<void> {
+  const env = (import.meta.env as Record<string, unknown> ?? {}) as Record<string, string | undefined>
+  const apiBase = env.VITE_API
+  if (!apiBase) return Promise.resolve()
+  if (httpWarmer) return httpWarmer
+  const adapter = new HttpUiRepos(apiBase)
+  httpWarmer = adapter
+    .buildServices()
+    .then((services) => setServices(services))
+    .catch(() => {
+      /* red caída → el store conserva el demo */
+    })
+  return httpWarmer
+}
+
+export function buildServices(dataset?: InMemoryDataset): AppServices {
   const data = dataset ?? buildDemoDataset()
   return {
     devices: new InMemoryDeviceRepository(data),
@@ -137,13 +160,16 @@ function buildServices(dataset?: InMemoryDataset): AppServices {
 
 interface ServiceStore {
   services: AppServices
+  /** Versión del dataset cargado (demo vs remoto), para re-renders. */
+  revision: number
 }
 
-export const useServices = create<ServiceStore>(() => ({
+export const useServices = create<ServiceStore>((set) => ({
   services: resolveServices(),
+  revision: 0,
 }))
 
 /** Permite a los tests inyectar un dataset controlado o el motor SQLite real. */
 export function setServices(services: AppServices): void {
-  useServices.setState({ services })
+  useServices.setState((prev) => ({ services, revision: prev.revision + 1 }))
 }

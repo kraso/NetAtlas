@@ -13,6 +13,7 @@ import { SearchBox } from './search-box.js'
 export function Dashboard(): React.JSX.Element {
   const categories = useCatalogStore((s) => s.categories)
   const { dslPreview } = useSearchStore()
+  const revision = useServices((s) => s.revision)
   const [deviceCount, setDeviceCount] = React.useState(0)
 
   React.useEffect(() => {
@@ -20,7 +21,7 @@ export function Dashboard(): React.JSX.Element {
       const count = await useServices.getState().services.devices.count()
       setDeviceCount(count)
     })()
-  }, [])
+  }, [revision])
 
   const raices = rootCategories(categories)
 

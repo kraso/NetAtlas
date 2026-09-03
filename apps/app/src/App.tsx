@@ -1,5 +1,7 @@
 import React from 'react'
 import { Routes, Route, NavLink } from 'react-router-dom'
+import { useCatalogStore } from './viewmodels/catalog-store.js'
+import { warmezaHttpSiDisponible, useServices } from './composition-root.js'
 import { Dashboard } from './ui/dashboard.js'
 import { Explore } from './ui/explore.js'
 import { DeviceSheet } from './ui/device-sheet.js'
@@ -14,7 +16,6 @@ import { Topologias } from './ui/topologies.js'
 import { Calidad } from './ui/calidad.js'
 import { Asistente } from './ui/asistente.js'
 import { Sincronizar } from './ui/sincronizar.js'
-import { useCatalogStore } from './viewmodels/catalog-store.js'
 
 // Las vistas con Cytoscape se cargan bajo demanda (solo-diferencias de la
 // fase): cytoscape + cytoscape-svg quedan fuera del chunk inicial de la app.
@@ -25,9 +26,17 @@ const Suspense = React.Suspense
 
 export function App(): React.JSX.Element {
   const load = useCatalogStore((s) => s.load)
+  const revision = useServices((s) => s.revision)
   React.useEffect(() => {
     void load()
-  }, [load])
+  }, [])
+  // Cuando el warmezo HTTP reemplaza services (demo→330), refresca el catálogo.
+  React.useEffect(() => {
+    if (revision > 0) void load(true)
+  }, [revision])
+  React.useEffect(() => {
+    void warmezaHttpSiDisponible()
+  }, [])
 
   return (
     <div className="app-shell">
