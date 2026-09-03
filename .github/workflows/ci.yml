@@ -104,6 +104,9 @@ jobs:
       - name: 'dataset:build (el backend e2e copia netatlas-seed.sqlite)'
         run: pnpm --filter @netatlas/dataset-tools run dataset:build
 
+      - name: 'Build app (el webServer sirve dist/ con vite preview)'
+        run: pnpm --filter @netatlas/app build
+
       - name: Install browsers
         run: pnpm --filter @netatlas/app exec playwright install --with-deps chromium firefox
 
