@@ -134,6 +134,7 @@ export { compareDevicesUseCase, type CompareInput } from './casos/compare-device
 export { manageFavorites, type FavoritesAction } from './casos/manage-favorites.js'
 export { buildLocalGraph, type BuildLocalGraphInput, type BuildLocalGraphOutput } from './casos/build-local-graph.js'
 export { buildGlobalGraph, type GlobalMapInput, type BuildGlobalGraphOutput } from './casos/build-global-graph.js'
+export { importarLote, type ImportarLoteInput, type ImportarLoteResult } from './casos/importar-lote.js'
 
 // ── Proyecciones UI ────────────────────────────────────────────────────────────
 export { buildSubgraph, dedup, type UiGraphSubgraph, type UiGraphNode, type UiGraphEdge } from './projections/subgraph.js'
