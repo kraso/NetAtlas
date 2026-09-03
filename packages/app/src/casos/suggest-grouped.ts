@@ -6,7 +6,6 @@
  * Fabricantes). Lógica pura y reutilizable por PWA, Tauri y servidor (F8B).
  */
 import type { SearchPort, CatalogPort } from '../index.js'
-import type { Manufacturer } from '@netatlas/domain'
 
 export interface SuggestGroupedInput {
   readonly prefix: string
@@ -52,21 +51,17 @@ export async function suggestGrouped(
     ports.catalog.listMedia(),
   ])
 
-  // Fabricantes: el catálogo no los expone como filas genéricas; se derivan de
-  // listCategories (que ya referencia manufacturer) o se dejan vacíos.
-  let fabricantes: readonly Manufacturer[] = []
+  const fabricantes = await ports.catalog.listManufacturers()
 
-  const result: Record<string, readonly { slug: string; label: string }[]> = {
+  return {
     Dispositivos: devices.map((d) => ({ slug: d.slug, label: d.label })),
     Categorías: toRows(categories, (c) => c.code, (c) => c.nameEs, prefix, limitPerGroup),
     Protocolos: toRows(protocols, (p) => p.code, (p) => p.name, prefix, limitPerGroup),
     Estándares: toRows(standards, (s) => s.slug, (s) => s.label, prefix, limitPerGroup),
     Medios: toRows(media, (m) => m.slug, (m) => m.label, prefix, limitPerGroup),
+    Fabricantes: fabricantes
+      .filter((m) => m.name.toLowerCase().includes(prefix.toLowerCase()))
+      .slice(0, limitPerGroup)
+      .map((m) => ({ slug: m.slug.value, label: m.name })),
   }
-
-  // Fabricantes opcionales: el contrato de CatalogPort no los modela aún
-  // (§26 los menciona como "fuentes"). Se dejan vacíos; se puede ampliar
-  // añadiendo listManufacturers() al CatalogPort sin tocar la UI.
-
-  return result
 }

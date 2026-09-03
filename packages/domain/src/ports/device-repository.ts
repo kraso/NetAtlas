@@ -31,6 +31,7 @@ export interface DeviceRepository {
 
 /** Puerto de catálogo auxiliar (fabricantes y categorías). */
 export interface CatalogRepository {
+  listManufacturers(): Promise<readonly Manufacturer[]>
   manufacturerBySlug(slug: string): Promise<Manufacturer | undefined>
   categoryByCode(code: string): Promise<Category | undefined>
   listCategories(): Promise<readonly Category[]>

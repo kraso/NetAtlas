@@ -53,6 +53,7 @@ function buildPorts(): { search: SearchPort; catalog: CatalogPort } {
       manufacturerBySlug: (slug) => services.catalog.manufacturerBySlug(slug),
       categoryByCode: (code) => services.catalog.categoryByCode(code),
       listProtocols: () => services.catalog.listProtocols(),
+      listManufacturers: () => services.catalog.listManufacturers(),
       // Standards: {org,identifier,title} → proyectado a CatalogoFila {slug,label}
       listStandards: async () => (await services.catalog.listStandards()).map((s) => ({ slug: `${s.org}/${s.identifier}`, label: s.title })),
       // Media: {code,kind,name,...} → proyectado a CatalogoFila {slug,label}

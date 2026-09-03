@@ -223,6 +223,10 @@ export class InMemoryCatalogRepository implements CatalogRepository {
     return this.data.categories
   }
 
+  async listManufacturers(): Promise<readonly Manufacturer[]> {
+    return this.data.manufacturers
+  }
+
   async listProtocols(): Promise<readonly { code: string; name: string; family: string; osiLayer: number }[]> {
     return this.data.protocols ?? []
   }

@@ -277,6 +277,22 @@ export class SqliteCatalogRepository implements CatalogRepository {
     })
   }
 
+  async listManufacturers(): Promise<readonly Manufacturer[]> {
+    const rows = this.db
+      .prepare('SELECT slug, name, country, founded_year, website, status FROM manufacturer ORDER BY name')
+      .all() as SqlRow[]
+    return rows.map((r) =>
+      Manufacturer.hydrate({
+        slug: String(r.slug),
+        name: String(r.name),
+        country: r.country !== null ? String(r.country) : undefined,
+        foundedYear: r.founded_year !== null ? Number(r.founded_year) : undefined,
+        website: r.website !== null ? String(r.website) : undefined,
+        status: (r.status !== null ? String(r.status) : 'active') as 'active' | 'inactive' | 'acquired' | 'defunct',
+      }),
+    )
+  }
+
   async listCategories(): Promise<readonly Category[]> {
     const rows = this.db
       .prepare('SELECT code, parent_id, name_es, name_en, aliases_json, definition, sort_order FROM category ORDER BY sort_order')

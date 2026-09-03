@@ -54,6 +54,7 @@ export interface CatalogoFila {
 /** Puerto de catálogo cerrado (NET-HW-005/006). */
 export interface CatalogPort {
   listCategories(): Promise<readonly Category[]>
+  listManufacturers(): Promise<readonly Manufacturer[]>
   manufacturerBySlug(slug: string): Promise<Manufacturer | undefined>
   categoryByCode(code: string): Promise<Category | undefined>
   listProtocols(): Promise<readonly ProtocoloCat[]>

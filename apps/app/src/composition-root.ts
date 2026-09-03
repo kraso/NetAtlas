@@ -41,6 +41,7 @@ export interface UiDeviceRepo {
 
 export interface UiCatalogRepo {
   listCategories(): Promise<readonly Category[]>
+  listManufacturers(): Promise<readonly Manufacturer[]>
   manufacturerBySlug(slug: string): Promise<Manufacturer | undefined>
   categoryByCode(code: string): Promise<Category | undefined>
   /** Catálogos cerrados para exploradores bidireccionales (NET-HW-023). */
