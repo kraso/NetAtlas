@@ -2,6 +2,11 @@
 
 Glosario alfabetizado y categorizado de términos, acrónimos y jerga usados en el desarrollo de software. La organización es por área temática para facilitar la consulta.
 
+> **Relación con el producto**: este documento cubre la jerga de *ingeniería de software* del equipo.
+> La aplicación NetAtlas incluye además un **glosario técnico navegable de hardware de redes**
+> (conmutador, VLAN, PoE, transceptor, dominio de colisión…) en la ruta `/glosario` de la PWA/escritorio,
+> alimentado por el seed (`packages/domain` → `apps/app/src/ui/glossary.tsx`).
+
 ## Índice
 
 - [Arquitectura y Diseño](#arquitectura-y-diseño)

@@ -9,6 +9,11 @@ NetAtlas no es una wiki ni un catálogo CRUD: es un **grafo de conocimiento téc
 
 El documento de referencia normativo es [`PLAN MAESTRO — APLICACIÓN ENCICLOPÉDICA DE HARDWARE DE REDES.md`](PLAN%20MAESTRO%20%E2%80%94%20APLICACI%C3%93N%20ENCICLOP%C3%89DICA%20DE%20HARDWARE%20DE%20REDES.md). Cualquier divergencia respecto a él se resuelve mediante ADR (`docs/adr/`).
 
+## Glosarios
+
+- [Glosario técnico de hardware de redes](docs/glosario-tecnico.md) — términos del producto, navegables en la app en `/glosario`.
+- [Glosario de desarrollo de software](docs/glosario-desarrollo.md) — jerga de ingeniería del equipo.
+
 ## Decisiones vertebrales (resumen)
 
 | Eje | Decisión |

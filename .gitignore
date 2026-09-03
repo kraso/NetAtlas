@@ -15,6 +15,10 @@ coverage/
 # Vite PWA emit en modo dev (workbox)
 dev-dist/
 
+# CodeGraph (índice local generado) y configuración personal del cliente opencode
+.codegraph/
+opencode.jsonc
+
 # SQLite datasets generados
 datasets/**/*.sqlite
 datasets/**/*.sqlite-wal
