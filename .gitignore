@@ -19,6 +19,9 @@ dev-dist/
 .codegraph/
 opencode.jsonc
 
+# Hermes session cache (no commit)
+.hermes/
+
 # SQLite datasets generados
 datasets/**/*.sqlite
 datasets/**/*.sqlite-wal
