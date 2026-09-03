@@ -1,0 +1,90 @@
+name: Release — instaladores de escritorio
+
+# Genera los instaladores reproducibles de NetAtlas al publicar un tag v*:
+#   Windows: NetAtlas_0.1.0_x64.msi + -setup.exe (NSIS)
+#   Linux:   netatlas-desktop_0.1.0_amd64.deb + .rpm + .AppImage
+# y los sube a la Release de GitHub como DRAFT (revisable antes de publicar).
+#
+# Este workflow complementa a ci.yml (guardarraíl de calidad): se dispara solo
+# con tags; ci.yml ya validó typecheck/tests/e2e/tauri en cada push.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish-tauri:
+    name: Build & publish instaladores (${{ matrix.platform }})
+    runs-on: ${{ matrix.platform }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: windows-latest
+            # msi (WiX) + exe (NSIS) — dependencias traídas por el runner
+            args: ''
+          - platform: ubuntu-latest
+            # deb + rpm + AppImage
+            args: ''
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9.15.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      # El beforeBuildCommand de tauri.conf.json ya ejecuta pnpm build (vite).
+      # Se regenera el seed por robustez (los E2E/importadores lo requieren si
+      # estas acciones se reutilizan; no afecta al bundle).
+      - name: 'dataset:build (seed → SQLite)'
+        run: pnpm --filter @netatlas/dataset-tools run dataset:build
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Dependencias nativas Linux (Tauri v2)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential curl wget file \
+            libxdo-dev libssl-dev \
+            libayatana-appindicator3-dev librsvg2-dev \
+            libgtk-3-dev libsqlite3-dev
+        shell: bash
+
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Reemplaza __VERSION__ con tauri.conf.json (0.1.0) → v0.1.0
+          tagName: v__VERSION__
+          releaseName: 'NetAtlas v__VERSION__'
+          releaseBody: |
+            Instaladores de escritorio de NetAtlas (${{ matrix.platform }}).
+
+            - Windows: `.msi` (WiX) y `.exe` (NSIS)
+            - Linux: `.deb`, `.rpm` y `.AppImage`
+
+            Cada instalador embebe la web ya compilada → funciona 100% offline.
+          releaseDraft: true
+          prerelease: false
+          args: ${{ matrix.args }}
