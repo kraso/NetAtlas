@@ -122,6 +122,7 @@ export type {
   SearchHit,
   SuggestResult,
   SearchResponse,
+  Favorito,
   Page,
   DeviceQuery,
 } from '@netatlas/domain'

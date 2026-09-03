@@ -2,10 +2,11 @@
   "name": "@netatlas/app",
   "version": "0.0.0",
   "private": true,
-  "description": "NetAtlas — casos de uso orquestadores: coordinan puertos del dominio y adaptadores (F1+ §26). Sin deps de framework.",
+  "description": "NetAtlas — casos de uso orquestadores: coordinan puertos del dominio y adaptadores (F1+ §26).",
   "type": "module",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./casos/*": "./src/casos/*.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",

@@ -16,6 +16,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@netatlas/app": "workspace:*",
     "@netatlas/data": "workspace:*",
     "@netatlas/domain": "workspace:*",
     "@netatlas/search": "workspace:*",

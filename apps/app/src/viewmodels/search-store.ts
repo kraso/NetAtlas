@@ -1,12 +1,17 @@
 import { create } from 'zustand'
+import { searchDevices, dslTerminos } from '@netatlas/app/casos/search-devices'
+import type { SearchPort } from '@netatlas/app'
+import type { SearchHit, SearchResponse } from '@netatlas/domain'
 import { useServices } from '../composition-root.js'
-import type { SearchHit, DslTermino } from '@netatlas/domain'
 
 /**
  * ViewModel de búsqueda (MVVM).
- * La consulta se delega al puerto SearchIndex; los resultados son proyección
- * (nunca objetos vivos de infraestructura).
+ *
+ * LA LÓGICA DE ORQUESTACIÓN (parse DSL + delegación al puerto)
+ * se extrajo al caso de uso `searchDevices` en @netatlas/app (ADR-047).
+ * Este store SOLO mantiene el estado local (zustand) y delega.
  */
+
 interface SearchState {
   query: string
   results: readonly SearchHit[]
@@ -17,24 +22,28 @@ interface SearchState {
   search: () => Promise<void>
 }
 
-/** Extrae términos de campo del DSL para el preview educativo (§12.6). */
-export function dslTerminos(query: string): readonly string[] {
-  const tokens = query.trim().split(/\s+/).filter(Boolean)
-  return tokens.filter((t) => t.includes(':'))
-}
-
 export const useSearchStore = create<SearchState>((set, get) => ({
   query: '',
   results: [],
   total: 0,
   loading: false,
   dslPreview: [],
-  setQuery: (q) => set({ query: q, dslPreview: dslTerminos(q) }),
+  setQuery: (q: string) => set({ query: q, dslPreview: dslTerminos(q) }),
   search: async () => {
     const { search } = useServices.getState().services
-    const query = get().query
+    const port: SearchPort = {
+      query: async (req): Promise<SearchResponse> => search.query(req),
+      suggest: (prefix: string, limit: number) => search.suggest(prefix, limit),
+      suggestGrouped: (prefix: string, limitPerGroup: number) =>
+        search.suggestGrouped(prefix, limitPerGroup),
+    }
     set({ loading: true })
-    const res = await search.query({ rawQuery: query, limit: 50 })
-    set({ results: res.hits, total: res.total, loading: false })
+    const res = await searchDevices({ search: port }, { rawQuery: get().query, limit: 50 })
+    set({
+      results: res.hits,
+      total: res.total,
+      dslPreview: res.dslPreview,
+      loading: false,
+    })
   },
 }))

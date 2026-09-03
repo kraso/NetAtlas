@@ -9,7 +9,7 @@ import { esEntidadValida } from '@netatlas/domain'
 import type { Favorito } from '@netatlas/domain'
 import type { FavoritesPort } from '../index.js'
 
-export type FavoritesAction = 'add' | 'remove'
+export type FavoritesAction = 'toggle' | 'add' | 'remove'
 
 export interface ManageFavoritesInput {
   readonly entidad: string
@@ -17,16 +17,15 @@ export interface ManageFavoritesInput {
 }
 
 export interface ManageFavoritesResult {
-  /** Estado actualizado tras la acción. */
   readonly favoritos: readonly Favorito[]
   /** true si la entidad ahora está en favoritos. */
   readonly added: boolean
 }
 
-/**
- * Alterna un favorito: si está → lo quita; si no → lo agrega.
- * Valida el formato de entidad (tipo:slug) antes de operar.
- */
+function makeFavorito(entidad: string): Favorito {
+  return { perfilId: 'local', entidad, createdAt: new Date().toISOString() }
+}
+
 export async function manageFavorites(
   ports: { favorites: FavoritesPort },
   input: ManageFavoritesInput,
@@ -38,12 +37,13 @@ export async function manageFavorites(
   const actuales = await ports.favorites.list()
   const existe = actuales.some((f) => f.entidad === input.entidad)
 
-  if (existe) {
+  if (input.action === 'remove' || (input.action === 'toggle' && existe)) {
     await ports.favorites.remove(input.entidad)
     return { favoritos: actuales.filter((f) => f.entidad !== input.entidad), added: false }
   }
 
+  // add o toggle (no existe)
   await ports.favorites.add(input.entidad)
-  const nuevo = [...actuales, { perfilId: 'local', entidad: input.entidad, createdAt: new Date().toISOString() } as Favorito]
+  const nuevo = [...actuales, makeFavorito(input.entidad)]
   return { favoritos: nuevo, added: true }
 }
