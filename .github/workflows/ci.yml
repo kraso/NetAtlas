@@ -41,7 +41,7 @@ jobs:
       - name: dataset:build (seed → SQLite)
         run: pnpm --filter @netatlas/dataset-tools run dataset:build
 
-      - name: Benchmark FTS5 (SLO F0: p95 < 50 ms sobre 10k)
+      - name: 'Benchmark FTS5 (SLO F0: p95 bajo 50 ms sobre 10k)'
         run: pnpm bench
 
   ui:
