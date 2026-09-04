@@ -7,7 +7,7 @@ import { setServices } from '../src/composition-root.js'
 import { buildSqliteServices } from '../src/composition-root-sqlite.js'
 
 /**
- * Fase C — la UI lee datos del SQLite REAL (netatlas-seed.sqlite, 330
+ * Fase C — la UI lee datos del SQLite REAL (netatlas-seed.sqlite, 333
  * dispositivos) en lugar del adaptador in-memory. El composition-root SQLite
  * cumple exactamente el mismo contrato de puertos que el in-memory: ninguna
  * vista cambia. En el navegador estático este rol lo juega wa-sqlite (mismo
@@ -31,14 +31,14 @@ function renderApp(route: string): void {
 }
 
 describe('UI sobre SQLite real (Fase C)', () => {
-  it('el dashboard muestra el conteo real del dataset (330)', async () => {
+  it('el dashboard muestra el conteo real del dataset (333)', async () => {
     renderApp('/')
     // El catálogo real tiene las 26 categorías semillas
     expect(await screen.findByRole('link', { name: /Interconexión y switching/i })).toBeDefined()
-    // Conteo real: 330 (el número vive en un span mono separado)
-    const cuenta = await screen.findByText('330')
+    // Conteo real: 333 (el número vive en un span mono separado)
+    const cuenta = await screen.findByText('333')
     expect(cuenta.id).toBeDefined()
-    expect(cuenta.textContent).toBe('330')
+    expect(cuenta.textContent).toBe('333')
   })
 
   it('la ficha de un dispositivo del seed real muestra sus protocolos', async () => {
@@ -56,6 +56,31 @@ describe('UI sobre SQLite real (Fase C)', () => {
     // La assertion throughput_gbps del seed está respaldada por datasheet oficial
     expect(await screen.findByText('throughput_gbps')).toBeDefined()
     expect(screen.getAllByText('Oficial').length).toBeGreaterThanOrEqual(1)
+  })
+
+  it('la ficha estructural muestra insignia y la curada no', async () => {
+    // grandstream-cat-sec-326: ficha sintética (importación asistida).
+    renderApp('/device/grandstream-cat-sec-326')
+    expect(await screen.findByTestId('ficha-estructural')).toBeDefined()
+    // aruba-2930f: ficha curada real → sin insignia.
+    cleanup()
+    renderApp('/device/aruba-2930f-48g-poeplus')
+    expect(await screen.findByRole('heading', { name: 'Aruba 2930F 48G PoE+ 4SFP+' })).toBeDefined()
+    expect(screen.queryByTestId('ficha-estructural')).toBeNull()
+  })
+
+  it('Especificaciones muestra la empresa SNMP del fabricante (sysObjectID base)', async () => {
+    renderApp('/device/aruba-2930f-48g-poeplus')
+    expect(await screen.findByRole('heading', { name: 'Aruba 2930F 48G PoE+ 4SFP+' })).toBeDefined()
+    fireEvent.click(screen.getByRole('tab', { name: 'Especificaciones' }))
+    expect(await screen.findByText('1.3.6.1.4.1.14823')).toBeDefined()
+  })
+
+  it('Especificaciones muestra el sysObjectID exacto cuando está curado', async () => {
+    renderApp('/device/cisco-catalyst-9300-48p')
+    expect(await screen.findByRole('heading', { name: 'Cisco Catalyst 9300-48P' })).toBeDefined()
+    fireEvent.click(screen.getByRole('tab', { name: 'Especificaciones' }))
+    expect(await screen.findByText('1.3.6.1.4.1.9.1.2494')).toBeDefined()
   })
 
   it('la búsqueda FTS real encuentra en el dataset completo', async () => {

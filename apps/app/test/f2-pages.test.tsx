@@ -52,6 +52,18 @@ describe('Glosario + enlaces inline (NET-HW-024)', () => {
     expect(await screen.findByText('VLAN (802.1Q)')).toBeDefined()
     expect(screen.getByText(/Segmentación lógica/i)).toBeDefined()
   })
+
+  it('el glosario ampliado incluye términos de Redes y Protocolos', async () => {
+    renderApp('/glosario')
+    expect(await screen.findByText('Enrutador (router)')).toBeDefined()
+    expect(screen.getByText('Cortafuegos (firewall)')).toBeDefined()
+    const input = screen.getByLabelText('Filtrar términos') as HTMLInputElement
+    fireEvent.change(input, { target: { value: 'qos' } })
+    expect(screen.getByText('QoS')).toBeDefined()
+    expect(screen.queryByText('Enrutador (router)')).toBeNull()
+    renderApp('/glosario/router')
+    expect(await screen.findByText(/encamina paquetes entre redes/i)).toBeDefined()
+  })
 })
 
 describe('Panel frontal SVG (NET-HW-022)', () => {
