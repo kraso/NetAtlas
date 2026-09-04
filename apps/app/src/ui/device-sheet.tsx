@@ -11,7 +11,7 @@ import { Genealogia } from './genealogia.js'
 
 // El mapa local (Cytoscape) solo se carga al abrir la pestaña Diagramas.
 const MapaLocal = React.lazy(() => import('./mapa-local.js').then((m) => ({ default: m.MapaLocal })))
-import type { Device } from '@netatlas/domain'
+import type { Device, Manufacturer } from '@netatlas/domain'
 import type { Assertion, Relationship } from '@netatlas/domain'
 
 /**
@@ -53,6 +53,8 @@ export function DeviceSheet(): React.JSX.Element {
   const [device, setDevice] = React.useState<Device | undefined>()
   const [pestaña, setPestaña] = React.useState<string>('resumen')
   const [notFound, setNotFound] = React.useState(false)
+  // Revisión del dataset (demo → remoto tras el warmezo F8B): recarga la ficha.
+  const revision = useServices((s) => s.revision)
   // Favoritos del usuario (F8B, NET-HW-064): local-first, sincronizable con /v1/favorites.
   const esFavorito = useEsFavorito(slug)
   const alternarFavorito = useFavoritosStore((s) => s.alternar)
@@ -60,12 +62,16 @@ export function DeviceSheet(): React.JSX.Element {
 
   React.useEffect(() => {
     sincronizarFavoritos()
+    setNotFound(false)
     void (async () => {
       const d = await useServices.getState().services.devices.findBySlug(slug)
+      // Solo publica si la revisión no ha cambiado mientras se resolvía (evita
+      // que una respuesta lenta del dataset demo pise a la remota ya instalada).
+      if (useServices.getState().revision !== revision) return
       setDevice(d)
       setNotFound(d === undefined)
     })()
-  }, [slug, sincronizarFavoritos])
+  }, [slug, sincronizarFavoritos, revision])
 
   if (notFound) {
     return (
@@ -174,10 +180,12 @@ function PanelContextual({ device }: { device: Device }): React.JSX.Element {
 function useDeviceRelations(device: Device | undefined): {
   relaciones: readonly Relationship[]
   assertions: readonly Assertion[]
+  fichas: readonly import('@netatlas/domain').Datasheet[]
   loading: boolean
 } {
   const [relaciones, setRelaciones] = React.useState<readonly Relationship[]>([])
   const [assertions, setAssertions] = React.useState<readonly Assertion[]>([])
+  const [fichas, setFichas] = React.useState<readonly import('@netatlas/domain').Datasheet[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
@@ -191,11 +199,12 @@ function useDeviceRelations(device: Device | undefined): {
       setRelaciones(edges)
       const asr = await sourcing.assertionsForDevice(device.slug.value)
       setAssertions(asr)
+      setFichas(await sourcing.datasheetsForDevice(device.slug.value))
       setLoading(false)
     })()
   }, [device])
 
-  return { relaciones, assertions, loading }
+  return { relaciones, assertions, fichas, loading }
 }
 
 /** Carga los valores EAV del dispositivo (F3, pestaña Capacidades). */
@@ -222,9 +231,40 @@ function useDeviceAttributes(device: Device | undefined): {
   return { valores, loading }
 }
 
+/**
+ * Fabricante del dispositivo (para el nº de empresa SNMP de Especificaciones).
+ * Se recarga con la revisión del dataset (demo → remoto tras el warmezo F8B).
+ */
+function useFabricante(slug: string | undefined): Manufacturer | undefined {
+  const [mfr, setMfr] = React.useState<Manufacturer | undefined>()
+  const revision = useServices((s) => s.revision)
+  React.useEffect(() => {
+    if (!slug) {
+      setMfr(undefined)
+      return
+    }
+    void (async () => {
+      const m = await useServices.getState().services.catalog.manufacturerBySlug(slug)
+      if (useServices.getState().revision !== revision) return
+      setMfr(m)
+    })()
+  }, [slug, revision])
+  return mfr
+}
+
 const Empty = ({ message }: { message: string }): React.JSX.Element => (
   <p className="empty-state">{message}</p>
 )
+
+/**
+ * Prefijo que marca fichas estructurales sintéticas (contrato con
+ * tools/dataset-tools/src/assisted-gen.ts: las 299 generadas lo llevan en el
+ * resumen; ninguna curada). La UI lo usa para la insignia «ficha estructural».
+ */
+const PREFIJO_ESTRUCTURAL = 'Ficha de referencia estructural'
+function esFichaEstructural(summary: string | undefined): boolean {
+  return (summary ?? '').startsWith(PREFIJO_ESTRUCTURAL)
+}
 
 /**
  * Similares curados (NET-HW-032): lista de dispositivos similar-to con el
@@ -266,7 +306,8 @@ function SimilaresComparar({
 }
 
 function PestanaContent({ device, pestaña }: { device: Device; pestaña: string }): React.JSX.Element {
-  const { relaciones, assertions, loading } = useDeviceRelations(device)
+  const { relaciones, assertions, fichas, loading } = useDeviceRelations(device)
+  const fabricante = useFabricante(device.manufacturerSlug)
   const { valores: atributos, loading: atributosLoading } = useDeviceAttributes(device)
   if (loading) return <p role="status">Cargando…</p>
 
@@ -284,6 +325,13 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
     case 'resumen':
       return (
         <div className="stack">
+          {esFichaEstructural(device.summary) ? (
+            <p role="note" className="guia-tecnica" data-testid="ficha-estructural">
+              Ficha estructural: dispositivo de referencia generado por importación asistida —
+              especificaciones pendientes de datasheet (F2).{' '}
+              <ConfidenceBadge confidence="third-party" size="sm" />
+            </p>
+          ) : null}
           <p>{device.summary ?? 'Sin resumen curado.'}</p>
           <p>
             Ciclo de vida: <span className="mono">{device.lifecycleStatus}</span>{' '}
@@ -308,6 +356,34 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
             <tr><th scope="row">Puertos totales</th><td className="mono">{device.portCount()}</td></tr>
             <tr><th scope="row">Presentación</th><td className="mono">{device.releasedOn ?? '—'}</td></tr>
             <tr><th scope="row">Fecha EoL / EoS</th><td className="mono">{device.eolOn ?? '—'} / {device.eosOn ?? '—'}</td></tr>
+            {(() => {
+              const oid = assertionDe('snmp_sysobjectid')
+              if (!oid) return null
+              let valor = ''
+              try {
+                valor = String(JSON.parse(oid.valueJson))
+              } catch {
+                return null
+              }
+              return (
+                <tr>
+                  <th scope="row">SNMP (sysObjectID)</th>
+                  <td className="mono">
+                    {valor} <ConfidenceBadge confidence={oid.confidence} size="sm" />{' '}
+                    <Link to="/glosario/sysobjectid" className="guia-tecnica">(qué es)</Link>
+                  </td>
+                </tr>
+              )
+            })()}
+            {fabricante?.snmpEnterprise ? (
+              <tr>
+                <th scope="row">SNMP (empresa)</th>
+                <td className="mono">
+                  1.3.6.1.4.1.{fabricante.snmpEnterprise}{' '}
+                  <Link to="/glosario/snmp" className="guia-tecnica">(qué es)</Link>
+                </td>
+              </tr>
+            ) : null}
           </tbody>
         </table>
       )
@@ -496,7 +572,23 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
       return <Genealogia device={device} />
 
     case 'documentacion':
-      return <Empty message="Datasheets y documentación de la ficha pendientes (F2)." />
+      return fichas.length === 0 ? (
+        <Empty message="Datasheets y documentación de la ficha pendientes (F2)." />
+      ) : (
+        <ul>
+          {fichas.map((f) => (
+            <li key={`${f.title}-${f.language}`}>
+              {f.url ? (
+                <a href={f.url} target="_blank" rel="noreferrer">{f.title}</a>
+              ) : (
+                <span>{f.title}</span>
+              )}{' '}
+              <span className="mono guia-tecnica">[{f.language}]</span>{' '}
+              <span className="guia-tecnica">{f.source.title}</span>
+            </li>
+          ))}
+        </ul>
+      )
 
     case 'referencias':
       return assertions.length === 0 ? (

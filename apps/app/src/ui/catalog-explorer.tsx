@@ -37,11 +37,12 @@ export function CatalogExplorer(): React.JSX.Element {
 
 function ProtocolosGrid(): React.JSX.Element {
   const [rows, setRows] = React.useState<readonly { code: string; name: string; family: string; osiLayer: number }[]>([])
+  const revision = useServices((s) => s.revision)
   React.useEffect(() => {
     void (async () => {
       setRows(await useServices.getState().services.catalog.listProtocols())
     })()
-  }, [])
+  }, [revision])
   return (
     <div className="stack">
       <p className="guia-tecnica">{rows.length} protocolos del catálogo cerrado (§14).</p>
@@ -62,11 +63,12 @@ function ProtocolosGrid(): React.JSX.Element {
 
 function EstandaresGrid(): React.JSX.Element {
   const [rows, setRows] = React.useState<readonly { org: string; identifier: string; title: string }[]>([])
+  const revision = useServices((s) => s.revision)
   React.useEffect(() => {
     void (async () => {
       setRows(await useServices.getState().services.catalog.listStandards())
     })()
-  }, [])
+  }, [revision])
   return (
     <div className="stack">
       <p className="guia-tecnica">{rows.length} estándares del catálogo cerrado (§15).</p>
@@ -84,11 +86,12 @@ function EstandaresGrid(): React.JSX.Element {
 
 function MediosGrid(): React.JSX.Element {
   const [rows, setRows] = React.useState<readonly { code: string; kind: string; name: string; maxSpeedMbps?: number }[]>([])
+  const revision = useServices((s) => s.revision)
   React.useEffect(() => {
     void (async () => {
       setRows(await useServices.getState().services.catalog.listMedia())
     })()
-  }, [])
+  }, [revision])
   return (
     <div className="stack">
       <p className="guia-tecnica">{rows.length} medios de transmisión del catálogo (§16).</p>

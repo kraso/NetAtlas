@@ -8,6 +8,7 @@ import {
   requireLifecycleStatus,
   Relationship,
   Assertion,
+  Datasheet,
   Source,
   Topology,
 } from '@netatlas/domain'
@@ -58,6 +59,8 @@ export interface InMemoryDataset {
   readonly deviceAttributeValues?: readonly InMemoryDeviceAttributeValue[]
   /** Topologías demo (F4 §13.3). */
   readonly topologies?: readonly Topology[]
+  /** Datasheets por dispositivo (F2-Documentación). */
+  readonly datasheets?: readonly Datasheet[]
 }
 
 /** Contrato de atributos (EAV §9.4) para las vistas — sin acoplar a @netatlas/data. */
@@ -426,6 +429,11 @@ export class InMemorySourcingRepository implements SourcingRepository {
 
   async sourceBySlug(slug: string): Promise<Source | undefined> {
     return this.data.sources.find((s) => s.slug === slug)
+  }
+
+  /** Datasheets de un dispositivo por slug (pestaña Documentación, F2). */
+  async datasheetsForDevice(deviceSlug: string): Promise<readonly Datasheet[]> {
+    return (this.data.datasheets ?? []).filter((f) => f.deviceSlug === deviceSlug)
   }
 }
 
@@ -800,10 +808,10 @@ export class InMemoryQualityRepository implements UiQualityRepo {
 
 export function buildDemoDataset(): InMemoryDataset {
   const manufacturers = [
-    Manufacturer.create({ slug: 'cisco', name: 'Cisco Systems', country: 'EE. UU.' }),
-    Manufacturer.create({ slug: 'aruba', name: 'Aruba Networks', country: 'EE. UU.' }),
-    Manufacturer.create({ slug: 'mikrotik', name: 'MikroTik', country: 'Letonia' }),
-    Manufacturer.create({ slug: 'fortinet', name: 'Fortinet', country: 'EE. UU.' }),
+    Manufacturer.create({ slug: 'cisco', name: 'Cisco Systems', country: 'EE. UU.', snmpEnterprise: 9 }),
+    Manufacturer.create({ slug: 'aruba', name: 'Aruba Networks', country: 'EE. UU.', snmpEnterprise: 14823 }),
+    Manufacturer.create({ slug: 'mikrotik', name: 'MikroTik', country: 'Letonia', snmpEnterprise: 14988 }),
+    Manufacturer.create({ slug: 'fortinet', name: 'Fortinet', country: 'EE. UU.', snmpEnterprise: 12356 }),
   ]
   const categories = [
     Category.create({ code: 'CAT-SWT', nameEs: 'Interconexión y switching', aliases: ['sw'], sortOrder: 1 }),
@@ -1119,7 +1127,25 @@ export function buildDemoDataset(): InMemoryDataset {
     )
   }
 
-  return { devices, manufacturers, categories, relationships, assertions, sources, protocols, standards, media, attributeDefinitions, deviceAttributeValues, topologies }
+  // Datasheets demo (F2-Documentación): reutilizan la fuente demo-datasheet.
+  const fuenteDemo = sources.find((s) => s.slug === 'demo-datasheet')!
+  const datasheets = [
+    Datasheet.create({
+      deviceSlug: 'fortinet-200f',
+      title: 'FortiGate 200F Series Data Sheet',
+      language: 'en',
+      url: 'https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture',
+      source: fuenteDemo,
+    }),
+    Datasheet.create({
+      deviceSlug: 'cisco-c9300-48p',
+      title: 'Cisco Catalyst 9300 Series — Hoja de datos',
+      language: 'es',
+      source: fuenteDemo,
+    }),
+  ]
+
+  return { devices, manufacturers, categories, relationships, assertions, sources, protocols, standards, media, attributeDefinitions, deviceAttributeValues, topologies, datasheets }
 }
 
 // ── Asistente IA demo (F7 §21): ToolContext sobre el dataset de demostración ─

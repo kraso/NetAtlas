@@ -37,15 +37,18 @@ function parDirigido(source: string, target: string, predicate: string): ParDiri
 export function Genealogia({ device }: { device: Device }): React.JSX.Element {
   const [subgrafo, setSubgrafo] = React.useState<UiGraphSubgraph | undefined>()
   const slug = device.slug.value
+  // Revisión del dataset (demo → remoto tras el warmezo F8B): recarga la vecindad.
+  const revision = useServices((s) => s.revision)
 
   React.useEffect(() => {
     void (async () => {
       const { graph } = useServices.getState().services
       const sg = await graph.vecindad({ type: 'device', slug }, PROFUNDIDAD, [...GENEALOGICOS, ...TECNOLOGICOS])
+      // Solo publica si no hubo otro warmezo mientras se resolvía.
+      if (useServices.getState().revision !== revision) return
       setSubgrafo(sg)
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug])
+  }, [slug, revision])
 
   if (!subgrafo) return <p role="status">Cargando genealogía…</p>
   if (subgrafo.edges.length === 0) {

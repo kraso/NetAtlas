@@ -80,6 +80,8 @@ export type { UiAttributeDefinition, UiDeviceAttributeValue, UiFacetCount, UiAtt
 
 export interface UiSourcingRepo {
   assertionsForDevice(slug: string): Promise<readonly Assertion[]>
+  /** Datasheets del dispositivo (pestaña Documentación, F2). */
+  datasheetsForDevice(deviceSlug: string): Promise<readonly import('@netatlas/domain').Datasheet[]>
 }
 
 /** Asistente IA (F7, §21): chat con citas obligatorias + flag ai.enabled. */
@@ -122,22 +124,33 @@ export function resolveServices(): AppServices {
   return buildServices()
 }
 
-/** Adaptador HTTP API server (F8B): si VITE_API está configurado, warmeza un
- * pull a /api/snapshot en background. El dataset remoto (330 dispositivos)
- * reemplaza al demo (6) en el store reactivo cuando llega. Si falla la red,
- * el adapter cae al demo (offline-first F8A). */
+/** Adaptador HTTP API server (F8B): warmeza un pull a /api/snapshot en background
+ * contra el server local. El dataset remoto (330 dispositivos) reemplaza al
+ * demo (6) en el store reactivo cuando llega. Si falla la red, el adapter cae
+ * al demo (offline-first F8A).
+ *
+ * El browser PWA (F1-baseline) no puede usar node:sqlite; en su lugar warmeza
+ * el API server F8B (localhost:8787) que expone los 330 dispositivos reales.
+ * Flag VITE_API overridea la URL (para CI/entornos distintos a localhost). */
 let httpWarmer: Promise<void> | null = null
 export function warmezaHttpSiDisponible(): Promise<void> {
-  const env = (import.meta.env as Record<string, unknown> ?? {}) as Record<string, string | undefined>
-  const apiBase = env.VITE_API
-  if (!apiBase) return Promise.resolve()
+  const apiBase =
+    (import.meta.env as Record<string, unknown> ?? {}).VITE_API === undefined
+      ? undefined
+      : ((import.meta.env as Record<string, string>).VITE_API ?? '')
+  const base = apiBase && apiBase.length > 0 ? apiBase : 'http://127.0.0.1:8787'
   if (httpWarmer) return httpWarmer
-  const adapter = new HttpUiRepos(apiBase)
+  const adapter = new HttpUiRepos(base)
   httpWarmer = adapter
     .buildServices()
     .then((services) => setServices(services))
-    .catch(() => {
-      /* red caída → el store conserva el demo */
+    .catch((err: unknown) => {
+      // Red caida: NO setServices(demo) — machacaria el dataset actual
+      // (demo inicial, SQLite inyectado en tests o remoto ya warmeado).
+      console.warn(
+        '[HTTP UI] pull F8B fallido, se conserva el dataset actual:',
+        err instanceof Error ? err.message : err,
+      )
     })
   return httpWarmer
 }
