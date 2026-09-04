@@ -410,6 +410,15 @@
     "authorityLevel": 1
   },
   {
+    "slug": "cisco-catalyst-3000-overview",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Catalyst 3000 Series Product Overview (página escaneada)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
     "slug": "ubnt-u6lr-datasheet",
     "kind": "datasheet",
     "publisher": "Ubiquiti",

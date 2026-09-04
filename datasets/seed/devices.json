@@ -1022,6 +1022,14 @@
         "objectType": "standard",
         "objectSlug": "itu-t/V.92"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Sportster 56K Faxmodem User Manual (Model 5630G)",
+        "language": "en",
+        "sourceSlug": "usrobotics-56k-manual",
+        "localPath": "docs/USR Model 5630G 56K.pdf"
+      }
     ]
   },
   {
@@ -3254,7 +3262,7 @@
     "categoryCode": "CAT-SWT-L2",
     "releasedOn": "1994-01-01",
     "lifecycleStatus": "legacy",
-    "summary": "Sucesor del Kalpana EtherSwitch tras la adquisicion de Kalpana por Cisco (1994); primer Catalyst de acceso Ethernet.",
+    "summary": "Sucesor del Kalpana EtherSwitch tras la adquisición de Kalpana por Cisco (1994): 16 puertos 10BaseT + AUI, slots de expansión y arquitectura apilable por matriz.",
     "osiProfile": {
       "terminate": [
         1,
@@ -3280,18 +3288,18 @@
       {
         "predicate": "internal-architecture",
         "value": {
-          "summary": "Conmutador de acceso heredado del diseño Kalpana EtherSwitch: conmutación MAC por hardware con CPU de gestión integrada de la época.",
+          "summary": "Conmutador apilable 16x10BaseT+AUI con 2 slots de expansión, puerto de consola y monitorización; matriz Catalyst opcional de 3.84 Gbps.",
           "soc": {
             "family": "Conmutador Kalpana/Cisco Catalyst 3000",
-            "note": "Evolución directa del EtherSwitch tras la adquisición de Kalpana (1994)"
+            "note": "Evolución del EtherSwitch; stack por matriz Catalyst (3-8 equipos)"
           },
           "networkProcessors": [
             "Conmutador Kalpana/Cisco Catalyst 3000"
           ]
         },
-        "sourceSlug": "kalpana-eifo-historical",
-        "confidence": "historical",
-        "note": "Ficha histórica documental; la CPU concreta no se conserva en fuentes públicas."
+        "sourceSlug": "cisco-catalyst-3000-overview",
+        "confidence": "official",
+        "note": "Product Overview escaneado: puertos, slots, matriz 3.84 Gbps"
       }
     ],
     "relationships": [
@@ -3304,6 +3312,34 @@
         "predicate": "succeeds",
         "objectType": "device",
         "objectSlug": "genesis-switch-ethernet"
+      }
+    ],
+    "ports": [
+      {
+        "label": "16x 10BaseT",
+        "interfaceCode": "rj45",
+        "quantity": 16,
+        "speedsMbps": [
+          10
+        ],
+        "role": "access"
+      },
+      {
+        "label": "1x AUI",
+        "interfaceCode": "aui",
+        "quantity": 1,
+        "speedsMbps": [
+          10
+        ],
+        "role": "uplink"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Catalyst 3000 Series Product Overview (página escaneada)",
+        "language": "en",
+        "sourceSlug": "cisco-catalyst-3000-overview",
+        "localPath": "docs/Cisco 3000 Series kalpana.jpg"
       }
     ]
   },
