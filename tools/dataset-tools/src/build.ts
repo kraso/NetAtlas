@@ -513,7 +513,7 @@ function seedDerivedStandards(
     '802.11n': 'ieee/802.11', '802.11ac': 'ieee/802.11', '802.11ax': 'ieee/802.11',
     '802.11be': 'ieee/802.11', wpa2: 'ieee/802.11i', wpa3: 'ieee/802.11i',
   }
-  const ETHERNET_IFACES = new Set(['rj45', 'sfp', 'sfp-plus', 'sfp56', 'qsfp-plus', 'qsfp28', 'qsfp56'])
+  const ETHERNET_IFACES = new Set(['rj45', '2.5gbase-t', 'sfp', 'sfp-plus', 'sfp56', 'qsfp-plus', 'qsfp28', 'qsfp56'])
   let assertionCount = 0
   let relationshipCount = 0
   for (const dev of seed.devices) {

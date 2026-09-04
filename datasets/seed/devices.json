@@ -592,6 +592,15 @@
         ],
         "poeStandard": "802.3at",
         "role": "uplink"
+      },
+      {
+        "label": "1x 2.5GbE",
+        "interfaceCode": "2.5gbase-t",
+        "quantity": 1,
+        "speedsMbps": [
+          2500
+        ],
+        "role": "uplink"
       }
     ],
     "assertions": [
@@ -604,7 +613,7 @@
       {
         "predicate": "max_clients",
         "value": 512,
-        "sourceSlug": "aruba-2930f-datasheet",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "third-party"
       },
       {
@@ -624,8 +633,8 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ax",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "aruba-ap515-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
@@ -656,6 +665,14 @@
         "predicate": "terminates-medium",
         "objectType": "medium",
         "objectSlug": "wifi-6e"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "HPE Aruba Networking 510 Series Campus Access Points data sheet (PSN1011028705WWEN)",
+        "language": "en",
+        "sourceSlug": "aruba-ap515-datasheet",
+        "localPath": "docs/HPE Aruba Networking 510 Series Campus Access Points data sheet-PSN1011028705WWEN.pdf"
       }
     ]
   },
@@ -2178,6 +2195,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "3"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "UniFi Dream Machine Pro — Technical Specifications",
+        "language": "en",
+        "url": "https://techspecs.ui.com/unifi/cloud-gateways/udm-pro",
+        "sourceSlug": "ubiquiti-techspecs"
       }
     ]
   },

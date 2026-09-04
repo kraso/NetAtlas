@@ -282,5 +282,14 @@
     "url": "https://support.industry.siemens.com/cs/document/109740669/scalance-xc-206-2",
     "retrievedOn": "2025-11-12",
     "authorityLevel": 1
+  },
+  {
+    "slug": "aruba-ap515-datasheet",
+    "kind": "datasheet",
+    "publisher": "Aruba Networks (HPE)",
+    "title": "HPE Aruba Networking 510 Series Campus Access Points data sheet (PSN1011028705WWEN)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
   }
 ]
