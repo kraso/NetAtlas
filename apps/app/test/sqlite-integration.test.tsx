@@ -7,7 +7,7 @@ import { setServices } from '../src/composition-root.js'
 import { buildSqliteServices } from '../src/composition-root-sqlite.js'
 
 /**
- * Fase C — la UI lee datos del SQLite REAL (netatlas-seed.sqlite, 333
+ * Fase C — la UI lee datos del SQLite REAL (netatlas-seed.sqlite, 341
  * dispositivos) en lugar del adaptador in-memory. El composition-root SQLite
  * cumple exactamente el mismo contrato de puertos que el in-memory: ninguna
  * vista cambia. En el navegador estático este rol lo juega wa-sqlite (mismo
@@ -31,14 +31,14 @@ function renderApp(route: string): void {
 }
 
 describe('UI sobre SQLite real (Fase C)', () => {
-  it('el dashboard muestra el conteo real del dataset (333)', async () => {
+  it('el dashboard muestra el conteo real del dataset (341)', async () => {
     renderApp('/')
     // El catálogo real tiene las 26 categorías semillas
     expect(await screen.findByRole('link', { name: /Interconexión y switching/i })).toBeDefined()
-    // Conteo real: 333 (el número vive en un span mono separado)
-    const cuenta = await screen.findByText('333')
+    // Conteo real: 341 (el número vive en un span mono separado)
+    const cuenta = await screen.findByText('341')
     expect(cuenta.id).toBeDefined()
-    expect(cuenta.textContent).toBe('333')
+    expect(cuenta.textContent).toBe('341')
   })
 
   it('la ficha de un dispositivo del seed real muestra sus protocolos', async () => {

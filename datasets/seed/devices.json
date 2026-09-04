@@ -287,9 +287,10 @@
     "assertions": [
       {
         "predicate": "throughput_gbps",
-        "value": 144,
-        "sourceSlug": "aruba-2930f-datasheet",
-        "confidence": "derived"
+        "value": 176,
+        "sourceSlug": "aruba-2920-datasheet",
+        "confidence": "official",
+        "note": "176 Gbps switching capacity (J9729A)"
       },
       {
         "predicate": "internal-architecture",
@@ -301,27 +302,27 @@
           },
           "summary": "Switch de acceso ArubaOS-Switch (serie 2920, predecesor del 2930F): plano de datos a wire-rate en el SoC de conmutación y CPU de gestión para el plano de control L2."
         },
-        "sourceSlug": "aruba-2930f-datasheet",
-        "confidence": "derived",
+        "sourceSlug": "aruba-2920-datasheet",
+        "confidence": "official",
         "note": "Arquitectura derivada de la serie 2920/2930F (misma plataforma ArubaOS-Switch)."
       },
       {
         "predicate": "supports-protocol",
         "value": "stp",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "aruba-2920-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
         "value": "lacp",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "aruba-2920-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
         "value": "lldp",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "aruba-2920-datasheet",
+        "confidence": "official"
       }
     ],
     "relationships": [
@@ -334,6 +335,14 @@
         "predicate": "replaced-by",
         "objectType": "device",
         "objectSlug": "aruba-2930f-48g-poeplus"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Aruba 2920 Switch Series data sheet (J9729A)",
+        "language": "en",
+        "sourceSlug": "aruba-2920-datasheet",
+        "localPath": "docs/Aruba 2920 Switch Series.pdf"
       }
     ]
   },
@@ -903,7 +912,7 @@
     "manufacturerSlug": "usrobotics",
     "familySlug": "sportster",
     "categoryCode": "CAT-ACC-DIAL",
-    "model": "USR5630",
+    "model": "USR5630 / 5630G",
     "releasedOn": "1997-01-01",
     "eosOn": "2005-01-01",
     "lifecycleStatus": "legacy",
@@ -972,6 +981,13 @@
         "sourceSlug": "usrobotics-56k-manual",
         "confidence": "official",
         "note": "56 kbit/s (V.90)"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "itu-t/V.92",
+        "sourceSlug": "usrobotics-56k-manual",
+        "confidence": "official",
+        "note": "V.92: Quick Connect y Modem-on-Hold (manual 5630G)"
       }
     ],
     "relationships": [
@@ -984,6 +1000,11 @@
         "predicate": "implements-standard",
         "objectType": "standard",
         "objectSlug": "itu-t/V.90"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "itu-t/V.92"
       }
     ]
   },
@@ -1120,8 +1141,8 @@
       {
         "predicate": "max_speed_mbps",
         "value": 10,
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "historical"
+        "sourceSlug": "3com-hub8-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "internal-architecture",
@@ -1140,8 +1161,8 @@
       {
         "predicate": "supports-protocol",
         "value": "ethernet",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "3com-hub8-datasheet",
+        "confidence": "official"
       }
     ],
     "relationships": [
@@ -1149,6 +1170,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "1"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "3Com OfficeConnect Hubs data sheet (3C16700A)",
+        "language": "en",
+        "sourceSlug": "3com-hub8-datasheet",
+        "localPath": "docs/3Com Model 3C16700A Ethernet Hub.pdf"
       }
     ]
   },
@@ -1793,19 +1822,18 @@
       {
         "predicate": "internal-architecture",
         "value": {
-          "cpu": "SmartNIC con núcleos ARM integrados para offload programable (Ascend/DPU class)",
+          "summary": "SmartNIC hasta 200Gb/s (2x100G o 1x200G) con IPsec/TLS inline en hardware y RoCE v1/v2; PCIe Gen4 x16.",
           "soc": {
-            "family": "ASIC ConnectX-6 Dx",
-            "note": "Adaptador inteligente 100GbE con offload NVMe-oF, RoCE y criptografía; ARMs integrados para servicios en línea de datos"
+            "family": "ASIC NVIDIA ConnectX-6 Dx",
+            "note": "Cifrado inline IPsec/TLS, RoCE sin ECN/PFC (Zero-touch), vSwitch/vRouter"
           },
           "networkProcessors": [
-            "ASIC ConnectX-6 Dx"
-          ],
-          "summary": "SmartNIC 100GbE: el ASIC ConnectX-6 Dx acelera el tráfico (RoCE, NVMe-oF, VxLAN, IPsec) y los núcleos ARM integrados ejecutan servicios programables sin tocar la CPU del host."
+            "ASIC NVIDIA ConnectX-6 Dx"
+          ]
         },
-        "sourceSlug": "nvidia-connectx6-dx-datasheet",
-        "confidence": "third-party",
-        "note": "Arquitectura SmartNIC del datasheet NVIDIA ConnectX-6 Dx; capacidades de RAM locales no publicadas."
+        "sourceSlug": "nvidia-connectx6dx-brief",
+        "confidence": "official",
+        "note": "Curado desde product brief/datasheet NVIDIA"
       }
     ],
     "relationships": [
@@ -1824,6 +1852,14 @@
         "predicate": "succeeds",
         "objectType": "device",
         "objectSlug": "nvidia-connectx-5"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "NVIDIA ConnectX-6 Dx Product Brief (200GbE, IPsec/TLS inline)",
+        "language": "en",
+        "sourceSlug": "nvidia-connectx6dx-brief",
+        "localPath": "docs/NVIDIA Model ConnectX-6 DX.pdf"
       }
     ]
   },
@@ -3017,18 +3053,18 @@
       {
         "predicate": "internal-architecture",
         "value": {
-          "summary": "Adaptador monolitico 100GbE/InfiniBand EDR: el ASIC ConnectX-5 descarga RDMA/RoCEv2, SR-IOV y DPDK; gestionado por el host (sin CPU de proposito general).",
+          "summary": "Adaptador 100Gb/s con RDMA, RoCE, NVMe-oF target offload, Socket Direct y GPUDirect; PCIe Gen3/Gen4.",
           "soc": {
-            "family": "ASIC Mellanox ConnectX-5 (MT27800)",
-            "note": "PCIe Gen3 x16, 2x 100GbE o EDR InfiniBand en un solo chip"
+            "family": "ASIC NVIDIA ConnectX-5",
+            "note": "PCIe Gen3/Gen4 x16, hasta 100Gb/s por puerto (QSFP28); NVMe-oF sin intervención de CPU"
           },
           "networkProcessors": [
-            "ASIC Mellanox ConnectX-5"
+            "ASIC NVIDIA ConnectX-5"
           ]
         },
-        "sourceSlug": "netatlas-assist",
-        "confidence": "third-party",
-        "note": "datos asistidos de familia; validar en F2"
+        "sourceSlug": "nvidia-connectx5-brief",
+        "confidence": "official",
+        "note": "Curado desde product brief/datasheet NVIDIA"
       }
     ],
     "relationships": [
@@ -3036,6 +3072,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "2"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "NVIDIA ConnectX-5 EN Adapter Cards Product Brief",
+        "language": "en",
+        "sourceSlug": "nvidia-connectx5-brief",
+        "localPath": "docs/NVIDIA Model ConnectX-5.pdf"
       }
     ]
   },
@@ -3091,18 +3135,18 @@
       {
         "predicate": "internal-architecture",
         "value": {
-          "summary": "Adaptador monolitico 400GbE/InfiniBand NDR: el ASIC ConnectX-7 descarga RDMA/RoCEv2, TLS/IPsec y telemetria; gestionado por el host (sin CPU de proposito general).",
+          "summary": "Adaptador 400Gb/s (NDR/HDR/EDR) con RDMA por Ethernet y aceleración definida por software; PCIe Gen5.",
           "soc": {
-            "family": "ASIC NVIDIA ConnectX-7 (MT2892)",
-            "note": "PCIe Gen5 x16, 2x 400GbE o NDR InfiniBand en un solo chip"
+            "family": "ASIC NVIDIA ConnectX-7",
+            "note": "Hasta 400Gb/s de ancho de banda total; PCIe Gen5"
           },
           "networkProcessors": [
             "ASIC NVIDIA ConnectX-7"
           ]
         },
-        "sourceSlug": "netatlas-assist",
-        "confidence": "third-party",
-        "note": "datos asistidos de familia; validar en F2"
+        "sourceSlug": "nvidia-connectx7-datasheet",
+        "confidence": "official",
+        "note": "Curado desde product brief/datasheet NVIDIA"
       }
     ],
     "relationships": [
@@ -3115,6 +3159,14 @@
         "predicate": "succeeds",
         "objectType": "device",
         "objectSlug": "nvidia-connectx-6-dx"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "NVIDIA ConnectX-7 400G Adapters Datasheet",
+        "language": "en",
+        "sourceSlug": "nvidia-connectx7-datasheet",
+        "localPath": "docs/NVIDIA Model ConnectX-7.pdf"
       }
     ]
   },
@@ -3176,6 +3228,687 @@
         "predicate": "succeeds",
         "objectType": "device",
         "objectSlug": "genesis-switch-ethernet"
+      }
+    ]
+  },
+  {
+    "slug": "cisco-ie-3000-8tc",
+    "name": "Cisco IE 3000-8TC (Industrial)",
+    "manufacturerSlug": "cisco",
+    "familySlug": "ie-3000",
+    "categoryCode": "CAT-IND",
+    "model": "IE-3000-8TC",
+    "lifecycleStatus": "mature",
+    "summary": "Switch industrial DIN-rail capa 2: 8 puertos 10/100 TX + 2 uplinks de doble propósito (cobre/SFP), PoE hasta 15.4W por puerto y sincronismo IEEE 1588v2.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "8x 10/100 TX",
+        "interfaceCode": "rj45",
+        "quantity": 8,
+        "speedsMbps": [
+          100
+        ],
+        "role": "access"
+      },
+      {
+        "label": "2x uplink doble propósito (cobre/SFP)",
+        "interfaceCode": "sfp",
+        "quantity": 2,
+        "speedsMbps": [
+          100,
+          1000
+        ],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "profinet",
+        "sourceSlug": "cisco-ie3000-datasheet",
+        "confidence": "official",
+        "note": "Certificación PROFINET v2, clase B"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco Industrial Ethernet 3000 Series Switches Data Sheet (2018)",
+        "language": "en",
+        "sourceSlug": "cisco-ie3000-datasheet",
+        "localPath": "docs/Cisco 3000 Serie Switches.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "usrobotics-5686g",
+    "name": "U.S. Robotics 5686G 56K Serial Faxmodem",
+    "manufacturerSlug": "usrobotics",
+    "familySlug": "sportster-56k",
+    "categoryCode": "CAT-ACC-DIAL",
+    "model": "5686G",
+    "lifecycleStatus": "legacy",
+    "summary": "Faxmódem serie externo 56K para empresa: V.92/V.90 con switches DIP, LEDs de señal y control manual de volumen.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "1x RS-232",
+        "interfaceCode": "serial",
+        "quantity": 1,
+        "speedsMbps": [],
+        "role": "console"
+      },
+      {
+        "label": "2x línea/teléfono RJ-11",
+        "interfaceCode": "rj11",
+        "quantity": 2,
+        "speedsMbps": [],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "max_speed_mbps",
+        "value": 0.056,
+        "sourceSlug": "usrobotics-5686g-datasheet",
+        "confidence": "official",
+        "note": "56 Kbps bajada / 48 Kbps subida (53.3 límite FCC)"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "itu-t/V.90",
+        "sourceSlug": "usrobotics-5686g-datasheet",
+        "confidence": "official",
+        "note": "Hoja 5686G"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "itu-t/V.92",
+        "sourceSlug": "usrobotics-5686g-datasheet",
+        "confidence": "official",
+        "note": "Hoja 5686G: V.92 con Quick Connect y Modem-on-Hold"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "itu-t/V.90"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "itu-t/V.92"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "U.S. Robotics 5686G 56K Serial Controller Faxmodem datasheet",
+        "language": "en",
+        "sourceSlug": "usrobotics-5686g-datasheet",
+        "localPath": "docs/USR datasheet-56k-faxmodem-5686g.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "usrobotics-5686g-pro",
+    "name": "U.S. Robotics Courier Lite 5686G-PRO",
+    "manufacturerSlug": "usrobotics",
+    "familySlug": "courier-lite-56k",
+    "categoryCode": "CAT-ACC-DIAL",
+    "model": "5686G-PRO (USR5686G-PRO US/CA, USR845686G-PRO EU/UK)",
+    "lifecycleStatus": "legacy",
+    "summary": "Faxmódem Courier Lite 56K para empresa: V.92/V.90 con V.Everything, puerto serie RS-232 y doble RJ-11.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "1x RS-232",
+        "interfaceCode": "serial",
+        "quantity": 1,
+        "speedsMbps": [],
+        "role": "console"
+      },
+      {
+        "label": "2x línea/teléfono RJ-11",
+        "interfaceCode": "rj11",
+        "quantity": 2,
+        "speedsMbps": [],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "max_speed_mbps",
+        "value": 0.056,
+        "sourceSlug": "usrobotics-5686g-pro-datasheet",
+        "confidence": "official",
+        "note": "56 Kbps bajada (53.3 límite FCC)"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "itu-t/V.90",
+        "sourceSlug": "usrobotics-5686g-pro-datasheet",
+        "confidence": "official",
+        "note": "Hoja 5686G-PRO"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "itu-t/V.92",
+        "sourceSlug": "usrobotics-5686g-pro-datasheet",
+        "confidence": "official",
+        "note": "Hoja 5686G-PRO: Quick Connect y Modem-on-Hold"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "itu-t/V.90"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "itu-t/V.92"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "U.S. Robotics Courier Lite 5686G-PRO 56K Business Modem datasheet",
+        "language": "en",
+        "sourceSlug": "usrobotics-5686g-pro-datasheet",
+        "localPath": "docs/USR datasheet-courier-lite-56k-business-modem-5686g-pro.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "nvidia-connectx-8",
+    "name": "NVIDIA ConnectX-8 SuperNIC (800G)",
+    "manufacturerSlug": "nvidia",
+    "familySlug": "connectx",
+    "categoryCode": "CAT-IFC",
+    "lifecycleStatus": "current",
+    "summary": "SuperNIC 800G para IA masiva: InfiniBand + Ethernet, RDMA/RoCEv2, cripto inline (IPsec/MACsec/PSP) y SHARP.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "1x 800G OSFP",
+        "interfaceCode": "osfp",
+        "quantity": 1,
+        "speedsMbps": [
+          800000
+        ],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "ethernet",
+        "sourceSlug": "nvidia-connectx8-datasheet",
+        "confidence": "official",
+        "note": "800 Gb/s Ethernet"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "roce",
+        "sourceSlug": "nvidia-connectx8-datasheet",
+        "confidence": "official",
+        "note": "RDMA/RoCEv2"
+      },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "summary": "SuperNIC 800G para IA masiva: InfiniBand + Ethernet, RDMA/RoCEv2, cripto inline (IPsec/MACsec/PSP) y SHARP.",
+          "soc": {
+            "family": "ASIC NVIDIA ConnectX-8 SuperNIC",
+            "note": "800 Gb/s extremo a extremo; PCIe Gen6"
+          },
+          "networkProcessors": [
+            "ASIC NVIDIA ConnectX-8 SuperNIC"
+          ]
+        },
+        "sourceSlug": "nvidia-connectx8-datasheet",
+        "confidence": "official",
+        "note": "Curado desde datasheet NVIDIA"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      },
+      {
+        "predicate": "succeeds",
+        "objectType": "device",
+        "objectSlug": "nvidia-connectx-7"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "NVIDIA ConnectX-8 SuperNIC Datasheet (800G IA)",
+        "language": "en",
+        "sourceSlug": "nvidia-connectx8-datasheet",
+        "localPath": "docs/NVIDIA Model ConnectX-8 SuperNIC.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "nvidia-connectx-9",
+    "name": "NVIDIA ConnectX-9 SuperNIC (800G)",
+    "manufacturerSlug": "nvidia",
+    "familySlug": "connectx",
+    "categoryCode": "CAT-IFC",
+    "lifecycleStatus": "current",
+    "summary": "SuperNIC 800G por puerto para gigafactorías IA: PCIe Gen6 (48 carriles), OSFP224/QSFP112, RoCEv2 e IPsec/TLS/PQC.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "1x 800G OSFP",
+        "interfaceCode": "osfp",
+        "quantity": 1,
+        "speedsMbps": [
+          800000
+        ],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "ethernet",
+        "sourceSlug": "nvidia-connectx9-datasheet",
+        "confidence": "official",
+        "note": "800 Gb/s Ethernet"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "roce",
+        "sourceSlug": "nvidia-connectx9-datasheet",
+        "confidence": "official",
+        "note": "RDMA/RoCEv2"
+      },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "summary": "SuperNIC 800G por puerto para gigafactorías IA: PCIe Gen6 (48 carriles), OSFP224/QSFP112, RoCEv2 e IPsec/TLS/PQC.",
+          "soc": {
+            "family": "ASIC NVIDIA ConnectX-9 SuperNIC",
+            "note": "PCIe Gen6 hasta 48 carriles; 800 Gb/s por puerto"
+          },
+          "networkProcessors": [
+            "ASIC NVIDIA ConnectX-9 SuperNIC"
+          ]
+        },
+        "sourceSlug": "nvidia-connectx9-datasheet",
+        "confidence": "official",
+        "note": "Curado desde datasheet NVIDIA"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      },
+      {
+        "predicate": "succeeds",
+        "objectType": "device",
+        "objectSlug": "nvidia-connectx-8"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "NVIDIA ConnectX-9 SuperNIC Datasheet (800G por puerto)",
+        "language": "en",
+        "sourceSlug": "nvidia-connectx9-datasheet",
+        "localPath": "docs/NVIDIA Model ConnectX-9 SuperNIC.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "panduit-tx6a-utp",
+    "name": "Panduit TX6A 10Gig UTP (PUP6AM04BU-UG)",
+    "manufacturerSlug": "panduit",
+    "familySlug": "panduit-tx6a",
+    "categoryCode": "CAT-PAS",
+    "model": "PUP6AM04BU-UG",
+    "lifecycleStatus": "current",
+    "summary": "Cable UTP Cat6A plenum 23 AWG con MaTriX: 10GBASE-T hasta 100 m.",
+    "osiProfile": {
+      "terminate": [
+        1
+      ],
+      "transparent": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 1
+    },
+    "ports": [],
+    "assertions": [
+      {
+        "predicate": "max_speed_mbps",
+        "value": 10000,
+        "sourceSlug": "ieee-8023-2018",
+        "confidence": "official",
+        "note": "10GBASE-T"
+      },
+      {
+        "predicate": "max_distance_m",
+        "value": 100,
+        "sourceSlug": "ieee-8023-2018",
+        "confidence": "official",
+        "note": "Canal Cat6A 100 m"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "tia-eia/568-C.2",
+        "sourceSlug": "panduit-tx6a-datasheet",
+        "confidence": "official",
+        "note": "Hoja PUP6AM04BU-UG"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "ieee/802.3an",
+        "sourceSlug": "panduit-tx6a-datasheet",
+        "confidence": "official",
+        "note": "Hoja PUP6AM04BU-UG"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "1"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "tia-eia/568-C.2"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "ieee/802.3an"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Panduit TX6A 10Gig UTP Copper Cabling (PUP6AM04BU-UG)",
+        "language": "en",
+        "sourceSlug": "panduit-tx6a-datasheet",
+        "localPath": "docs/Panduit Model TX6A UTP 10Gig.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "belden-10gxe01",
+    "name": "Belden 10GXE01 Cat6A F/FTP",
+    "manufacturerSlug": "belden",
+    "familySlug": "belden",
+    "categoryCode": "CAT-PAS",
+    "model": "10GXE01",
+    "lifecycleStatus": "current",
+    "summary": "Cable Cat6A F/FTP 23 AWG LSZH (625 MHz): 10GBase-T y PoE 802.3bt.",
+    "osiProfile": {
+      "terminate": [
+        1
+      ],
+      "transparent": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 1
+    },
+    "ports": [],
+    "assertions": [
+      {
+        "predicate": "max_speed_mbps",
+        "value": 10000,
+        "sourceSlug": "ieee-8023-2018",
+        "confidence": "official",
+        "note": "10GBASE-T"
+      },
+      {
+        "predicate": "max_distance_m",
+        "value": 100,
+        "sourceSlug": "ieee-8023-2018",
+        "confidence": "official",
+        "note": "Canal Cat6A 100 m"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "iec/61156-5",
+        "sourceSlug": "belden-10gxe01-datasheet",
+        "confidence": "official",
+        "note": "Hoja 10GXE01"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "ieee/802.3an",
+        "sourceSlug": "belden-10gxe01-datasheet",
+        "confidence": "official",
+        "note": "Hoja 10GXE01"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "ieee/802.3bt",
+        "sourceSlug": "belden-10gxe01-datasheet",
+        "confidence": "official",
+        "note": "Hoja 10GXE01"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "1"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "iec/61156-5"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "ieee/802.3an"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "ieee/802.3bt"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Belden 10GXE01 Cat6A F/FTP (Eca)",
+        "language": "en",
+        "sourceSlug": "belden-10gxe01-datasheet",
+        "localPath": "docs/Belden Model 10GXE01.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "belden-10gxe02",
+    "name": "Belden 10GXE02 Cat6A S/FTP",
+    "manufacturerSlug": "belden",
+    "familySlug": "belden",
+    "categoryCode": "CAT-PAS",
+    "model": "10GXE02",
+    "lifecycleStatus": "current",
+    "summary": "Cable Cat6A S/FTP 23 AWG LSZH con trenza (625 MHz): 10GBase-T y PoE 802.3bt.",
+    "osiProfile": {
+      "terminate": [
+        1
+      ],
+      "transparent": [
+        2,
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 1
+    },
+    "ports": [],
+    "assertions": [
+      {
+        "predicate": "max_speed_mbps",
+        "value": 10000,
+        "sourceSlug": "ieee-8023-2018",
+        "confidence": "official",
+        "note": "10GBASE-T"
+      },
+      {
+        "predicate": "max_distance_m",
+        "value": 100,
+        "sourceSlug": "ieee-8023-2018",
+        "confidence": "official",
+        "note": "Canal Cat6A 100 m"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "iec/61156-5",
+        "sourceSlug": "belden-10gxe02-datasheet",
+        "confidence": "official",
+        "note": "Hoja 10GXE02"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "ieee/802.3an",
+        "sourceSlug": "belden-10gxe02-datasheet",
+        "confidence": "official",
+        "note": "Hoja 10GXE02"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "ieee/802.3bt",
+        "sourceSlug": "belden-10gxe02-datasheet",
+        "confidence": "official",
+        "note": "Hoja 10GXE02"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "1"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "iec/61156-5"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "ieee/802.3an"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "ieee/802.3bt"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Belden 10GXE02 Cat6A S/FTP (Eca)",
+        "language": "en",
+        "sourceSlug": "belden-10gxe02-datasheet",
+        "localPath": "docs/Belden Model 10GXE02.pdf"
       }
     ]
   }

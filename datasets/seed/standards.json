@@ -111,5 +111,10 @@
   { "org": "wi-fi-alliance", "identifier": "wifi-7", "title": "Wi-Fi 7 certification (802.11be)", "version": "2024", "publishedOn": "2024-01-01", "status": "active" },
   { "org": "odva", "identifier": "ethernet-ip", "title": "EtherNet/IP (CIP on Ethernet)", "version": "2023", "publishedOn": "2023-01-01", "status": "active" },
   { "org": "pi", "identifier": "profinet", "title": "PROFINET IO", "version": "2023", "publishedOn": "2023-01-01", "status": "active" },
-  { "org": "itu-t", "identifier": "V.90", "title": "V.90 — Módem digital 56k (par módem digital/analógico en RTB)", "version": "1998", "publishedOn": "1998-09-25", "status": "active" }
+  { "org": "itu-t", "identifier": "V.90", "title": "V.90 — Módem digital 56k (par módem digital/analógico en RTB)", "version": "1998", "publishedOn": "1998-09-25", "status": "active" },
+  { "org": "itu-t", "identifier": "V.92", "title": "V.92 — Mejoras 56k (Quick Connect, Modem-on-Hold)", "version": "2000", "publishedOn": "2000-11-17", "status": "active" },
+  { "org": "ieee", "identifier": "802.3df", "title": "IEEE 802.3df — 800 Gb/s Ethernet", "version": "2024", "publishedOn": "2024-02-16", "status": "active" },
+  { "org": "ieee", "identifier": "802.3an", "title": "IEEE 802.3an — 10GBASE-T (10 Gb/s cobre)", "version": "2006", "publishedOn": "2006-06-08", "status": "active" },
+  { "org": "tia-eia", "identifier": "568-C.2", "title": "ANSI/TIA-568-C.2 — Cableado par trenzado y componentes", "version": "2009", "publishedOn": "2009-08-11", "status": "superseded" },
+  { "org": "iec", "identifier": "61156-5", "title": "IEC 61156-5 — Cables para transmisión digital (horizontal)", "version": "2020", "publishedOn": "2020-01-01", "status": "active" }
 ]

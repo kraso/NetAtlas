@@ -3,29 +3,29 @@ import { test, expect } from '@playwright/test'
 /**
  * Dataset E2E (PLAN MAESTRO §28 / ADR-047).
  *
- * Valida el dataset REAL (333 dispositivos) expuesto por el API server F8B
+ * Valida el dataset REAL (341 dispositivos) expuesto por el API server F8B
  * (packages/server sobre datasets/netatlas-seed.sqlite) al browser PWA vía el
  * adaptador HTTP F8B (apps/app/src/adapters/http-ui.ts). El warmezo warmeza
  * /api/snapshot?since=0 al montar App → replacea el demo de 6 (offline) por
- * los 333 del server (F1-late dataset real vía F8B).
+ * los 341 del server (F1-late dataset real vía F8B).
  *
  * Baseline offline (sin server): el demo de 6 sigue validado en tests unitarios
  * (packages/data, tools/import-cli) — no requiere browser E2E.
  *
  * Flag Vite inlineado en build (F8B-baseline): VITE_API=http://127.0.0.1:8787
  */
-test.describe('Dataset E2E — NetAtlas real via API F8B (333 dispositivos)', () => {
+test.describe('Dataset E2E — NetAtlas real via API F8B (341 dispositivos)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
   })
 
-  test('dashboard muestra el dataset real (333 dispositivos · 26 categorías)', async ({ page }) => {
+  test('dashboard muestra el dataset real (341 dispositivos · 26 categorías)', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('NetAtlas')
 
     // dashboard.tsx: "Dataset de demostración: N dispositivos · M categorías."
     // El count se refresca reactivamente cuando el warmezo HTTP termina.
     const datasetLine = page.locator('.guia-tecnica', { hasText: /Dataset de demostración/ })
-    await expect(datasetLine).toContainText('333 dispositivos', { timeout: 15000 })
+    await expect(datasetLine).toContainText('341 dispositivos', { timeout: 15000 })
     await expect(datasetLine).toContainText('26 categorías')
   })
 
@@ -49,7 +49,7 @@ test.describe('Dataset E2E — NetAtlas real via API F8B (333 dispositivos)', ()
     await input.fill('Cisco')
     // El form role="search" (aria-label "Buscar hardware de redes") navega a /explore?q=Cisco
     await page.locator('form[role="search"]').locator('button[type="submit"]').click()
-    // Resultados: al menos un Catalyst de los 333 aparece como Link
+    // Resultados: al menos un Catalyst de los 341 aparece como Link
     await expect(page.locator('table.tabla-specs')).toContainText('Cisco')
   })
 

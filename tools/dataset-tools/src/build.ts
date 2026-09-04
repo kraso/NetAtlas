@@ -514,6 +514,8 @@ function seedDerivedStandards(
     '802.11be': 'ieee/802.11', wpa2: 'ieee/802.11i', wpa3: 'ieee/802.11i',
   }
   const ETHERNET_IFACES = new Set(['rj45', '2.5gbase-t', 'sfp', 'sfp-plus', 'sfp56', 'qsfp-plus', 'qsfp28', 'qsfp56'])
+  // 800G (802.3df): los puertos OSFP/QSFP112 implican el estándar, no el 802.3 base.
+  const G800_IFACES = new Set(['osfp', 'qsfp112'])
   let assertionCount = 0
   let relationshipCount = 0
   for (const dev of seed.devices) {
@@ -525,7 +527,8 @@ function seedDerivedStandards(
       }
     }
     for (const port of dev.ports ?? []) {
-      if (ETHERNET_IFACES.has(port.interfaceCode)) refs.add('ieee/802.3')
+      if (G800_IFACES.has(port.interfaceCode)) refs.add('ieee/802.3df')
+      else if (ETHERNET_IFACES.has(port.interfaceCode)) refs.add('ieee/802.3')
       if (port.poeStandard === '802.3af' || port.poeStandard === '802.3at' || port.poeStandard === '802.3bt') {
         refs.add(`ieee/${port.poeStandard}`)
       }

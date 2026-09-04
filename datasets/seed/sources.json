@@ -302,10 +302,127 @@
     "authorityLevel": 1
   },
   {
+    "slug": "cisco-ie3000-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco Industrial Ethernet 3000 Series Switches Data Sheet (2018)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "usrobotics-5686g-pro-datasheet",
+    "kind": "datasheet",
+    "publisher": "U.S. Robotics",
+    "title": "U.S. Robotics Courier Lite 5686G-PRO 56K Business Modem datasheet",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "usrobotics-5686g-datasheet",
+    "kind": "datasheet",
+    "publisher": "U.S. Robotics",
+    "title": "U.S. Robotics 5686G 56K Serial Controller Faxmodem datasheet",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "3com-hub8-datasheet",
+    "kind": "datasheet",
+    "publisher": "3Com",
+    "title": "3Com OfficeConnect Hubs data sheet (3C16700A)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "nvidia-connectx5-brief",
+    "kind": "datasheet",
+    "publisher": "NVIDIA",
+    "title": "NVIDIA ConnectX-5 EN Adapter Cards Product Brief",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "nvidia-connectx6dx-brief",
+    "kind": "datasheet",
+    "publisher": "NVIDIA",
+    "title": "NVIDIA ConnectX-6 Dx Product Brief (200GbE, IPsec/TLS inline)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "nvidia-connectx7-datasheet",
+    "kind": "datasheet",
+    "publisher": "NVIDIA",
+    "title": "NVIDIA ConnectX-7 400G Adapters Datasheet",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "nvidia-connectx8-datasheet",
+    "kind": "datasheet",
+    "publisher": "NVIDIA",
+    "title": "NVIDIA ConnectX-8 SuperNIC Datasheet (800G IA)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "nvidia-connectx9-datasheet",
+    "kind": "datasheet",
+    "publisher": "NVIDIA",
+    "title": "NVIDIA ConnectX-9 SuperNIC Datasheet (800G por puerto)",
+    "url": "https://resources.nvidia.com/en-us-accelerated-networking-resource-library/connectx-9-supernic-datasheet",
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "panduit-tx6a-datasheet",
+    "kind": "datasheet",
+    "publisher": "Panduit",
+    "title": "Panduit TX6A 10Gig UTP Copper Cabling (PUP6AM04BU-UG)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "belden-10gxe01-datasheet",
+    "kind": "datasheet",
+    "publisher": "Belden",
+    "title": "Belden 10GXE01 Cat6A F/FTP (Eca)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "belden-10gxe02-datasheet",
+    "kind": "datasheet",
+    "publisher": "Belden",
+    "title": "Belden 10GXE02 Cat6A S/FTP (Eca)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
     "slug": "ubnt-u6lr-datasheet",
     "kind": "datasheet",
     "publisher": "Ubiquiti",
     "title": "Ubiquiti Access Point U6 Long-Range (datasheet + tech specs)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "aruba-2920-datasheet",
+    "kind": "datasheet",
+    "publisher": "Aruba Networks (HPE)",
+    "title": "Aruba 2920 Switch Series data sheet (J9729A)",
     "url": null,
     "retrievedOn": "2026-09-04",
     "authorityLevel": 1
