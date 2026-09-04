@@ -6,7 +6,13 @@
  * son intercambiables sin tocar rutas ni dominio (§6.7 — prueba ácida de la
  * fase: adaptador nuevo, cero cambios en packages/domain ni en vistas).
  */
-import type { OutboxEntry } from '@netatlas/domain'
+import type {
+  OutboxEntry,
+  SyncAttributeDefinition,
+  SyncCatalogs,
+  SyncDeviceDetail,
+  SyncSource,
+} from '@netatlas/domain'
 
 export interface ServerDevice {
   readonly slug: string
@@ -32,6 +38,11 @@ export interface ServidorStore {
   categorias(): Promise<readonly { code: string; nameEs: string }[]>
   /** Snapshot de catálogo desde una versión (0 = completa). */
   snapshot(since: number): Promise<readonly ServerSnapshotRow[]>
+  /** Aristas de topología entre dispositivos (para el mapa/arquitectura UI). */
+  snapshotLinks(since: number): Promise<readonly SnapshotLink[]>
+  /** Detalle por dispositivo (ficha completa sin N+1): puertos, aristas de
+   *  catálogo, afirmaciones, EAV + catálogos y fuentes. Vacío si since >= version. */
+  snapshotDetail(since: number): Promise<SnapshotDetail>
   /** Versión actual del catálogo lado servidor. */
   version(): Promise<number>
   /** Recibe contribuciones (outbox del cliente) y devuelve las aceptadas. */
@@ -60,6 +71,32 @@ export interface ServerSnapshotRow {
   readonly lifecycleStatus: string
   readonly updatedAt: string
   readonly version: number
+}
+
+/** Detalle del snapshot F8B (transporta la ficha sin N+1). */
+export interface SnapshotDetail {
+  readonly devices: readonly SyncDeviceDetail[]
+  readonly catalogs: SyncCatalogs
+  readonly sources: readonly SyncSource[]
+  readonly attributeDefinitions: readonly SyncAttributeDefinition[]
+}
+
+/** Detalle vacío (deltas sin cambios + stub PostgreSQL sin topología). */
+export const EMPTY_SNAPSHOT_DETAIL: SnapshotDetail = {
+  devices: [],
+  catalogs: { protocols: [], standards: [], media: [], layers: [], manufacturers: [] },
+  sources: [],
+  attributeDefinitions: [],
+}
+
+/** Arista resuelta de topología entre dos dispositivos (snake-case plano). */
+export interface SnapshotLink {
+  /** Slug del dispositivo origen (subject). */
+  readonly from: string
+  /** Slug del dispositivo destino (object). */
+  readonly to: string
+  /** Predicado de la arista (domain-validado en el cliente). */
+  readonly predicate: string
 }
 
 /** Driver SQL neutral para los adaptadores (SQLite y Postgres lo implementan). */

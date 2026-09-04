@@ -86,7 +86,9 @@ export function crearServidor(
       const since = Math.max(0, Number(ctx.url.searchParams.get('since') ?? '0'))
       const version = await store.version()
       const dispositivos = await store.snapshot(since)
-      return { status: 200, cuerpo: { version, since, dispositivos } }
+      const links = await store.snapshotLinks(since)
+      const detalle = await store.snapshotDetail(since)
+      return { status: 200, cuerpo: { version, since, dispositivos, links, detalle } }
     },
   })
 

@@ -10,7 +10,8 @@ export type { AuthVerifier, VerificacionAuth, JwkRsa, PayloadJWT } from './auth.
 export { SqliteServidorStore, SqliteExecutor } from './sqlite-store.js'
 export { PostgresServidorStore, traducirParametros } from './postgres-store.js'
 export type { PgDriver, PgConfig, PgConnector, PgRow } from './postgres-store.js'
-export type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, SqlExecutor } from './store.js'
+export type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, SnapshotLink, SnapshotDetail, SqlExecutor } from './store.js'
+export { EMPTY_SNAPSHOT_DETAIL } from './store.js'
 export { HttpSyncServer } from './sync-http.js'
 // API pública (F8B, NET-HW-064/065)
 export { SqlitePublicStore } from './public-store.js'

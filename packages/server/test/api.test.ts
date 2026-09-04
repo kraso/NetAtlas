@@ -96,6 +96,27 @@ describe('API REST del servidor (F8A, NET-HW-062) — HTTP real', () => {
     expect(body.dispositivos.length).toBeGreaterThan(0)
   })
 
+  it('snapshot incluye detalle F8B (ficha sin N+1)', async () => {
+    const r = await fetch(`${base}/api/snapshot?since=0`)
+    expect(r.status).toBe(200)
+    const body = (await r.json()) as {
+      detalle: {
+        devices: { slug: string; ports: { label: string }[]; relations: { predicate: string; objectType: string; objectCode: string }[] }[]
+        catalogs: { protocols: unknown[]; standards: unknown[]; media: unknown[]; layers: unknown[] }
+        sources: unknown[]
+        attributeDefinitions: unknown[]
+      }
+    }
+    expect(body.detalle.devices.length).toBeGreaterThan(0)
+    expect(body.detalle.catalogs.protocols.length).toBeGreaterThan(0)
+    expect(body.detalle.sources.length).toBeGreaterThan(0)
+    expect(body.detalle.attributeDefinitions.length).toBeGreaterThan(0)
+    const arista = body.detalle.devices.find((d) => d.slug === 'arista-7050sx-64')
+    expect(arista).toBeDefined()
+    expect(arista!.ports.length).toBeGreaterThan(0)
+    expect(arista!.relations.some((x) => x.predicate === 'supports-protocol' && x.objectType === 'protocol')).toBe(true)
+  })
+
   it('POST /api/contributions sin auth → 401', async () => {
     const r = await fetch(`${base}/api/contributions`, {
       method: 'POST',

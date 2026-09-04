@@ -9,7 +9,8 @@
  * real en CI (doble de test) y conectarse a uno en despliegue.
  */
 
-import type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, DatasetPublico } from './store.js'
+import type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, SnapshotLink, SnapshotDetail, DatasetPublico } from './store.js'
+import { EMPTY_SNAPSHOT_DETAIL } from './store.js'
 import { mergeLWWporEntidad } from '@netatlas/domain'
 import type { OutboxEntry } from '@netatlas/domain'
 
@@ -138,6 +139,16 @@ export class PostgresServidorStore implements ServidorStore {
       [base, since],
     )
     return rows as unknown as ServerSnapshotRow[]
+  }
+
+  /** PostgreSQL aún no modela topología de enlaces (NET-HW-067 futuro). */
+  async snapshotLinks(_since: number): Promise<readonly SnapshotLink[]> {
+    return []
+  }
+
+  /** Detalle F8B-detalle aún no modelado en PostgreSQL (mismo futuro que links). */
+  async snapshotDetail(_since: number): Promise<SnapshotDetail> {
+    return EMPTY_SNAPSHOT_DETAIL
   }
 
   async version(): Promise<number> {
