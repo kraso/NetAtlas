@@ -6,7 +6,7 @@ import { loadMigrations, applyMigrations, NodeSqliteDriver, CatalogDao } from '.
 const here = dirname(fileURLToPath(import.meta.url))
 const migrationsDir = resolve(here, '..', 'migrations')
 
-describe('Migraciones (0001_init + 0002_reconciliation)', () => {
+describe('Migraciones (0001_init + 0002_reconciliation + 0003_manufacturer_snmp)', () => {
   let driver: NodeSqliteDriver
 
   beforeAll(() => {
@@ -15,11 +15,14 @@ describe('Migraciones (0001_init + 0002_reconciliation)', () => {
     const result = applyMigrations(driver, migrations)
     expect(result.applied).toContain(1)
     expect(result.applied).toContain(2)
+    expect(result.applied).toContain(3)
   })
 
   it('aplica las migraciones y registra la última versión', () => {
     const row = driver.prepare('SELECT MAX(version) AS v FROM schema_version').get()
-    expect(Number(row?.v)).toBe(2)
+    expect(Number(row?.v)).toBe(3)
+    const col = driver.prepare("SELECT name FROM pragma_table_info('manufacturer') WHERE name = 'snmp_enterprise'").get()
+    expect(col).toBeDefined()
   })
 
   it('re-aplicar es idempotente (skipped, sin error)', () => {
@@ -28,6 +31,7 @@ describe('Migraciones (0001_init + 0002_reconciliation)', () => {
     expect(second.applied).toHaveLength(0)
     expect(second.skipped).toContain(1)
     expect(second.skipped).toContain(2)
+    expect(second.skipped).toContain(3)
   })
 
   it('crea todas las tablas núcleo del modelo', () => {

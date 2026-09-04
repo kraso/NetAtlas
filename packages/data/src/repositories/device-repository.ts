@@ -244,9 +244,9 @@ export class SqliteCatalogRepository implements CatalogRepository {
 
   async manufacturerBySlug(slug: string): Promise<Manufacturer | undefined> {
     const row = this.db
-      .prepare('SELECT slug, name, country, founded_year, website, status FROM manufacturer WHERE slug = ?')
+      .prepare('SELECT slug, name, country, founded_year, website, status, snmp_enterprise FROM manufacturer WHERE slug = ?')
       .get(slug) as
-      | { slug: string; name: string; country: string | null; founded_year: number | null; website: string | null; status: string }
+      | { slug: string; name: string; country: string | null; founded_year: number | null; website: string | null; status: string; snmp_enterprise: number | null }
       | undefined
     if (!row) return undefined
     return Manufacturer.hydrate({
@@ -256,6 +256,7 @@ export class SqliteCatalogRepository implements CatalogRepository {
       foundedYear: row.founded_year ?? undefined,
       website: row.website ?? undefined,
       status: (row.status ?? 'active') as 'active' | 'inactive' | 'acquired' | 'defunct',
+      snmpEnterprise: row.snmp_enterprise !== null ? Number(row.snmp_enterprise) : undefined,
     })
   }
 
@@ -279,7 +280,7 @@ export class SqliteCatalogRepository implements CatalogRepository {
 
   async listManufacturers(): Promise<readonly Manufacturer[]> {
     const rows = this.db
-      .prepare('SELECT slug, name, country, founded_year, website, status FROM manufacturer ORDER BY name')
+      .prepare('SELECT slug, name, country, founded_year, website, status, snmp_enterprise FROM manufacturer ORDER BY name')
       .all() as SqlRow[]
     return rows.map((r) =>
       Manufacturer.hydrate({
@@ -289,6 +290,7 @@ export class SqliteCatalogRepository implements CatalogRepository {
         foundedYear: r.founded_year !== null ? Number(r.founded_year) : undefined,
         website: r.website !== null ? String(r.website) : undefined,
         status: (r.status !== null ? String(r.status) : 'active') as 'active' | 'inactive' | 'acquired' | 'defunct',
+        snmpEnterprise: r.snmp_enterprise !== null ? Number(r.snmp_enterprise) : undefined,
       }),
     )
   }

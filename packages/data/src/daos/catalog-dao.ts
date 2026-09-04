@@ -11,6 +11,7 @@ export interface ManufacturerRow {
   readonly name: string
   readonly country?: string
   readonly website?: string
+  readonly snmpEnterprise?: number
 }
 
 export interface CategoryRow {
@@ -88,9 +89,9 @@ export class CatalogDao {
     if (existing) return Number(existing.id)
     const res = this.db
       .prepare(
-        'INSERT INTO manufacturer (slug, name, country, website) VALUES (?, ?, ?, ?)',
+        'INSERT INTO manufacturer (slug, name, country, website, snmp_enterprise) VALUES (?, ?, ?, ?, ?)',
       )
-      .run(row.slug, row.name, row.country ?? null, row.website ?? null)
+      .run(row.slug, row.name, row.country ?? null, row.website ?? null, row.snmpEnterprise ?? null)
     return Number(res.lastInsertRowid)
   }
 
@@ -297,6 +298,42 @@ export class CatalogDao {
           )
       }
     })
+  }
+
+  /** Refs "org/identifier" de implements-standard ya curados de un dispositivo. */
+  existingStandardRefs(deviceId: number): string[] {
+    const rows = this.db
+      .prepare(
+        `SELECT s.org || '/' || s.identifier AS ref
+         FROM relationship r
+         JOIN standard s ON s.id = r.object_id AND r.object_type = 'standard'
+         WHERE r.subject_type = 'device' AND r.subject_id = ?
+           AND r.predicate = 'implements-standard'`,
+      )
+      .all(deviceId) as { ref: string }[]
+    return rows.map((r) => String(r.ref))
+  }
+
+  /** Inserta un datasheet de dispositivo (resuelve device + fuente). */
+  addDatasheet(row: {
+    readonly deviceSlug: string
+    readonly title: string
+    readonly language?: string
+    readonly url?: string
+    readonly localPath?: string
+    readonly sourceSlug: string
+  }): number {
+    const deviceId = this.deviceId(row.deviceSlug)
+    if (deviceId === undefined) throw new Error(`addDatasheet: dispositivo desconocido "${row.deviceSlug}".`)
+    const sourceId = this.sourceId(row.sourceSlug)
+    if (sourceId === undefined) throw new Error(`addDatasheet: fuente desconocida "${row.sourceSlug}".`)
+    const res = this.db
+      .prepare(
+        `INSERT INTO datasheet (device_id, title, language, source_id, local_path, url)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+      )
+      .run(deviceId, row.title, row.language ?? 'es', sourceId, row.localPath ?? null, row.url ?? null)
+    return Number(res.lastInsertRowid)
   }
 
   addRelationship(row: RelationshipRow): void {

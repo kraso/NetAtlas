@@ -1,5 +1,5 @@
 import type { SqliteDriver, SqlRow } from '../driver.js'
-import { Assertion, Source, isConfidence } from '@netatlas/domain'
+import { Assertion, Datasheet, Source, isConfidence } from '@netatlas/domain'
 import type { Confidence, SourcingRepository } from '@netatlas/domain'
 
 /**
@@ -55,6 +55,41 @@ export class SqliteSourcingRepository implements SourcingRepository {
         note: r.note !== null ? String(r.note) : undefined,
       })
     })
+  }
+
+  /** Datasheets de un dispositivo por slug (join con fuente). */
+  async datasheetsForDevice(deviceSlug: string): Promise<readonly Datasheet[]> {
+    const rows = this.db
+      .prepare(
+        `SELECT f.title, f.language, f.url, f.local_path,
+                s.id AS source_id, s.slug AS source_slug, s.kind AS source_kind,
+                s.publisher AS source_publisher, s.title AS source_title, s.url AS source_url,
+                s.retrieved_on AS source_retrieved, s.authority_level AS source_authority
+         FROM datasheet f
+         JOIN device d ON d.id = f.device_id
+         JOIN source s ON s.id = f.source_id
+         WHERE d.slug = ?
+         ORDER BY f.title`,
+      )
+      .all(deviceSlug) as SqlRow[]
+    return rows.map((r) =>
+      Datasheet.create({
+        deviceSlug,
+        title: String(r.title),
+        language: String(r.language),
+        url: r.url !== null ? String(r.url) : undefined,
+        localPath: r.local_path !== null ? String(r.local_path) : undefined,
+        source: Source.create({
+          slug: String(r.source_slug),
+          kind: String(r.source_kind) as 'datasheet' | 'manual' | 'rfc' | 'ieee' | 'web-oficial' | 'libro' | 'terceros' | 'editorial',
+          publisher: r.source_publisher !== null ? String(r.source_publisher) : undefined,
+          title: String(r.source_title),
+          url: r.source_url !== null ? String(r.source_url) : undefined,
+          retrievedOn: r.source_retrieved !== null ? String(r.source_retrieved) : undefined,
+          authorityLevel: Number(r.source_authority) as 1 | 2 | 3 | 4,
+        }),
+      }),
+    )
   }
 
   async sourceBySlug(slug: string): Promise<Source | undefined> {

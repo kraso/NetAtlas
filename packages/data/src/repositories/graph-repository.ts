@@ -24,7 +24,9 @@ const RESOLVE_SQL: Record<string, { table: string; slugCol: string; idCol?: stri
   category: { table: 'category', slugCol: 'code' },
   interface: { table: 'interface', slugCol: 'code' },
   protocol: { table: 'protocol', slugCol: 'code' },
-  standard: { table: 'standard', slugCol: 'code' },
+  // standard no tiene columna code: el slug canónico es "org/identifier"
+  // (misma convención que suggestGrouped, StandardSheet y snapshotDetail).
+  standard: { table: 'standard', slugCol: "org || '/' || identifier" },
   technology: { table: 'technology', slugCol: 'slug' },
   medium: { table: 'medium', slugCol: 'code' },
   component: { table: 'component', slugCol: 'model' },
