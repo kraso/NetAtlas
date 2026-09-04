@@ -1,5 +1,6 @@
 import type { Assertion, Source } from '../sourcing/assertion.js'
 import type { Datasheet } from '../sourcing/datasheet.js'
+import type { DeviceImage } from '../sourcing/image.js'
 
 /**
  * Puerto SourcingRepository (sección 20.2).
@@ -16,4 +17,6 @@ export interface SourcingRepository {
   sourceBySlug(slug: string): Promise<Source | undefined>
   /** Datasheets de un dispositivo por slug (pestaña Documentación, F2). */
   datasheetsForDevice(deviceSlug: string): Promise<readonly Datasheet[]>
+  /** Imágenes del dispositivo (foto en Resumen, F2-Fotos). */
+  imagesForDevice(deviceSlug: string): Promise<readonly DeviceImage[]>
 }

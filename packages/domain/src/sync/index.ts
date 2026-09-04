@@ -17,6 +17,7 @@ export type {
   SyncDeviceRelation,
   SyncAssertion,
   SyncDatasheet,
+  SyncImage,
   SyncSource,
   SyncAttributeDefinition,
   SyncAttributeValue,

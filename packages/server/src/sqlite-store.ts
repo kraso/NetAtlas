@@ -11,7 +11,7 @@ import type { SearchIndex } from '@netatlas/domain'
 import { mergeLWWporEntidad } from '@netatlas/domain'
 import type { ServidorStore, ServerDevice, ServerHit, ServerSnapshotRow, SnapshotLink, SnapshotDetail, SqlExecutor, DatasetPublico } from './store.js'
 import { EMPTY_SNAPSHOT_DETAIL } from './store.js'
-import type { SyncAssertion, SyncAttributeValue, SyncDatasheet, SyncDeviceDetail, SyncDeviceRelation, SyncPort } from '@netatlas/domain'
+import type { SyncAssertion, SyncAttributeValue, SyncDatasheet, SyncDeviceDetail, SyncDeviceRelation, SyncImage, SyncPort } from '@netatlas/domain'
 import type { OutboxEntry } from '@netatlas/domain'
 import { readFileSync, existsSync } from 'node:fs'
 import { createHash } from 'node:crypto'
@@ -342,6 +342,25 @@ export class SqliteServidorStore implements ServidorStore {
       })
       porAfirmacion.set(a.subject_slug, lista)
     }
+    const porImagen = new Map<string, SyncImage[]>()
+    const imagenes = await this.executor.query<{
+      device_slug: string; kind: string; caption: string | null;
+      local_path: string | null; url: string | null; source_slug: string
+    }>(
+      `SELECT d.slug AS device_slug, g.kind, g.caption, g.local_path, g.url, s.slug AS source_slug
+       FROM image g
+       JOIN device d ON d.id = g.device_id
+       JOIN source s ON s.id = g.source_id
+       ORDER BY d.id, g.kind`,
+    )
+    for (const g of imagenes) {
+      const lista = porImagen.get(g.device_slug) ?? []
+      lista.push({
+        kind: g.kind, caption: g.caption ?? undefined,
+        localPath: g.local_path ?? undefined, url: g.url ?? undefined, sourceSlug: g.source_slug,
+      })
+      porImagen.set(g.device_slug, lista)
+    }
     const porDatasheet = new Map<string, SyncDatasheet[]>()
     for (const f of fichas) {
       const lista = porDatasheet.get(f.device_slug) ?? []
@@ -368,6 +387,7 @@ export class SqliteServidorStore implements ServidorStore {
         assertions: porAfirmacion.get(d.slug) ?? [],
         attributeValues: (porValor.get(d.slug) ?? []).map((v) => ({ key: v.key, display: v.display })),
         datasheets: porDatasheet.get(d.slug) ?? [],
+        images: porImagen.get(d.slug) ?? [],
       })),
       catalogs: {
         protocols: protocolos.map((p) => ({ code: p.code, name: p.name, family: p.family, osiLayer: Number(p.osi_layer) })),

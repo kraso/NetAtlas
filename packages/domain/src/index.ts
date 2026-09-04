@@ -21,6 +21,8 @@ export { Source, Assertion, CONFIDENCE_LEVELS, isConfidence } from './sourcing/a
 export type { SourceProps, AssertionProps, Confidence } from './sourcing/assertion.js'
 export { Datasheet } from './sourcing/datasheet.js'
 export type { DatasheetProps } from './sourcing/datasheet.js'
+export { DeviceImage } from './sourcing/image.js'
+export type { ImageProps, ImageKind } from './sourcing/image.js'
 
 // Grafo (sección 8.3)
 export {
@@ -171,6 +173,7 @@ export type {
   SyncDeviceRelation,
   SyncAssertion,
   SyncDatasheet,
+  SyncImage,
   SyncSource,
   SyncAttributeDefinition,
   SyncAttributeValue,

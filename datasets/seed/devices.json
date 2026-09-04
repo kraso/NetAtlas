@@ -235,6 +235,14 @@
         "url": "https://www.arubanetworks.com/assets/ds/DS_2930F.pdf",
         "sourceSlug": "aruba-2930f-datasheet"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Aruba 2930F 48G PoE+ (JL260A) frontal",
+        "localPath": "assets/img/aruba-2930f-48g-poeplus-frontal.webp",
+        "sourceSlug": "aruba-2930f-datasheet"
+      }
     ]
   },
   {
@@ -343,6 +351,14 @@
         "language": "en",
         "sourceSlug": "aruba-2920-datasheet",
         "localPath": "docs/Aruba 2920 Switch Series.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Aruba 2920-48G frontal",
+        "localPath": "assets/img/aruba-2920-48g-frontal.jpg",
+        "sourceSlug": "aruba-2920-datasheet"
       }
     ]
   },
@@ -1969,6 +1985,14 @@
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-9300-series-switches/datasheet-c78-742519.html",
         "sourceSlug": "cisco-cat9300-datasheet"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Cisco Catalyst 9300-48P frontal",
+        "localPath": "assets/img/cisco-catalyst-9300-48p-frontal.jpg",
+        "sourceSlug": "cisco-cat9300-datasheet"
+      }
     ]
   },
   {
@@ -2070,6 +2094,14 @@
         "url": "https://www.arista.com/assets/data/pdf/Datasheets/7050SX-128_64_Datasheet.pdf",
         "sourceSlug": "arista-7050sx-datasheet"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Arista DCS-7050SX-64 frontal (48xSFP+ + 4xQSFP+)",
+        "localPath": "assets/img/arista-7050sx-64-frontal.jpg",
+        "sourceSlug": "arista-7050sx-datasheet"
+      }
     ]
   },
   {
@@ -2167,6 +2199,14 @@
         "title": "FortiGate 200F Series Data Sheet + Hardware acceleration (FortiOS 7.6.2)",
         "language": "en",
         "url": "https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture",
+        "sourceSlug": "fortinet-fg200f-datasheet"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "FortiGate 200F frontal",
+        "localPath": "assets/img/fortinet-fortigate-200f-frontal.jpg",
         "sourceSlug": "fortinet-fg200f-datasheet"
       }
     ]
@@ -2381,6 +2421,26 @@
         "language": "en",
         "sourceSlug": "ubnt-u6lr-datasheet",
         "localPath": "docs/Ubiquiti Access Point U6 Long-Range.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "U6-LR frontal: 8 streams Wi-Fi 6, LED de estado, Ø220 mm",
+        "localPath": "assets/img/ubiquiti-unifi-uw6-lr-frontal.png",
+        "sourceSlug": "ubnt-u6lr-datasheet"
+      },
+      {
+        "kind": "lateral",
+        "caption": "U6-LR perfil: 48 mm, muesca de bloqueo",
+        "localPath": "assets/img/ubiquiti-unifi-uw6-lr-lateral.png",
+        "sourceSlug": "ubnt-u6lr-datasheet"
+      },
+      {
+        "kind": "trasera",
+        "caption": "U6-LR trasera: GbE PoE+, reset, radio BLE IoT, IP54",
+        "localPath": "assets/img/ubiquiti-unifi-uw6-lr-trasera.png",
+        "sourceSlug": "ubnt-u6lr-datasheet"
       }
     ]
   },
@@ -2688,6 +2748,14 @@
         "language": "en",
         "sourceSlug": "aruba-6300m-datasheet",
         "localPath": "docs/HPE Aruba Networking 6300M 48-Port.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "HPE Aruba 6300M 48G frontal",
+        "localPath": "assets/img/hpe-aruba-6300m-frontal.avif",
+        "sourceSlug": "aruba-6300m-datasheet"
       }
     ]
   },
@@ -3167,6 +3235,14 @@
         "language": "en",
         "sourceSlug": "nvidia-connectx7-datasheet",
         "localPath": "docs/NVIDIA Model ConnectX-7.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "NVIDIA ConnectX-7 (render oficial)",
+        "localPath": "assets/img/nvidia-connectx-7-frontal.png",
+        "sourceSlug": "nvidia-connectx7-datasheet"
       }
     ]
   },

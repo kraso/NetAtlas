@@ -336,6 +336,32 @@ export class CatalogDao {
     return Number(res.lastInsertRowid)
   }
 
+  /** Inserta una imagen de dispositivo (resuelve device + fuente). */
+  addImage(row: {
+    readonly deviceSlug: string
+    readonly kind: string
+    readonly caption?: string
+    readonly localPath?: string
+    readonly url?: string
+    readonly sourceSlug: string
+  }): number {
+    const deviceId = this.deviceId(row.deviceSlug)
+    if (deviceId === undefined) throw new Error(`addImage: dispositivo desconocido "${row.deviceSlug}".`)
+    const sourceId = this.sourceId(row.sourceSlug)
+    if (sourceId === undefined) throw new Error(`addImage: fuente desconocida "${row.sourceSlug}".`)
+    const res = this.db
+      .prepare(
+        `INSERT INTO image (content_hash, device_id, kind, caption, source_id, attribution, local_path, url)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      )
+      .run(
+        `seed:${row.deviceSlug}:${row.localPath ?? row.url ?? row.kind}`,
+        deviceId, row.kind, row.caption ?? null, sourceId, null,
+        row.localPath ?? null, row.url ?? null,
+      )
+    return Number(res.lastInsertRowid)
+  }
+
   addRelationship(row: RelationshipRow): void {
     this.db
       .prepare(

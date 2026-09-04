@@ -82,6 +82,8 @@ export interface UiSourcingRepo {
   assertionsForDevice(slug: string): Promise<readonly Assertion[]>
   /** Datasheets del dispositivo (pestaña Documentación, F2). */
   datasheetsForDevice(deviceSlug: string): Promise<readonly import('@netatlas/domain').Datasheet[]>
+  /** Imágenes del dispositivo (foto en Resumen, F2-Fotos). */
+  imagesForDevice(deviceSlug: string): Promise<readonly import('@netatlas/domain').DeviceImage[]>
 }
 
 /** Asistente IA (F7, §21): chat con citas obligatorias + flag ai.enabled. */

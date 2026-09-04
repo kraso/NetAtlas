@@ -9,6 +9,7 @@ import {
   Relationship,
   Assertion,
   Datasheet,
+  DeviceImage,
   Source,
   Topology,
 } from '@netatlas/domain'
@@ -61,6 +62,8 @@ export interface InMemoryDataset {
   readonly topologies?: readonly Topology[]
   /** Datasheets por dispositivo (F2-Documentación). */
   readonly datasheets?: readonly Datasheet[]
+  /** Imágenes por dispositivo (foto en Resumen, F2-Fotos). */
+  readonly images?: readonly DeviceImage[]
 }
 
 /** Contrato de atributos (EAV §9.4) para las vistas — sin acoplar a @netatlas/data. */
@@ -434,6 +437,11 @@ export class InMemorySourcingRepository implements SourcingRepository {
   /** Datasheets de un dispositivo por slug (pestaña Documentación, F2). */
   async datasheetsForDevice(deviceSlug: string): Promise<readonly Datasheet[]> {
     return (this.data.datasheets ?? []).filter((f) => f.deviceSlug === deviceSlug)
+  }
+
+  /** Imágenes del dispositivo (foto en Resumen, F2-Fotos). */
+  async imagesForDevice(deviceSlug: string): Promise<readonly DeviceImage[]> {
+    return (this.data.images ?? []).filter((g) => g.deviceSlug === deviceSlug)
   }
 }
 

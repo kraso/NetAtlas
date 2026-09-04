@@ -137,3 +137,18 @@ body {
   border: 1px dashed var(--border-strong);
   border-radius: var(--radius-md);
 }
+
+/* Foto de producto en Resumen (F2-Fotos): acotada y con pie. */
+.foto-producto {
+  margin: 0 0 var(--space-4);
+}
+.foto-producto img {
+  display: block;
+  max-width: min(100%, 420px);
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+.foto-producto figcaption {
+  margin-top: var(--space-1);
+}

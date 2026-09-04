@@ -39,6 +39,7 @@ export interface SeedDevice {
   assertions?: { predicate: string; sourceSlug: string; confidence?: string; value?: unknown }[]
   relationships?: { predicate: string; objectType: string; objectSlug: string }[]
   datasheets?: { title: string; language?: string; url?: string; localPath?: string; sourceSlug: string }[]
+  images?: { kind: string; caption?: string; localPath?: string; url?: string; sourceSlug: string }[]
 }
 
 interface SeedCategory {

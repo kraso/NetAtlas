@@ -156,6 +156,15 @@ export interface SyncDatasheet {
   readonly sourceSlug: string
 }
 
+/** Imagen plana para el snapshot (F2-Fotos). */
+export interface SyncImage {
+  readonly kind: string
+  readonly caption?: string | undefined
+  readonly localPath?: string | undefined
+  readonly url?: string | undefined
+  readonly sourceSlug: string
+}
+
 /** Fuente documental plana para el snapshot. */
 export interface SyncSource {
   readonly slug: string
@@ -211,6 +220,7 @@ export interface SyncDeviceDetail {
   readonly assertions: readonly SyncAssertion[]
   readonly attributeValues: readonly { key: string; display: string }[]
   readonly datasheets: readonly SyncDatasheet[]
+  readonly images: readonly SyncImage[]
 }
 
 /** Réplica local del catálogo del servidor (misma interfaz que v1 local). */

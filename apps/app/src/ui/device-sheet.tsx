@@ -181,11 +181,13 @@ function useDeviceRelations(device: Device | undefined): {
   relaciones: readonly Relationship[]
   assertions: readonly Assertion[]
   fichas: readonly import('@netatlas/domain').Datasheet[]
+  imagenes: readonly import('@netatlas/domain').DeviceImage[]
   loading: boolean
 } {
   const [relaciones, setRelaciones] = React.useState<readonly Relationship[]>([])
   const [assertions, setAssertions] = React.useState<readonly Assertion[]>([])
   const [fichas, setFichas] = React.useState<readonly import('@netatlas/domain').Datasheet[]>([])
+  const [imagenes, setImagenes] = React.useState<readonly import('@netatlas/domain').DeviceImage[]>([])
   const [loading, setLoading] = React.useState(true)
 
   React.useEffect(() => {
@@ -200,11 +202,12 @@ function useDeviceRelations(device: Device | undefined): {
       const asr = await sourcing.assertionsForDevice(device.slug.value)
       setAssertions(asr)
       setFichas(await sourcing.datasheetsForDevice(device.slug.value))
+      setImagenes(await sourcing.imagesForDevice(device.slug.value))
       setLoading(false)
     })()
   }, [device])
 
-  return { relaciones, assertions, fichas, loading }
+  return { relaciones, assertions, fichas, imagenes, loading }
 }
 
 /** Carga los valores EAV del dispositivo (F3, pestaña Capacidades). */
@@ -306,7 +309,7 @@ function SimilaresComparar({
 }
 
 function PestanaContent({ device, pestaña }: { device: Device; pestaña: string }): React.JSX.Element {
-  const { relaciones, assertions, fichas, loading } = useDeviceRelations(device)
+  const { relaciones, assertions, fichas, imagenes, loading } = useDeviceRelations(device)
   const fabricante = useFabricante(device.manufacturerSlug)
   const { valores: atributos, loading: atributosLoading } = useDeviceAttributes(device)
   if (loading) return <p role="status">Cargando…</p>
@@ -325,6 +328,14 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
     case 'resumen':
       return (
         <div className="stack">
+          {imagenes.filter((g) => g.kind === 'frontal').slice(0, 1).map((g) => (
+            <figure key={g.localPath ?? g.url ?? g.caption ?? 'foto'} className="foto-producto">
+              <img src={g.url ?? `/${g.localPath ?? ''}`} alt={`Foto de ${device.name}`} loading="lazy" />
+              <figcaption className="guia-tecnica">
+                {g.caption ?? device.name} — {g.source.title}
+              </figcaption>
+            </figure>
+          ))}
           {esFichaEstructural(device.summary) ? (
             <p role="note" className="guia-tecnica" data-testid="ficha-estructural">
               Ficha estructural: dispositivo de referencia generado por importación asistida —

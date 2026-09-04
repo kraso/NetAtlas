@@ -15,6 +15,7 @@ import type { Device } from '@netatlas/domain'
 import {
   Assertion,
   Datasheet,
+  DeviceImage,
   Device as DeviceEntity,
   Manufacturer,
   Category,
@@ -308,6 +309,29 @@ export async function fetchDatasetRemoto(apiBase: string, fetchImpl: typeof fetc
   )
 
   // Datasheets (F2-Documentación): una fila inválida no tumba el pull.
+  const imagenes: DeviceImage[] = []
+  dispositivos.forEach((dev) => {
+    const det = detPorSlug.get(dev.slug.value)
+    if (!det) return
+    for (const g of det.images ?? []) {
+      try {
+        const fuente = fuentes.get(g.sourceSlug)
+        if (!fuente || (g.kind !== 'frontal' && g.kind !== 'trasera' && g.kind !== 'lateral' && g.kind !== 'interior' && g.kind !== 'panel')) continue
+        imagenes.push(
+          DeviceImage.create({
+            deviceSlug: dev.slug.value,
+            kind: g.kind,
+            caption: g.caption ?? undefined,
+            localPath: g.localPath ?? undefined,
+            url: g.url ?? undefined,
+            source: fuente,
+          }),
+        )
+      } catch {
+        // imagen inválida → descartar fila.
+      }
+    }
+  })
   const fichas: Datasheet[] = []
   dispositivos.forEach((dev) => {
     const det = detPorSlug.get(dev.slug.value)
@@ -346,6 +370,7 @@ export async function fetchDatasetRemoto(apiBase: string, fetchImpl: typeof fetc
     attributeDefinitions,
     deviceAttributeValues,
     datasheets: fichas,
+    images: imagenes,
   }
 }
 

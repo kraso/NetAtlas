@@ -134,6 +134,17 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
     })
     const deviceId = dao.deviceId(dev.slug)!
 
+    for (const imagen of dev.images ?? []) {
+      dao.addImage({
+        deviceSlug: dev.slug,
+        kind: imagen.kind,
+        caption: imagen.caption,
+        localPath: imagen.localPath,
+        url: imagen.url,
+        sourceSlug: imagen.sourceSlug,
+      })
+    }
+
     for (const ficha of dev.datasheets ?? []) {
       dao.addDatasheet({
         deviceSlug: dev.slug,

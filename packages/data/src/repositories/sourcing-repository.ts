@@ -1,5 +1,5 @@
 import type { SqliteDriver, SqlRow } from '../driver.js'
-import { Assertion, Datasheet, Source, isConfidence } from '@netatlas/domain'
+import { Assertion, Datasheet, DeviceImage, Source, isConfidence } from '@netatlas/domain'
 import type { Confidence, SourcingRepository } from '@netatlas/domain'
 
 /**
@@ -79,6 +79,41 @@ export class SqliteSourcingRepository implements SourcingRepository {
         language: String(r.language),
         url: r.url !== null ? String(r.url) : undefined,
         localPath: r.local_path !== null ? String(r.local_path) : undefined,
+        source: Source.create({
+          slug: String(r.source_slug),
+          kind: String(r.source_kind) as 'datasheet' | 'manual' | 'rfc' | 'ieee' | 'web-oficial' | 'libro' | 'terceros' | 'editorial',
+          publisher: r.source_publisher !== null ? String(r.source_publisher) : undefined,
+          title: String(r.source_title),
+          url: r.source_url !== null ? String(r.source_url) : undefined,
+          retrievedOn: r.source_retrieved !== null ? String(r.source_retrieved) : undefined,
+          authorityLevel: Number(r.source_authority) as 1 | 2 | 3 | 4,
+        }),
+      }),
+    )
+  }
+
+  /** Imágenes del dispositivo (join con fuente + hash de contenido). */
+  async imagesForDevice(deviceSlug: string): Promise<readonly DeviceImage[]> {
+    const rows = this.db
+      .prepare(
+        `SELECT g.kind, g.caption, g.local_path, g.url,
+                s.id AS source_id, s.slug AS source_slug, s.kind AS source_kind,
+                s.publisher AS source_publisher, s.title AS source_title, s.url AS source_url,
+                s.retrieved_on AS source_retrieved, s.authority_level AS source_authority
+         FROM image g
+         JOIN device d ON d.id = g.device_id
+         JOIN source s ON s.id = g.source_id
+         WHERE d.slug = ?
+         ORDER BY g.kind, g.caption`,
+      )
+      .all(deviceSlug) as SqlRow[]
+    return rows.map((r) =>
+      DeviceImage.create({
+        deviceSlug,
+        kind: String(r.kind) as 'photo' | 'diagram',
+        caption: r.caption !== null ? String(r.caption) : undefined,
+        localPath: r.local_path !== null ? String(r.local_path) : undefined,
+        url: r.url !== null ? String(r.url) : undefined,
         source: Source.create({
           slug: String(r.source_slug),
           kind: String(r.source_kind) as 'datasheet' | 'manual' | 'rfc' | 'ieee' | 'web-oficial' | 'libro' | 'terceros' | 'editorial',
