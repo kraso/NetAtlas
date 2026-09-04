@@ -16,6 +16,11 @@ import type { SeedDevice } from './lint.js'
  *     + nota 'datos asistidos; validar en F2' → la UI la muestra con insignia ámbar.
  *
  * Determinista (semilla) para reproducibilidad en CI.
+ *
+ * CONTRATO UI (opción 3): todo resumen generado empieza por
+ * 'Ficha de referencia estructural'. apps/app/src/ui/device-sheet.tsx lo usa
+ * como discriminador para la insignia «ficha estructural» — no cambiar el
+ * prefijo sin actualizar la UI (hay test en sqlite-integration.test.tsx).
  */
 
 const here = dirname(fileURLToPath(import.meta.url))

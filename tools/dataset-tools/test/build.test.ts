@@ -29,7 +29,7 @@ describe('dataset:build', () => {
     expect(result.deviceCount).toBeGreaterThanOrEqual(300) // seed hacia 300–500
     expect(result.assertionCount).toBeGreaterThan(0)
     expect(result.relationshipCount).toBeGreaterThan(0)
-    expect(result.schemaVersion).toBe(2)
+    expect(result.schemaVersion).toBe(3) // 0003_manufacturer_snmp (empresa SNMP)
   })
 
   it('persiste predicados, capas y FTS sincronizado', () => {

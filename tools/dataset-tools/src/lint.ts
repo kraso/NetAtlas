@@ -38,6 +38,7 @@ export interface SeedDevice {
   ports?: { label: string; interfaceCode: string; quantity: number; speedsMbps: number[]; poeStandard?: string; role?: string }[]
   assertions?: { predicate: string; sourceSlug: string; confidence?: string; value?: unknown }[]
   relationships?: { predicate: string; objectType: string; objectSlug: string }[]
+  datasheets?: { title: string; language?: string; url?: string; localPath?: string; sourceSlug: string }[]
 }
 
 interface SeedCategory {
@@ -51,6 +52,7 @@ interface SeedCategory {
 interface SeedManufacturer {
   slug: string
   name: string
+  snmpEnterprise?: number
   country?: string
   website?: string
   status?: string

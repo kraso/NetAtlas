@@ -52,6 +52,7 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
       name: mfr.name,
       country: mfr.country,
       website: mfr.website,
+      snmpEnterprise: (mfr as { snmpEnterprise?: number }).snmpEnterprise,
     })
   }
   for (const src of seed.sources) {
@@ -133,6 +134,17 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
     })
     const deviceId = dao.deviceId(dev.slug)!
 
+    for (const ficha of dev.datasheets ?? []) {
+      dao.addDatasheet({
+        deviceSlug: dev.slug,
+        title: ficha.title,
+        language: ficha.language,
+        url: ficha.url,
+        localPath: ficha.localPath,
+        sourceSlug: ficha.sourceSlug,
+      })
+    }
+
     for (const port of dev.ports ?? []) {
       dao.addPort({
         deviceSlug: dev.slug,
@@ -171,6 +183,13 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
       }
     }
 
+  }
+
+  // ── Aristas explícitas del seed (SEGUNDA PASADA): el objeto puede
+  //    declararse DESPUÉS que su sujeto en devices.json; en una sola pasada
+  //    esas referencias futuras se perdían en silencio (p.ej. 2930F→2920).
+  for (const dev of seed.devices) {
+    const deviceId = dao.deviceId(dev.slug)!
     for (const rel of dev.relationships ?? []) {
       const spec = findPredicate(rel.predicate)
       if (!spec) continue
@@ -191,6 +210,14 @@ export function buildSeedDatabase(seedDir: string, outPath: string): {
   // Las facetas numéricas salen de las claves de assertion existentes en cada
   // categoría; 'stackable' se deriva de puertos de rol stack/resumen del seed.
   seedAttributes(dao, seed)
+
+  // ── Estándares derivados de inventario/protocolos (F2-asistido) ───────────
+  // implements-standard honesto-derivado (confidence=derived): cada puerto
+  // Ethernet implica IEEE 802.3, PoE su 802.3x, y cada protocolo con estándar
+  // canónico mapea a su RFC/IEEE. Trazable vía assertion + arista.
+  const derived = seedDerivedStandards(dao, seed)
+  assertionCount += derived.assertionCount
+  relationshipCount += derived.relationshipCount
 
   // ── Topologías de referencia (F4 / §13.3) ────────────────────────────────────
   seedTopologies(dao, driver)
@@ -429,5 +456,110 @@ function seedAttributes(
       })
       dao.setDeviceAttribute(dev.slug, 'stackable', apilable ? 'sí' : 'no')
     }
+
+    // Hechos de inventario computados (puertos curados → EAV honesto-derivado):
+    // todo dispositivo con puertos declara conteo total, uplinks y velocidad
+    // máxima. Sin puertos no se inventa nada (empty-state honesto).
+    const puertos = dev.ports ?? []
+    if (puertos.length > 0) {
+      const total = puertos.reduce((s, p) => s + (p.quantity ?? 0), 0)
+      const uplinks = puertos
+        .filter((p) => p.role === 'uplink')
+        .reduce((s, p) => s + (p.quantity ?? 0), 0)
+      const maxSpeed = Math.max(0, ...puertos.flatMap((p) => p.speedsMbps ?? []))
+      const inv = (key: string, labelEs: string, value: number, unit?: string): void => {
+        dao.defineAttribute({
+          categoryCode: dev.categoryCode,
+          key,
+          labelEs,
+          valueType: 'number',
+          unit,
+          isFacet: true,
+          isComparable: false,
+          compareRule: 'none',
+        })
+        dao.setDeviceAttribute(dev.slug, key, value)
+      }
+      inv('port_count', 'Puertos (inventario)', total)
+      inv('uplink_ports', 'Puertos uplink', uplinks)
+      if (maxSpeed > 0) inv('max_port_speed_mbps', 'Velocidad máxima de puerto', maxSpeed, 'Mbps')
+    }
   }
+}
+
+/**
+ * Estándares derivados (F2-asistido, confidence=derived): mapea protocolos con
+ * estándar canónico e interfaces/PoE a su implements-standard. Solo mapeos
+ * exactos (RFC/IEEE/ITU publicados); lo dudoso se omite, no se inventa.
+ */
+function seedDerivedStandards(
+  dao: CatalogDao,
+  seed: ReturnType<typeof loadSeed>,
+): { assertionCount: number; relationshipCount: number } {
+  const PROTOCOL_STANDARD: Record<string, string> = {
+    ospf: 'ietf/2328', bgp: 'ietf/4271', rip: 'ietf/2453', vrrp: 'ietf/5798',
+    dhcp: 'ietf/2131', dns: 'ietf/1035', snmp: 'ietf/3411', ntp: 'ietf/5905',
+    ssh: 'ietf/4253', radius: 'ietf/2865', netconf: 'ietf/6241', restconf: 'ietf/8040',
+    quic: 'ietf/9000', sctp: 'ietf/4960', bfd: 'ietf/5880',
+    ipsec: 'ietf/4301', vxlan: 'ietf/7348', 'vxlan-evpn': 'ietf/7348', geneve: 'ietf/8926',
+    profinet: 'pi/profinet', 'ethernet-ip': 'odva/ethernet-ip',
+    ethernet: 'ieee/802.3', gpon: 'itu-t/G.984', xgspon: 'itu-t/G.9807.1',
+    tsn: 'ieee/802.1Qbv', stp: 'ieee/802.1D', rstp: 'ieee/802.1w', mstp: 'ieee/802.1s',
+    lldp: 'ieee/802.1ab', lacp: 'ieee/802.1ax', '802.1x': 'ieee/802.1X', '802.1q': 'ieee/802.1Q',
+    ipv6: 'ietf/8200', tcp: 'ietf/793', udp: 'ietf/768', icmp: 'ietf/792', arp: 'ietf/826',
+    prp: 'iec/62439-3', hsr: 'iec/62439-3', 'iec-61850': 'iec/61850',
+    erps: 'itu-t/G.8032', otn: 'itu-t/G.709',
+    '802.11a': 'ieee/802.11', '802.11b': 'ieee/802.11', '802.11g': 'ieee/802.11',
+    '802.11n': 'ieee/802.11', '802.11ac': 'ieee/802.11', '802.11ax': 'ieee/802.11',
+    '802.11be': 'ieee/802.11', wpa2: 'ieee/802.11i', wpa3: 'ieee/802.11i',
+  }
+  const ETHERNET_IFACES = new Set(['rj45', 'sfp', 'sfp-plus', 'sfp56', 'qsfp-plus', 'qsfp28', 'qsfp56'])
+  let assertionCount = 0
+  let relationshipCount = 0
+  for (const dev of seed.devices) {
+    const refs = new Set<string>()
+    for (const assertion of dev.assertions ?? []) {
+      if (assertion.predicate === 'supports-protocol' && typeof assertion.value === 'string') {
+        const ref = PROTOCOL_STANDARD[assertion.value]
+        if (ref) refs.add(ref)
+      }
+    }
+    for (const port of dev.ports ?? []) {
+      if (ETHERNET_IFACES.has(port.interfaceCode)) refs.add('ieee/802.3')
+      if (port.poeStandard === '802.3af' || port.poeStandard === '802.3at' || port.poeStandard === '802.3bt') {
+        refs.add(`ieee/${port.poeStandard}`)
+      }
+      if (port.interfaceCode === 'gpon') refs.add('itu-t/G.984')
+    }
+    if (refs.size === 0) continue
+    const deviceId = dao.deviceId(dev.slug)!
+    // Omite estándares ya curados explícitamente en el seed (evita duplicar
+    // la arista y violar la unicidad de relationship).
+    const curados = new Set(dao.existingStandardRefs(deviceId))
+    for (const ref of [...refs].sort()) {
+      if (curados.has(ref)) continue
+      const assertionId = dao.addAssertion({
+        subjectType: 'device',
+        subjectId: deviceId,
+        predicate: 'implements-standard',
+        valueJson: JSON.stringify(ref),
+        sourceSlug: 'netatlas-assist',
+        confidence: 'derived',
+        verifiedOn: '2025-02-10',
+        author: 'curator-seed',
+        reviewedBy: 'reviewer-seed',
+      })
+      assertionCount++
+      dao.addRelationship({
+        subjectType: 'device',
+        subjectId: deviceId,
+        predicate: 'implements-standard',
+        objectType: 'standard',
+        objectId: dao.standardId(ref),
+        assertionId,
+      })
+      relationshipCount++
+    }
+  }
+  return { assertionCount, relationshipCount }
 }

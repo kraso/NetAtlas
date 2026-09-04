@@ -110,5 +110,6 @@
   { "org": "wi-fi-alliance", "identifier": "wifi-6", "title": "Wi-Fi 6 certification (802.11ax)", "version": "2019", "publishedOn": "2019-09-01", "status": "active" },
   { "org": "wi-fi-alliance", "identifier": "wifi-7", "title": "Wi-Fi 7 certification (802.11be)", "version": "2024", "publishedOn": "2024-01-01", "status": "active" },
   { "org": "odva", "identifier": "ethernet-ip", "title": "EtherNet/IP (CIP on Ethernet)", "version": "2023", "publishedOn": "2023-01-01", "status": "active" },
-  { "org": "pi", "identifier": "profinet", "title": "PROFINET IO", "version": "2023", "publishedOn": "2023-01-01", "status": "active" }
+  { "org": "pi", "identifier": "profinet", "title": "PROFINET IO", "version": "2023", "publishedOn": "2023-01-01", "status": "active" },
+  { "org": "itu-t", "identifier": "V.90", "title": "V.90 — Módem digital 56k (par módem digital/analógico en RTB)", "version": "1998", "publishedOn": "1998-09-25", "status": "active" }
 ]

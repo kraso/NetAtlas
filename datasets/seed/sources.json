@@ -85,6 +85,15 @@
     "authorityLevel": 1
   },
   {
+    "slug": "librenms-fixtures",
+    "kind": "terceros",
+    "publisher": "LibreNMS",
+    "title": "LibreNMS OS test fixtures (capturas SNMP reales de dispositivos)",
+    "url": "https://github.com/librenms/librenms/tree/master/tests/data",
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 3
+  },
+  {
     "slug": "netatlas-assist",
     "kind": "editorial",
     "publisher": "Equipo NetAtlas (importación asistida)",
@@ -260,9 +269,9 @@
     "slug": "netgear-gs324tp-spec",
     "kind": "datasheet",
     "publisher": "Netgear",
-    "title": "Netgear S350 GS324TP — 24-Port PoE+ Smart Switch datasheet",
-    "url": "https://www.netgear.com/business/wired/switches/smart-switches/gigabit-plus/gs324tp/",
-    "retrievedOn": "2025-11-12",
+    "title": "Netgear GS324TP — Soporte, manuales y firmware",
+    "url": "https://www.netgear.com/support/product/gs324tp",
+    "retrievedOn": "2026-09-04",
     "authorityLevel": 1
   },
   {

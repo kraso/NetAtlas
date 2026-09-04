@@ -89,6 +89,13 @@
         "sourceSlug": "cisco-cat2960x-datasheet",
         "confidence": "official",
         "note": "Datos públicos estables del datasheet 2960-X (DRAM/flash estándar del modelo 48LPD-L)."
+      },
+      {
+        "predicate": "snmp_sysobjectid",
+        "value": "1.3.6.1.4.1.9.1.1208",
+        "sourceSlug": "librenms-fixtures",
+        "confidence": "third-party",
+        "note": "sysObjectID de captura SNMP real (fixture LibreNMS ios_2960x); validar en F2."
       }
     ],
     "relationships": [
@@ -101,6 +108,19 @@
         "predicate": "implements-standard",
         "objectType": "standard",
         "objectSlug": "ieee/802.3at"
+      },
+      {
+        "predicate": "replaced-by",
+        "objectType": "device",
+        "objectSlug": "cisco-catalyst-9300-48p"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco Catalyst 2960-X Series Switches Data Sheet",
+        "language": "en",
+        "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-2960-x-series-switches/datasheet-c78-728091.html",
+        "sourceSlug": "cisco-cat2960x-datasheet"
       }
     ]
   },
@@ -206,11 +226,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "3"
-      },
+      }
+    ],
+    "datasheets": [
       {
-        "predicate": "succeeds",
-        "objectType": "device",
-        "objectSlug": "aruba-2920-48g"
+        "title": "Aruba 2930F Switch Series Data Sheet",
+        "language": "en",
+        "url": "https://www.arubanetworks.com/assets/ds/DS_2930F.pdf",
+        "sourceSlug": "aruba-2930f-datasheet"
       }
     ]
   },
@@ -306,6 +329,11 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "2"
+      },
+      {
+        "predicate": "replaced-by",
+        "objectType": "device",
+        "objectSlug": "aruba-2930f-48g-poeplus"
       }
     ]
   },
@@ -399,6 +427,13 @@
         "sourceSlug": "cisco-isr4321-datasheet",
         "confidence": "official",
         "note": "Datos estructurales del datasheet oficial (4 GB DRAM / 4 GB flash estándar del 4321)."
+      },
+      {
+        "predicate": "snmp_sysobjectid",
+        "value": "1.3.6.1.4.1.9.1.2093",
+        "sourceSlug": "librenms-fixtures",
+        "confidence": "third-party",
+        "note": "sysObjectID de captura SNMP real (fixture LibreNMS iosxe_isr4321); validar en F2."
       }
     ],
     "relationships": [
@@ -406,6 +441,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "3"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco 4000 Series ISR Data Sheet",
+        "language": "en",
+        "url": "https://www.cisco.com/c/en/us/products/collateral/routers/4000-series-integrated-services-routers-isr/datasheet-c78-732543.html",
+        "sourceSlug": "cisco-isr4321-datasheet"
       }
     ]
   },
@@ -504,6 +547,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "3"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "hEX S (RB760iGS) — Product specifications",
+        "language": "en",
+        "url": "https://mikrotik.com/product/hex_s",
+        "sourceSlug": "mikrotik-hex-s-spec"
       }
     ]
   },
@@ -790,6 +841,14 @@
         "objectType": "layer",
         "objectSlug": "2"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "SURFboard SB6121 DOCSIS 3.0 Cable Modem — Data Sheet",
+        "language": "en",
+        "url": "https://gditechnology.com/manuals/Motorola-SB6121_Data_Sheet.pdf",
+        "sourceSlug": "motorola-sb6121-datasheet"
+      }
     ]
   },
   {
@@ -860,6 +919,13 @@
         "value": "ppp",
         "sourceSlug": "3com-hub-editorial",
         "confidence": "third-party"
+      },
+      {
+        "predicate": "implements-standard",
+        "value": "itu-t/V.90",
+        "sourceSlug": "usrobotics-56k-manual",
+        "confidence": "official",
+        "note": "56 kbit/s (V.90)"
       }
     ],
     "relationships": [
@@ -867,6 +933,11 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "2"
+      },
+      {
+        "predicate": "implements-standard",
+        "objectType": "standard",
+        "objectSlug": "itu-t/V.90"
       }
     ]
   },
@@ -952,6 +1023,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "4"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "FortiGate 100F and 101F fast path architecture (FortiOS 7.6.7)",
+        "language": "en",
+        "url": "https://docs.fortinet.com/document/fortigate/7.6.7/hardware-acceleration/47902/fortigate-100f-and-101f-fast-path-architecture",
+        "sourceSlug": "fortinet-fg100f-docs"
       }
     ]
   },
@@ -1098,6 +1177,14 @@
         "objectSlug": "cisco-catalyst-9300-48p",
         "assertionSource": "cisco-sfp-10g-sr-datasheet"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco 10GBASE SFP+ Modules Data Sheet",
+        "language": "en",
+        "url": "https://www.cisco.com/c/en/us/products/collateral/interfaces-modules/transceiver-modules/datasheet-c78-455693.html",
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet"
+      }
     ]
   },
   {
@@ -1169,6 +1256,14 @@
         "objectType": "device",
         "objectSlug": "arista-7050sx-64",
         "assertionSource": "fs-sfp-10g-lr-datasheet"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "FS SFP-10GLR-31 — 10GBASE-LR SFP+ transceiver datasheet",
+        "language": "en",
+        "url": "https://www.fs.com/products/100032.html",
+        "sourceSlug": "fs-sfp-10g-lr-datasheet"
       }
     ]
   },
@@ -1341,6 +1436,14 @@
         "objectType": "device",
         "objectSlug": "cisco-catalyst-4000"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco Catalyst 6500 Series Switches Data Sheet (Supervisor Engine)",
+        "language": "en",
+        "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-6500-series-switches/product_data_sheet0900aecd804a85b4.html",
+        "sourceSlug": "cisco-cat6500-datasheet"
+      }
     ]
   },
   {
@@ -1416,12 +1519,20 @@
         "objectType": "layer",
         "objectSlug": "3"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco Catalyst 4000 Series Switches Data Sheet (Supervisor Engine)",
+        "language": "en",
+        "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-4000-series-switches/product_data_sheet0900aecd80192b01.html",
+        "sourceSlug": "cisco-cat4000-datasheet"
+      }
     ]
   },
   {
     "slug": "genesis-switch-ethernet",
     "name": "Primer switch Ethernet (Kalpana EIFO)",
-    "manufacturerSlug": "3com",
+    "manufacturerSlug": "cisco",
     "familySlug": "kalpana",
     "categoryCode": "CAT-SWT-L2",
     "model": "EIFO-8",
@@ -1574,12 +1685,20 @@
         "objectType": "standard",
         "objectSlug": "ieee/802.3at"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco NCS 5500 Series Data Sheet (Silicon One / Jericho)",
+        "language": "en",
+        "url": "https://www.cisco.com/c/en/us/products/collateral/routers/network-convergence-system-5500-series/datasheet-c78-737226.html",
+        "sourceSlug": "cisco-ncs5500-datasheet"
+      }
     ]
   },
   {
     "slug": "nvidia-connectx-6-dx",
     "name": "NVIDIA ConnectX-6 Dx (SmartNIC 100G)",
-    "manufacturerSlug": "ubiquiti",
+    "manufacturerSlug": "nvidia",
     "familySlug": "connectx-6",
     "categoryCode": "CAT-IFC",
     "model": "MCX623106AN-CDAT",
@@ -1615,14 +1734,14 @@
       {
         "predicate": "max_speed_mbps",
         "value": 100000,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "netatlas-assist",
         "confidence": "third-party",
         "note": "Dato de puerto mensual; pendiente fuente oficial"
       },
       {
         "predicate": "supports-protocol",
         "value": "roce",
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "netatlas-assist",
         "confidence": "third-party"
       },
       {
@@ -1654,6 +1773,11 @@
         "objectType": "device",
         "objectSlug": "arista-7050sx-64",
         "assertionSource": "nvidia-connectx6-dx-datasheet"
+      },
+      {
+        "predicate": "succeeds",
+        "objectType": "device",
+        "objectSlug": "nvidia-connectx-5"
       }
     ]
   },
@@ -1740,6 +1864,13 @@
         "sourceSlug": "cisco-cat9300-datasheet",
         "confidence": "official",
         "note": "Arquitectura UADP 2.0 y plano de control del datasheet oficial; DRAM/flash concretas del SKU pendientes de verificación."
+      },
+      {
+        "predicate": "snmp_sysobjectid",
+        "value": "1.3.6.1.4.1.9.1.2494",
+        "sourceSlug": "librenms-fixtures",
+        "confidence": "third-party",
+        "note": "sysObjectID de captura SNMP real (fixture LibreNMS iosxe_c9300); validar en F2."
       }
     ],
     "relationships": [
@@ -1747,6 +1878,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "3"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco Catalyst 9300 Series Switches Data Sheet (UADP 2.0 ASIC)",
+        "language": "en",
+        "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-9300-series-switches/datasheet-c78-742519.html",
+        "sourceSlug": "cisco-cat9300-datasheet"
       }
     ]
   },
@@ -1841,6 +1980,14 @@
         "objectType": "layer",
         "objectSlug": "3"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Arista 7050SX Series Datasheet (7050SX-64)",
+        "language": "en",
+        "url": "https://www.arista.com/assets/data/pdf/Datasheets/7050SX-128_64_Datasheet.pdf",
+        "sourceSlug": "arista-7050sx-datasheet"
+      }
     ]
   },
   {
@@ -1931,6 +2078,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "4"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "FortiGate 200F Series Data Sheet + Hardware acceleration (FortiOS 7.6.2)",
+        "language": "en",
+        "url": "https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture",
+        "sourceSlug": "fortinet-fg200f-datasheet"
       }
     ]
   },
@@ -2201,6 +2356,14 @@
         "objectType": "layer",
         "objectSlug": "2"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "CRS328-24P-4S+RM — Product specifications",
+        "language": "en",
+        "url": "https://mikrotik.com/product/crs328_24p_4s_rm",
+        "sourceSlug": "mikrotik-crs328-spec"
+      }
     ]
   },
   {
@@ -2282,6 +2445,14 @@
         "objectType": "layer",
         "objectSlug": "2"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "EX2300 Ethernet Switch Datasheet",
+        "language": "en",
+        "url": "https://www.juniper.net/gb/en/products/switches/ex-series/ex2300-ethernet-switch-datasheet.html",
+        "sourceSlug": "juniper-ex2300-datasheet"
+      }
     ]
   },
   {
@@ -2362,6 +2533,13 @@
         "sourceSlug": "aruba-2930f-datasheet",
         "confidence": "third-party",
         "note": "Aruba 6300M: switching capacity 2.9 Tbps (serie AOS-CX); cifra del datasheet de la serie 6300."
+      },
+      {
+        "predicate": "snmp_sysobjectid",
+        "value": "1.3.6.1.4.1.47196.4.1.1.1.100",
+        "sourceSlug": "librenms-fixtures",
+        "confidence": "third-party",
+        "note": "sysObjectID de captura SNMP real (fixture LibreNMS arubaos-cx_6300m); validar en F2."
       }
     ],
     "relationships": [
@@ -2369,6 +2547,11 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "3"
+      },
+      {
+        "predicate": "succeeds",
+        "objectType": "device",
+        "objectSlug": "aruba-2930f-48g-poeplus"
       }
     ]
   },
@@ -2475,6 +2658,14 @@
         "objectType": "medium",
         "objectSlug": "wifi-6"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Archer AX55 — AX3000 Wi-Fi 6 Router specs",
+        "language": "en",
+        "url": "https://www.tp-link.com/us/home-networking/wifi-router/archer-ax55/",
+        "sourceSlug": "tplink-archer-ax55-spec"
+      }
     ]
   },
   {
@@ -2575,6 +2766,14 @@
         "objectType": "layer",
         "objectSlug": "2"
       }
+    ],
+    "datasheets": [
+      {
+        "title": "Netgear GS324TP — Soporte, manuales y firmware",
+        "language": "en",
+        "url": "https://www.netgear.com/support/product/gs324tp",
+        "sourceSlug": "netgear-gs324tp-spec"
+      }
     ]
   },
   {
@@ -2655,6 +2854,228 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "2"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Siemens SCALANCE XC206-2 — Industrial Ethernet Switch data sheet",
+        "language": "en",
+        "url": "https://support.industry.siemens.com/cs/document/109740669/scalance-xc-206-2",
+        "sourceSlug": "siemens-scalance-xc206-2-datasheet"
+      }
+    ]
+  },
+  {
+    "slug": "nvidia-connectx-5",
+    "name": "NVIDIA ConnectX-5 (100GbE/EDR)",
+    "manufacturerSlug": "nvidia",
+    "familySlug": "connectx-5",
+    "categoryCode": "CAT-IFC",
+    "releasedOn": "2017-01-01",
+    "lifecycleStatus": "mature",
+    "summary": "Adaptador 100GbE/InfiniBand EDR PCIe Gen3/Gen4, antecesor del ConnectX-6 Dx.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "transparent": [
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "2x 100GE QSFP28",
+        "interfaceCode": "qsfp28",
+        "quantity": 2,
+        "speedsMbps": [
+          100000
+        ],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "ethernet",
+        "sourceSlug": "netatlas-assist",
+        "confidence": "third-party",
+        "note": "datos asistidos de familia; validar en F2"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "roce",
+        "sourceSlug": "netatlas-assist",
+        "confidence": "third-party",
+        "note": "datos asistidos de familia; validar en F2"
+      },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "summary": "Adaptador monolitico 100GbE/InfiniBand EDR: el ASIC ConnectX-5 descarga RDMA/RoCEv2, SR-IOV y DPDK; gestionado por el host (sin CPU de proposito general).",
+          "soc": {
+            "family": "ASIC Mellanox ConnectX-5 (MT27800)",
+            "note": "PCIe Gen3 x16, 2x 100GbE o EDR InfiniBand en un solo chip"
+          },
+          "networkProcessors": [
+            "ASIC Mellanox ConnectX-5"
+          ]
+        },
+        "sourceSlug": "netatlas-assist",
+        "confidence": "third-party",
+        "note": "datos asistidos de familia; validar en F2"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      }
+    ]
+  },
+  {
+    "slug": "nvidia-connectx-7",
+    "name": "NVIDIA ConnectX-7 (400GbE/NDR)",
+    "manufacturerSlug": "nvidia",
+    "familySlug": "connectx-7",
+    "categoryCode": "CAT-IFC",
+    "releasedOn": "2022-01-01",
+    "lifecycleStatus": "current",
+    "summary": "Adaptador 400GbE/InfiniBand NDR PCIe Gen5, sucesor del ConnectX-6 Dx.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "transparent": [
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "2x 400GE QSFP",
+        "interfaceCode": "qsfp56",
+        "quantity": 2,
+        "speedsMbps": [
+          400000
+        ],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "ethernet",
+        "sourceSlug": "netatlas-assist",
+        "confidence": "third-party",
+        "note": "datos asistidos de familia; validar en F2"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "roce",
+        "sourceSlug": "netatlas-assist",
+        "confidence": "third-party",
+        "note": "datos asistidos de familia; validar en F2"
+      },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "summary": "Adaptador monolitico 400GbE/InfiniBand NDR: el ASIC ConnectX-7 descarga RDMA/RoCEv2, TLS/IPsec y telemetria; gestionado por el host (sin CPU de proposito general).",
+          "soc": {
+            "family": "ASIC NVIDIA ConnectX-7 (MT2892)",
+            "note": "PCIe Gen5 x16, 2x 400GbE o NDR InfiniBand en un solo chip"
+          },
+          "networkProcessors": [
+            "ASIC NVIDIA ConnectX-7"
+          ]
+        },
+        "sourceSlug": "netatlas-assist",
+        "confidence": "third-party",
+        "note": "datos asistidos de familia; validar en F2"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      },
+      {
+        "predicate": "succeeds",
+        "objectType": "device",
+        "objectSlug": "nvidia-connectx-6-dx"
+      }
+    ]
+  },
+  {
+    "slug": "cisco-catalyst-3000",
+    "name": "Cisco Catalyst 3000 (Kalpana)",
+    "manufacturerSlug": "cisco",
+    "familySlug": "catalyst-3000",
+    "categoryCode": "CAT-SWT-L2",
+    "releasedOn": "1994-01-01",
+    "lifecycleStatus": "legacy",
+    "summary": "Sucesor del Kalpana EtherSwitch tras la adquisicion de Kalpana por Cisco (1994); primer Catalyst de acceso Ethernet.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "ethernet",
+        "sourceSlug": "kalpana-eifo-historical",
+        "confidence": "historical",
+        "note": "Ficha histórica documental; no hay datasheet digital conservado."
+      },
+      {
+        "predicate": "internal-architecture",
+        "value": {
+          "summary": "Conmutador de acceso heredado del diseño Kalpana EtherSwitch: conmutación MAC por hardware con CPU de gestión integrada de la época.",
+          "soc": {
+            "family": "Conmutador Kalpana/Cisco Catalyst 3000",
+            "note": "Evolución directa del EtherSwitch tras la adquisición de Kalpana (1994)"
+          },
+          "networkProcessors": [
+            "Conmutador Kalpana/Cisco Catalyst 3000"
+          ]
+        },
+        "sourceSlug": "kalpana-eifo-historical",
+        "confidence": "historical",
+        "note": "Ficha histórica documental; la CPU concreta no se conserva en fuentes públicas."
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      },
+      {
+        "predicate": "succeeds",
+        "objectType": "device",
+        "objectSlug": "genesis-switch-ethernet"
       }
     ]
   }
