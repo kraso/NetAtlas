@@ -751,8 +751,8 @@
       {
         "predicate": "supports-protocol",
         "value": "gpon",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "huawei-hg8245h-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
@@ -765,6 +765,27 @@
         "value": "dhcp",
         "sourceSlug": "3com-hub-editorial",
         "confidence": "third-party"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "802.11b",
+        "sourceSlug": "huawei-hg8245h-datasheet",
+        "confidence": "official",
+        "note": "IEEE 802.11 b/g/n, MIMO 2x2 (docs HG8245H)"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "802.11g",
+        "sourceSlug": "huawei-hg8245h-datasheet",
+        "confidence": "official",
+        "note": "IEEE 802.11 b/g/n, MIMO 2x2 (docs HG8245H)"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "802.11n",
+        "sourceSlug": "huawei-hg8245h-datasheet",
+        "confidence": "official",
+        "note": "IEEE 802.11 b/g/n, MIMO 2x2 (docs HG8245H)"
       }
     ],
     "relationships": [
@@ -772,6 +793,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "2"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Huawei EchoLife HG8245H GPON Terminal (brochure + data sheet)",
+        "language": "en",
+        "sourceSlug": "huawei-hg8245h-datasheet",
+        "localPath": "docs/huawei-echolife-hg8245h-brochure-datasheet.pdf"
       }
     ]
   },
@@ -2215,7 +2244,7 @@
     "model": "U6-LR",
     "releasedOn": "2021-01-01",
     "lifecycleStatus": "current",
-    "summary": "AP indoor Wi-Fi 6 (802.11ax) 4x4, dual banda, PoE++ (802.3bt), 500+ clientes.",
+    "summary": "AP interior Wi-Fi 6 (802.11ax) 4x4, doble banda, PoE+ (802.3at), 350+ clientes.",
     "osiProfile": {
       "terminate": [
         1,
@@ -2238,7 +2267,7 @@
         "speedsMbps": [
           1000
         ],
-        "poeStandard": "802.3bt",
+        "poeStandard": "802.3at",
         "role": "uplink"
       }
     ],
@@ -2246,8 +2275,8 @@
       {
         "predicate": "wifi_standard",
         "value": "802.11ax",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "ubnt-u6lr-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "terminates-medium",
@@ -2273,8 +2302,8 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ax",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "ubnt-u6lr-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
@@ -2287,6 +2316,20 @@
         "value": "wpa3",
         "sourceSlug": "3com-hub-editorial",
         "confidence": "third-party"
+      },
+      {
+        "predicate": "max_clients",
+        "value": 350,
+        "sourceSlug": "ubnt-u6lr-datasheet",
+        "confidence": "official",
+        "note": "350+ clientes (tech specs U6-LR)"
+      },
+      {
+        "predicate": "throughput_gbps",
+        "value": 2.4,
+        "sourceSlug": "ubnt-u6lr-datasheet",
+        "confidence": "official",
+        "note": "2.4 Gbps en 5 GHz (BW160)"
       }
     ],
     "relationships": [
@@ -2294,6 +2337,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "2"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Ubiquiti Access Point U6 Long-Range (datasheet + tech specs)",
+        "language": "en",
+        "sourceSlug": "ubnt-u6lr-datasheet",
+        "localPath": "docs/Ubiquiti Access Point U6 Long-Range.pdf"
       }
     ]
   },
@@ -2529,35 +2580,37 @@
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "aruba-6300m-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
         "value": "vxlan",
-        "sourceSlug": "3com-hub-editorial",
-        "confidence": "third-party"
+        "sourceSlug": "aruba-6300m-datasheet",
+        "confidence": "official"
       },
       {
         "predicate": "internal-architecture",
         "value": {
-          "cpu": "CPU de gestión de la plataforma ArubaOS-CX (plano de control)",
+          "summary": "Conmutador multicapa con ASIC Aruba Gen7 programable no bloqueante y Network Analytics Engine; apilable por VSF hasta 10 equipos.",
           "soc": {
-            "family": "SoC de conmutación Aruba 6300 (ASIC de reenvío + CPU)",
-            "note": "Serie AOS-CX con uplinks SFP56 50G y VSF; el datasheet no publica el modelo del ASIC"
+            "family": "ASIC Aruba Gen7",
+            "note": "Arquitectura programable con telemetría integrada (NAE); plano de control ArubaOS-CX"
           },
-          "summary": "Switch de acceso/apilado ArubaOS-CX: plano de datos a wire-rate en el ASIC de conmutación (con uplinks 50G SFP56 y stacking VSF) y CPU de gestión para el plano de control L2/L3."
+          "networkProcessors": [
+            "ASIC Aruba Gen7"
+          ]
         },
-        "sourceSlug": "aruba-2930f-datasheet",
-        "confidence": "experimental",
-        "note": "Arquitectura AOS-CX (ASIC + CPU de gestión); modelo del ASIC no publicado."
+        "sourceSlug": "aruba-6300m-datasheet",
+        "confidence": "official",
+        "note": "Hoja JL663A: Gen7 ASIC, VSF hasta 10"
       },
       {
         "predicate": "throughput_gbps",
-        "value": 2900,
-        "sourceSlug": "aruba-2930f-datasheet",
-        "confidence": "third-party",
-        "note": "Aruba 6300M: switching capacity 2.9 Tbps (serie AOS-CX); cifra del datasheet de la serie 6300."
+        "value": 880,
+        "sourceSlug": "aruba-6300m-datasheet",
+        "confidence": "official",
+        "note": "880 Gbps switching capacity (JL663A)"
       },
       {
         "predicate": "snmp_sysobjectid",
@@ -2565,6 +2618,20 @@
         "sourceSlug": "librenms-fixtures",
         "confidence": "third-party",
         "note": "sysObjectID de captura SNMP real (fixture LibreNMS arubaos-cx_6300m); validar en F2."
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "bgp",
+        "sourceSlug": "aruba-6300m-datasheet",
+        "confidence": "official",
+        "note": "JL663A: BGP/EVPN/VXLAN/OSPF de capa 3"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "vxlan-evpn",
+        "sourceSlug": "aruba-6300m-datasheet",
+        "confidence": "official",
+        "note": "JL663A: BGP/EVPN/VXLAN/OSPF de capa 3"
       }
     ],
     "relationships": [
@@ -2577,6 +2644,14 @@
         "predicate": "succeeds",
         "objectType": "device",
         "objectSlug": "aruba-2930f-48g-poeplus"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "HPE Aruba Networking 6300M 48-Port 1GbE + 4 SFP56 (JL663A) data sheet",
+        "language": "en",
+        "sourceSlug": "aruba-6300m-datasheet",
+        "localPath": "docs/HPE Aruba Networking 6300M 48-Port.pdf"
       }
     ]
   },

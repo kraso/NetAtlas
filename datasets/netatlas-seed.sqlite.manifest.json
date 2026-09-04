@@ -6,13 +6,13 @@
   "publishedOn": "2026-09-04",
   "counts": {
     "dispositivos": 333,
-    "relaciones": 2121,
-    "assertions": 2145,
+    "relaciones": 2128,
+    "assertions": 2154,
     "protocolos": 118,
     "categorias": 26,
     "topologias": 3
   },
-  "sha256": "ebe8c69c307f7c495e65a0e81667851db07a8010669ccf153f313f3ab063bde6",
+  "sha256": "12605bb6b814acb595755fc230691653a20ce04e367eecd1ff1de6d6f743cf6b",
   "changelog": [
     "dataset:build regenerado (2026-09-04)"
   ]

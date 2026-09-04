@@ -284,6 +284,33 @@
     "authorityLevel": 1
   },
   {
+    "slug": "aruba-6300m-datasheet",
+    "kind": "datasheet",
+    "publisher": "Aruba Networks (HPE)",
+    "title": "HPE Aruba Networking 6300M 48-Port 1GbE + 4 SFP56 (JL663A) data sheet",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "huawei-hg8245h-datasheet",
+    "kind": "datasheet",
+    "publisher": "Huawei",
+    "title": "Huawei EchoLife HG8245H GPON Terminal (brochure + data sheet)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "ubnt-u6lr-datasheet",
+    "kind": "datasheet",
+    "publisher": "Ubiquiti",
+    "title": "Ubiquiti Access Point U6 Long-Range (datasheet + tech specs)",
+    "url": null,
+    "retrievedOn": "2026-09-04",
+    "authorityLevel": 1
+  },
+  {
     "slug": "aruba-ap515-datasheet",
     "kind": "datasheet",
     "publisher": "Aruba Networks (HPE)",
