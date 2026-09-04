@@ -59,6 +59,13 @@ describe('Manufacturer / ProductFamily', () => {
     ).toThrow()
   })
 
+  it('acepta empresa SNMP válida y rechaza inválida', () => {
+    expect(Manufacturer.create({ slug: 'cisco', name: 'Cisco', snmpEnterprise: 9 }).snmpEnterprise).toBe(9)
+    expect(Manufacturer.create({ slug: 'x', name: 'X' }).snmpEnterprise).toBeUndefined()
+    expect(() => Manufacturer.create({ slug: 'x', name: 'X', snmpEnterprise: 0 })).toThrow()
+    expect(() => Manufacturer.create({ slug: 'x', name: 'X', snmpEnterprise: 1.5 })).toThrow()
+  })
+
   it('construye familia con clave natural (manufacturer, slug)', () => {
     const f = ProductFamily.create({ manufacturerSlug: 'aruba', slug: '2930F', name: 'Aruba 2930F' })
     expect(f.manufacturerSlug).toBe('aruba')

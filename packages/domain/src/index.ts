@@ -19,6 +19,8 @@ export type { LifecycleStatus } from './value-objects/lifecycle.js'
 // Sourcing (sección 20)
 export { Source, Assertion, CONFIDENCE_LEVELS, isConfidence } from './sourcing/assertion.js'
 export type { SourceProps, AssertionProps, Confidence } from './sourcing/assertion.js'
+export { Datasheet } from './sourcing/datasheet.js'
+export type { DatasheetProps } from './sourcing/datasheet.js'
 
 // Grafo (sección 8.3)
 export {
@@ -164,6 +166,15 @@ export type {
   OutboxRepository,
   SyncServer,
   SyncDevice,
+  SyncDeviceDetail,
+  SyncPort,
+  SyncDeviceRelation,
+  SyncAssertion,
+  SyncDatasheet,
+  SyncSource,
+  SyncAttributeDefinition,
+  SyncAttributeValue,
+  SyncCatalogs,
   ReplicaRepository,
   SyncResultado,
 } from './sync/index.js'

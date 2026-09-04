@@ -1,4 +1,5 @@
 import type { Assertion, Source } from '../sourcing/assertion.js'
+import type { Datasheet } from '../sourcing/datasheet.js'
 
 /**
  * Puerto SourcingRepository (sección 20.2).
@@ -13,4 +14,6 @@ export interface SourcingRepository {
   assertionsForDevice(slug: string): Promise<readonly Assertion[]>
   /** Fuente por slug (para resolver referencias desde assertions). */
   sourceBySlug(slug: string): Promise<Source | undefined>
+  /** Datasheets de un dispositivo por slug (pestaña Documentación, F2). */
+  datasheetsForDevice(deviceSlug: string): Promise<readonly Datasheet[]>
 }
