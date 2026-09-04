@@ -483,6 +483,20 @@
         "url": "https://www.cisco.com/c/en/us/products/collateral/routers/4000-series-integrated-services-routers-isr/datasheet-c78-732543.html",
         "sourceSlug": "cisco-isr4321-datasheet"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "ISR 4321 (frontal rotulado 4300 Series, render oficial)",
+        "localPath": "assets/img/cisco-isr-4321-frontal.webp",
+        "sourceSlug": "cisco-isr4321-datasheet"
+      },
+      {
+        "kind": "trasera",
+        "caption": "ISR 4321 trasera rotulada CISCO 4321 (con alimentador externo)",
+        "localPath": "assets/img/cisco-isr-4321-trasera.webp",
+        "sourceSlug": "cisco-isr4321-datasheet"
+      }
     ]
   },
   {
@@ -587,6 +601,14 @@
         "title": "hEX S (RB760iGS) — Product specifications",
         "language": "en",
         "url": "https://mikrotik.com/product/hex_s",
+        "sourceSlug": "mikrotik-hex-s-spec"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "hEX S (RB760iGS) con 5xRJ45 y SFP",
+        "localPath": "assets/img/mikrotik-hex-s-frontal.jpg",
         "sourceSlug": "mikrotik-hex-s-spec"
       }
     ]
@@ -2576,6 +2598,14 @@
         "url": "https://mikrotik.com/product/crs328_24p_4s_rm",
         "sourceSlug": "mikrotik-crs328-spec"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "CRS328-24P-4S+RM frontal rotulado",
+        "localPath": "assets/img/mikrotik-crs328-24p-frontal.jpg",
+        "sourceSlug": "mikrotik-crs328-spec"
+      }
     ]
   },
   {
@@ -2663,6 +2693,14 @@
         "title": "EX2300 Ethernet Switch Datasheet",
         "language": "en",
         "url": "https://www.juniper.net/gb/en/products/switches/ex-series/ex2300-ethernet-switch-datasheet.html",
+        "sourceSlug": "juniper-ex2300-datasheet"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Juniper EX2300-48P PoE+ frontal 48P",
+        "localPath": "assets/img/juniper-ex2300-48p-frontal.jpg",
         "sourceSlug": "juniper-ex2300-datasheet"
       }
     ]
@@ -3113,6 +3151,14 @@
         "title": "Siemens SCALANCE XC206-2 — Industrial Ethernet Switch data sheet",
         "language": "en",
         "url": "https://support.industry.siemens.com/cs/document/109740669/scalance-xc-206-2",
+        "sourceSlug": "siemens-scalance-xc206-2-datasheet"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "SCALANCE XC206-2 en carril DIN (6xRJ45 + 2xFX)",
+        "localPath": "assets/img/siemens-scalance-xc206-2-frontal.webp",
         "sourceSlug": "siemens-scalance-xc206-2-datasheet"
       }
     ]
@@ -3712,6 +3758,14 @@
         "sourceSlug": "nvidia-connectx8-datasheet",
         "localPath": "docs/NVIDIA Model ConnectX-8 SuperNIC.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "ConnectX-8 SuperNIC (render oficial)",
+        "localPath": "assets/img/nvidia-connectx-8-frontal.jpeg",
+        "sourceSlug": "nvidia-connectx8-datasheet"
+      }
     ]
   },
   {
@@ -3797,6 +3851,14 @@
         "language": "en",
         "sourceSlug": "nvidia-connectx9-datasheet",
         "localPath": "docs/NVIDIA Model ConnectX-9 SuperNIC.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "ConnectX-9 SuperNIC con bracket (render oficial)",
+        "localPath": "assets/img/nvidia-connectx-9-frontal.jpeg",
+        "sourceSlug": "nvidia-connectx9-datasheet"
       }
     ]
   },
