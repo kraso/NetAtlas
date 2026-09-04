@@ -122,6 +122,14 @@
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-2960-x-series-switches/datasheet-c78-728091.html",
         "sourceSlug": "cisco-cat2960x-datasheet"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Cisco Catalyst 2960X-48PD frontal",
+        "localPath": "assets/img/cisco-catalyst-2960x-48lpd-l-frontal.jpg",
+        "sourceSlug": "cisco-cat2960x-datasheet"
+      }
     ]
   },
   {
@@ -827,6 +835,14 @@
         "sourceSlug": "huawei-hg8245h-datasheet",
         "localPath": "docs/huawei-echolife-hg8245h-brochure-datasheet.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Huawei HG8245H con alimentador",
+        "localPath": "assets/img/huawei-echolife-hg8245h-frontal.jpg",
+        "sourceSlug": "huawei-hg8245h-datasheet"
+      }
     ]
   },
   {
@@ -1121,6 +1137,14 @@
         "title": "FortiGate 100F and 101F fast path architecture (FortiOS 7.6.7)",
         "language": "en",
         "url": "https://docs.fortinet.com/document/fortigate/7.6.7/hardware-acceleration/47902/fortigate-100f-and-101f-fast-path-architecture",
+        "sourceSlug": "fortinet-fg100f-docs"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "FortiGate 100F frontal (USB, consola, 16xRJ45 + SFP)",
+        "localPath": "assets/img/fortinet-fortigate-100f-frontal.jpg",
         "sourceSlug": "fortinet-fg100f-docs"
       }
     ]
@@ -2317,6 +2341,14 @@
         "url": "https://techspecs.ui.com/unifi/cloud-gateways/udm-pro",
         "sourceSlug": "ubiquiti-techspecs"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "UDM-Pro con accesorios de montaje",
+        "localPath": "assets/img/ubiquiti-unifi-udm-pro-frontal.png",
+        "sourceSlug": "ubiquiti-techspecs"
+      }
     ]
   },
   {
@@ -2876,6 +2908,14 @@
         "title": "Archer AX55 — AX3000 Wi-Fi 6 Router specs",
         "language": "en",
         "url": "https://www.tp-link.com/us/home-networking/wifi-router/archer-ax55/",
+        "sourceSlug": "tplink-archer-ax55-spec"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "TP-Link Archer AX55 frontal (4 antenas)",
+        "localPath": "assets/img/tplink-archer-ax55-frontal.jpg",
         "sourceSlug": "tplink-archer-ax55-spec"
       }
     ]
