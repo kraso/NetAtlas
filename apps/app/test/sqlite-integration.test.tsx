@@ -35,10 +35,10 @@ describe('UI sobre SQLite real (Fase C)', () => {
     renderApp('/')
     // El catálogo real tiene las 26 categorías semillas
     expect(await screen.findByRole('link', { name: /Interconexión y switching/i })).toBeDefined()
-    // Conteo real: 341 (el número vive en un span mono separado)
-    const cuenta = await screen.findByText('341')
+    // Conteo real: 345 (el número vive en un span mono separado)
+    const cuenta = await screen.findByText('345')
     expect(cuenta.id).toBeDefined()
-    expect(cuenta.textContent).toBe('341')
+    expect(cuenta.textContent).toBe('345')
   })
 
   it('la ficha de un dispositivo del seed real muestra sus protocolos', async () => {

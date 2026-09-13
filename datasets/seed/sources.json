@@ -444,5 +444,41 @@
     "url": null,
     "retrievedOn": "2026-09-04",
     "authorityLevel": 1
+  },
+  {
+    "slug": "cisco-ie4000-datasheet",
+    "kind": "datasheet",
+    "publisher": "Cisco Systems",
+    "title": "Cisco Industrial Ethernet 4000 Series Switches Data Sheet",
+    "url": null,
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "usr5638-datasheet",
+    "kind": "datasheet",
+    "publisher": "U.S. Robotics",
+    "title": "USR 5638 V.92 PCIe Faxmodem Datasheet",
+    "url": null,
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "usr2980-datasheet",
+    "kind": "datasheet",
+    "publisher": "U.S. Robotics",
+    "title": "USR 2980-OEM V.92 Low Profile PCI Modem Datasheet",
+    "url": null,
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 1
+  },
+  {
+    "slug": "kalpana-eps2115-datasheet",
+    "kind": "datasheet",
+    "publisher": "Kalpana (Cisco Archive)",
+    "title": "Kalpana EPS-2115M EtherSwitch Data Sheet (1986)",
+    "url": null,
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 1
   }
 ]

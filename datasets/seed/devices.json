@@ -3473,6 +3473,11 @@
         "predicate": "succeeds",
         "objectType": "device",
         "objectSlug": "genesis-switch-ethernet"
+      },
+      {
+        "predicate": "succeeds",
+        "objectType": "device",
+        "objectSlug": "kalpana-eps-2115m"
       }
     ],
     "ports": [
@@ -4206,6 +4211,291 @@
         "language": "en",
         "sourceSlug": "belden-10gxe02-datasheet",
         "localPath": "docs/Belden Model 10GXE02.pdf"
+      }
+    ]
+  },
+  {
+    "slug": "cisco-ie-4000",
+    "name": "Cisco IE 4000 (Industrial Gigabit)",
+    "manufacturerSlug": "cisco",
+    "familySlug": "ie-4000",
+    "categoryCode": "CAT-IND",
+    "model": "IE-4000",
+    "lifecycleStatus": "mature",
+    "summary": "Switch industrial Gigabit DIN-rail: hasta 20 puertos GbE, PoE+ hasta 240W, dual ring design, -40 a 70°C, soporta PROFINET/EtherNet/IP/Modbus TCP.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "up to 16x 10/100/1000 TX",
+        "interfaceCode": "rj45",
+        "quantity": 16,
+        "speedsMbps": [
+          1000
+        ],
+        "role": "access"
+      },
+      {
+        "label": "4x Gigabit uplink SFP",
+        "interfaceCode": "sfp",
+        "quantity": 4,
+        "speedsMbps": [
+          1000
+        ],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "profinet",
+        "sourceSlug": "cisco-ie4000-datasheet",
+        "confidence": "official"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "ethernet-ip",
+        "sourceSlug": "cisco-ie4000-datasheet",
+        "confidence": "official"
+      },
+      {
+        "predicate": "supports-protocol",
+        "value": "modbus",
+        "sourceSlug": "cisco-ie4000-datasheet",
+        "confidence": "official"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Cisco Industrial Ethernet 4000 Series Switches Data Sheet",
+        "language": "en",
+        "sourceSlug": "cisco-ie4000-datasheet",
+        "localPath": "docs/Cisco Industrial Ethernet 4000 Series Switches.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Cisco IE 4000-8T4G-E industrial Gigabit",
+        "localPath": "assets/img/cisco-ie-4000-frontal.webp",
+        "sourceSlug": "cisco-ie4000-datasheet"
+      }
+    ]
+  },
+  {
+    "slug": "usrobotics-5638",
+    "name": "U.S. Robotics 5638 PCIe Faxmodem",
+    "manufacturerSlug": "usrobotics",
+    "familySlug": "56k-modems",
+    "categoryCode": "CAT-ACC-DIAL",
+    "model": "5638",
+    "lifecycleStatus": "legacy",
+    "summary": "Modem interno PCIe x1 V.92/V.90 con fax, compatible Windows/Linux, placa de perfil completo y bajo.",
+    "osiProfile": {
+      "terminate": [
+        1
+      ],
+      "transparent": [
+        2,
+        3
+      ],
+      "primary": 1
+    },
+    "ports": [
+      {
+        "label": "1x RJ11",
+        "interfaceCode": "rj11",
+        "quantity": 1,
+        "speedsMbps": [
+          0.056
+        ],
+        "role": "access"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "v.92",
+        "sourceSlug": "usr5638-datasheet",
+        "confidence": "official"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "1"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "USR 5638 V.92 PCIe Faxmodem Datasheet",
+        "language": "es",
+        "sourceSlug": "usr5638-datasheet",
+        "localPath": "docs/USR5638-es-datasheet.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "USR 5638 PCIe Faxmodem",
+        "localPath": "assets/img/usr5638-frontal.webp",
+        "sourceSlug": "usr5638-datasheet"
+      }
+    ]
+  },
+  {
+    "slug": "usrobotics-2980",
+    "name": "U.S. Robotics 2980 PCI Modem",
+    "manufacturerSlug": "usrobotics",
+    "familySlug": "56k-modems",
+    "categoryCode": "CAT-ACC-DIAL",
+    "model": "2980-OEM",
+    "lifecycleStatus": "legacy",
+    "summary": "Modem PCI low-profile V.92 basado en controlador, optimizado para POS/ATM con Fast Connect V.22.",
+    "osiProfile": {
+      "terminate": [
+        1
+      ],
+      "transparent": [
+        2,
+        3
+      ],
+      "primary": 1
+    },
+    "ports": [
+      {
+        "label": "2x RJ11",
+        "interfaceCode": "rj11",
+        "quantity": 2,
+        "speedsMbps": [
+          0.056
+        ],
+        "role": "access"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "v.92",
+        "sourceSlug": "usr2980-datasheet",
+        "confidence": "official"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "1"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "USR 2980-OEM V.92 Low Profile PCI Modem Datasheet",
+        "language": "en",
+        "sourceSlug": "usr2980-datasheet",
+        "localPath": "docs/USR2980-OEM & USR802981-OEM Datasheet.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "USR 2980-OEM PCI Modem (2xRJ11)",
+        "localPath": "assets/img/usr2980-frontal.webp",
+        "sourceSlug": "usr2980-datasheet"
+      }
+    ]
+  },
+  {
+    "slug": "kalpana-eps-2115m",
+    "name": "Kalpana EtherSwitch EPS-2115M",
+    "manufacturerSlug": "cisco",
+    "familySlug": "kalpana-etherswitch",
+    "categoryCode": "CAT-SWT-L2",
+    "model": "EPS-2115M",
+    "lifecycleStatus": "legacy",
+    "summary": "Primer switch Ethernet modular Kalpana (1986): 16 puertos 10BaseT + AUI, slots de expansión, predecesor del Catalyst 3000.",
+    "osiProfile": {
+      "terminate": [
+        1,
+        2
+      ],
+      "transparent": [
+        3,
+        4,
+        5,
+        6,
+        7
+      ],
+      "primary": 2
+    },
+    "ports": [
+      {
+        "label": "16x 10BaseT",
+        "interfaceCode": "rj45",
+        "quantity": 16,
+        "speedsMbps": [
+          10
+        ],
+        "role": "access"
+      },
+      {
+        "label": "1x AUI",
+        "interfaceCode": "aui",
+        "quantity": 1,
+        "speedsMbps": [
+          10
+        ],
+        "role": "uplink"
+      }
+    ],
+    "assertions": [
+      {
+        "predicate": "supports-protocol",
+        "value": "ethernet",
+        "sourceSlug": "kalpana-eifo-historical",
+        "confidence": "historical"
+      }
+    ],
+    "relationships": [
+      {
+        "predicate": "operates-at-layer",
+        "objectType": "layer",
+        "objectSlug": "2"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Kalpana EPS-2115M EtherSwitch Data Sheet (1986)",
+        "language": "en",
+        "sourceSlug": "kalpana-eps2115-datasheet"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Kalpana EPS-2115M EtherSwitch (16x10BaseT + AUI)",
+        "localPath": "assets/img/kalpana-eps-2115m-frontal.webp",
+        "sourceSlug": "kalpana-eps2115-datasheet"
       }
     ]
   }

@@ -5,14 +5,14 @@
   "schemaVersion": 3,
   "publishedOn": "2026-09-13",
   "counts": {
-    "dispositivos": 341,
-    "relaciones": 2162,
-    "assertions": 2188,
-    "protocolos": 118,
+    "dispositivos": 345,
+    "relaciones": 2177,
+    "assertions": 2198,
+    "protocolos": 119,
     "categorias": 26,
     "topologias": 3
   },
-  "sha256": "a30b298679f5f1741fca35487bfa154f20ee9349f05f1e57ef95be0f708d658c",
+  "sha256": "ecf029287889766422a70a175a310f212b7063a59ebe713d1126523aadb788f8",
   "changelog": [
     "dataset:build regenerado (2026-09-13)"
   ]

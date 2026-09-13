@@ -19,13 +19,13 @@ test.describe('Dataset E2E — NetAtlas real via API F8B (341 dispositivos)', ()
     await page.goto('/')
   })
 
-  test('dashboard muestra el dataset real (341 dispositivos · 26 categorías)', async ({ page }) => {
+  test('dashboard muestra el dataset real (345 dispositivos · 26 categorías)', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('NetAtlas')
 
     // dashboard.tsx: "Dataset de demostración: N dispositivos · M categorías."
     // El count se refresca reactivamente cuando el warmezo HTTP termina.
     const datasetLine = page.locator('.guia-tecnica', { hasText: /Dataset de demostración/ })
-    await expect(datasetLine).toContainText('341 dispositivos', { timeout: 15000 })
+    await expect(datasetLine).toContainText('345 dispositivos', { timeout: 15000 })
     await expect(datasetLine).toContainText('26 categorías')
   })
 
