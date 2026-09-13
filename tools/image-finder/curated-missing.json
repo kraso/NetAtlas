@@ -1,0 +1,14 @@
+[
+  { "slug": "aruba-ap-515",            "manufacturerSlug": "aruba",      "query": "Aruba AP-515 Wi-Fi 6 access point" },
+  { "slug": "usrobotics-sportster-56k", "manufacturerSlug": "usrobotics", "query": "US Robotics Sportster 56K modem" },
+  { "slug": "3com-officeconnect-hub-8", "manufacturerSlug": "3com",     "query": "3Com OfficeConnect Hub 8 port ethernet" },
+  { "slug": "utp-cat6a",              "manufacturerSlug": "tplink",     "query": "UTP Cat6A cable RJ45" },
+  { "slug": "smf-os2",                "manufacturerSlug": "tplink",     "query": "SMF OS2 single mode fiber optic cable" },
+  { "slug": "cisco-catalyst-4000",    "manufacturerSlug": "cisco",      "query": "Cisco Catalyst 4000 series switch" },
+  { "slug": "cisco-catalyst-3000",    "manufacturerSlug": "cisco",      "query": "Cisco Catalyst 3000 Kalpana switch" },
+  { "slug": "usrobotics-5686g",       "manufacturerSlug": "usrobotics", "query": "US Robotics 5686G 56K serial faxmodem" },
+  { "slug": "usrobotics-5686g-pro",   "manufacturerSlug": "usrobotics", "query": "US Robotics Courier Lite 5686G-PRO modem" },
+  { "slug": "panduit-tx6a-utp",       "manufacturerSlug": "panduit",    "query": "Panduit TX6A UTP 10Gig cable" },
+  { "slug": "belden-10gxe01",         "manufacturerSlug": "belden",     "query": "Belden 10GXE01 Cat6A F/FTP cable" },
+  { "slug": "belden-10gxe02",         "manufacturerSlug": "belden",     "query": "Belden 10GXE02 Cat6A S/FTP cable" }
+]

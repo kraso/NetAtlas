@@ -43,3 +43,6 @@ Thumbs.db
 # Archivos de log
 hardware-v1.md 
 hardware-v2.md
+SESION-*.md
+# Image finder temp files
+tools/image-finder/.tmp/

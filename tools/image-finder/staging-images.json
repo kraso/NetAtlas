@@ -1,0 +1,1523 @@
+{
+  "generatedAt": "2026-09-13T02:23:46.057Z",
+  "totalEntries": 42,
+  "sources": [
+    {
+      "slug": "brave-search-huawei",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for huawei devices",
+      "url": "https://s.alicdn.com/@sc04/kf/A7a35feff2421469ea7d9a243988d515do.jpg_300x300.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-ruckus",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for ruckus devices",
+      "url": "https://images-na.ssl-images-amazon.com/images/I/51H9UuWLaTL.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-cradlepoint",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for cradlepoint devices",
+      "url": "https://i.ebayimg.com/images/g/13EAAeSwgIBqgWXX/s-l225.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-panduit",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for panduit devices",
+      "url": "https://s7d9.scene7.com/is/image/panduitdm/featured-product-3-image-1?qlt=85&ts=1780344172869&dpr=off",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-fiberhome",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for fiberhome devices",
+      "url": "https://www.hongtelecom.com/wp-content/uploads/sites/270/2018/09/FiberHome_FONST-6000-U-300x300.png",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-amazon",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for amazon devices",
+      "url": "https://i.ebayimg.com/images/g/aNYAAOSwkE5hrR0i/s-l225.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-zyxel",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for zyxel devices",
+      "url": "https://m.media-amazon.com/images/I/51M70MIz7EL.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-dell",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for dell devices",
+      "url": "https://res.cloudinary.com/dmwxtja1g/image/upload/q_1,e_blur:2000/c_lpad,dpr_1.0,f_auto,h_120,q_80,w_180/v1/media/catalog/product/d/e/dell_networking_n2248x-on_48x12.5gb_rj45_4xsfp28_2xqsfp_1xpsu_os6_front_zoom_2_1.jpg?_i=AB",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-fortinet",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for fortinet devices",
+      "url": "https://5.imimg.com/data5/SELLER/Default/2024/4/409010133/OI/JZ/PB/1422641/product-1-250x250.png",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-aruba",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for aruba devices",
+      "url": "https://inexa.in/wp-content/uploads/2022/11/product-access-points-remote_595x393.jpeg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-alcatel",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for alcatel devices",
+      "url": "https://web-assets.al-enterprise.com/-/media/assets/internet/images/os6370-p24-visual-product-page.png?h=1080&iar=0&w=1080&v=1&d=20260630T163632Z&hash=4EFC87342E3291E36300959B86A5C9BF",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-extreme",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for extreme devices",
+      "url": "https://webobjects2.cdw.com/is/image/CDW/6768626?$product-detail$",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-netgear",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for netgear devices",
+      "url": "https://www.insight.com/content/insight-web/en_US/shop/partner/netgear/jcr:content/root/responsivegrid_235889130/column_layout_1395696424/-column-1/image.img.png/1565230120773.png",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-watchguard",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for watchguard devices",
+      "url": "https://www.watchguard.com/sites/default/files/styles/medium/public/t40_compare.png?itok=pBaky2ud",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-peplink",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for peplink devices",
+      "url": "https://lian-li.com/wp-content/uploads/2024/10/L-Wireless-Controller_03.webp",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-checkpoint",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for checkpoint devices",
+      "url": "https://images.g2crowd.com/uploads/product/image/8dedb235969bcb553f9e412b16e93d0a/check-point-next-generation-firewalls-ngfws.png",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-google",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for google devices",
+      "url": "https://m.media-amazon.com/images/I/51S2PUgQt+S.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-usrobotics",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for usrobotics devices",
+      "url": "https://i.ebayimg.com/images/g/06UAAOSwDRxZswUR/s-l400.webp",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-paloalto",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for paloalto devices",
+      "url": "https://sitgl.co.uk/wp-content/uploads/2023/04/New-Palo-Alto-PA-850-NextGen-Firewall.png?v=1684332623",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-nokia",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for nokia devices",
+      "url": "https://telecomcauliffe.com/wp-content/uploads/2026/08/TELECOMCAULIFFE-Nokia-Telecom-Equipment-Guide-1-scaled.png",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-juniper",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for juniper devices",
+      "url": "https://webobjects2.cdw.com/is/image/CDW/juniper-ex4000-product-756?$transparent$",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-finisar",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for finisar devices",
+      "url": "https://m.media-amazon.com/images/I/81SpeOX8BcL.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-belden",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for belden devices",
+      "url": "https://www.discountedcables.com/cdn/shop/files/Belden-10GXS13-Roll-product-03.webp?v=1714080109&width=1445",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-moxa",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for moxa devices",
+      "url": "https://assets.rs-online.com/image/upload/f_auto,q_auto/v1665068911/MKT/LP/Suppliers/moxa/industrial-networking/moxa-industrial_networking-card.png",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-ciscoa",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for ciscoa devices",
+      "url": "https://networkwarehouse.co.uk/cdn/shop/files/cisco-wireless-9176-wifi-7-high-performance-directional-indoor-access-point-cw9176d1-cfg-938448_370x.jpg?v=1739313846%20370w",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-hpe",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for hpe devices",
+      "url": "https://i.ebayimg.com/images/g/2mMAAeSwlL9ob8vZ/s-l140.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-fs",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for fs devices",
+      "url": "https://m.media-amazon.com/images/I/814j7P3O2sL.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-digi",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for digi devices",
+      "url": "https://www.digi.com/getattachment/a6952adc-89c5-4a27-8d75-7489f48b5637/ix15-web.jpg?lang=en-US&width=480&height=270&ext=.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-zte",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for zte devices",
+      "url": "https://s.alicdn.com/@sc01/kf/HTB1qStrgb_I8KJjy1Xaq6zsxpXa4.jpg_80x80.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-arista",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for arista devices",
+      "url": "https://www.arista.com/assets/images/banner/product/7060_7260-product-1.png",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-tplink",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for tplink devices",
+      "url": "https://m.media-amazon.com/images/I/61QTaQ1INML.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-3com",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for 3com devices",
+      "url": "https://m.media-amazon.com/images/I/61YE6ww1qQL.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    },
+    {
+      "slug": "brave-search-cisco",
+      "kind": "terceros",
+      "publisher": "Brave Search (product photo)",
+      "title": "Product photo for cisco devices",
+      "url": "https://cdn.blueally.com/secureitstore/images/c4500/cisco-switch-4500-series.jpg",
+      "retrievedOn": "2026-09-13",
+      "authorityLevel": 3
+    }
+  ],
+  "images": [
+    {
+      "deviceSlug": "huawei",
+      "manufacturerSlug": "huawei",
+      "image": {
+        "kind": "frontal",
+        "caption": "Internet <strong>Switch</strong> S1730S-S24P4S-A1 Network <strong>Switch</strong> Poe - Product Image 3 frontal",
+        "localPath": "assets/img/huawei-frontal.webp",
+        "sourceSlug": "brave-search-huawei"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-huawei",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for huawei devices",
+        "url": "https://s.alicdn.com/@sc04/kf/A7a35feff2421469ea7d9a243988d515do.jpg_300x300.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "huawei switch product photo",
+        "originalUrl": "https://s.alicdn.com/@sc04/kf/A7a35feff2421469ea7d9a243988d515do.jpg_300x300.jpg",
+        "confidence": "high",
+        "width": 300,
+        "height": 300,
+        "webpSize": 808,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "ruckus",
+      "manufacturerSlug": "ruckus",
+      "image": {
+        "kind": "frontal",
+        "caption": "Ruckus 901-R750-US00 [R750] Wi-Fi 6 802.11ax Wireless Access Point w/ Mounting Kit (Renewed) frontal",
+        "localPath": "assets/img/ruckus-frontal.webp",
+        "sourceSlug": "brave-search-ruckus"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-ruckus",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for ruckus devices",
+        "url": "https://images-na.ssl-images-amazon.com/images/I/51H9UuWLaTL.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "ruckus wireless access point product photo",
+        "originalUrl": "https://images-na.ssl-images-amazon.com/images/I/51H9UuWLaTL.jpg",
+        "confidence": "high",
+        "width": 2000,
+        "height": 2000,
+        "webpSize": 10580,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-WLS-AP"
+      }
+    },
+    {
+      "deviceSlug": "cradlepoint",
+      "manufacturerSlug": "cradlepoint",
+      "image": {
+        "kind": "frontal",
+        "caption": "Cradlepoint IBR200 4G LTE Cat 1 Wi-Fi Router NetCloud IoT Gateway Cellular Modem frontal",
+        "localPath": "assets/img/cradlepoint-frontal.webp",
+        "sourceSlug": "brave-search-cradlepoint"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-cradlepoint",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for cradlepoint devices",
+        "url": "https://i.ebayimg.com/images/g/13EAAeSwgIBqgWXX/s-l225.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "cradlepoint IoT gateway product photo",
+        "originalUrl": "https://i.ebayimg.com/images/g/13EAAeSwgIBqgWXX/s-l225.jpg",
+        "confidence": "high",
+        "width": 225,
+        "height": 184,
+        "webpSize": 966,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-IOT"
+      }
+    },
+    {
+      "deviceSlug": "panduit",
+      "manufacturerSlug": "panduit",
+      "image": {
+        "kind": "frontal",
+        "caption": "RapidID™ Network Mapping System featuring a reader and cable, ideal for fast and accurate data identification. frontal",
+        "localPath": "assets/img/panduit-frontal.webp",
+        "sourceSlug": "brave-search-panduit"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-panduit",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for panduit devices",
+        "url": "https://s7d9.scene7.com/is/image/panduitdm/featured-product-3-image-1?qlt=85&ts=1780344172869&dpr=off",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "panduit network cable product photo",
+        "originalUrl": "https://s7d9.scene7.com/is/image/panduitdm/featured-product-3-image-1?qlt=85&ts=1780344172869&dpr=off",
+        "confidence": "high",
+        "width": 559,
+        "height": 314,
+        "webpSize": 1442,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-ACC-CABLE"
+      }
+    },
+    {
+      "deviceSlug": "fiberhome",
+      "manufacturerSlug": "fiberhome",
+      "image": {
+        "kind": "frontal",
+        "caption": "fiberhome telecom equipment product photo frontal",
+        "localPath": "assets/img/fiberhome-frontal.webp",
+        "sourceSlug": "brave-search-fiberhome"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-fiberhome",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for fiberhome devices",
+        "url": "https://www.hongtelecom.com/wp-content/uploads/sites/270/2018/09/FiberHome_FONST-6000-U-300x300.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "fiberhome telecom equipment product photo",
+        "originalUrl": "https://www.hongtelecom.com/wp-content/uploads/sites/270/2018/09/FiberHome_FONST-6000-U-300x300.png",
+        "confidence": "medium",
+        "width": 300,
+        "height": 300,
+        "webpSize": 1800,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-TEL"
+      }
+    },
+    {
+      "deviceSlug": "amazon",
+      "manufacturerSlug": "amazon",
+      "image": {
+        "kind": "frontal",
+        "caption": "Amazon Fire Game Controller 1st Gen Wireless Gaming Controller No Back Cover frontal",
+        "localPath": "assets/img/amazon-frontal.webp",
+        "sourceSlug": "brave-search-amazon"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-amazon",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for amazon devices",
+        "url": "https://i.ebayimg.com/images/g/aNYAAOSwkE5hrR0i/s-l225.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "amazon wireless controller product photo",
+        "originalUrl": "https://i.ebayimg.com/images/g/aNYAAOSwkE5hrR0i/s-l225.jpg",
+        "confidence": "high",
+        "width": 225,
+        "height": 168,
+        "webpSize": 938,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-WLS"
+      }
+    },
+    {
+      "deviceSlug": "zyxel",
+      "manufacturerSlug": "zyxel",
+      "image": {
+        "kind": "frontal",
+        "caption": "Zyxel 8-Port Gigabit Easy Web Managed Plus Switch, Sturdy Metal, QoS, WebGUI, Jubmo Frames, VLANs, DHCP Client, IGMP Snoop... frontal",
+        "localPath": "assets/img/zyxel-frontal.webp",
+        "sourceSlug": "brave-search-zyxel"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-zyxel",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for zyxel devices",
+        "url": "https://m.media-amazon.com/images/I/51M70MIz7EL.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "zyxel switch product photo",
+        "originalUrl": "https://m.media-amazon.com/images/I/51M70MIz7EL.jpg",
+        "confidence": "high",
+        "width": 1000,
+        "height": 1000,
+        "webpSize": 5766,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "dell",
+      "manufacturerSlug": "dell",
+      "image": {
+        "kind": "frontal",
+        "caption": "New Dell Networking N2248X-ON Switch 2.5GbE, OS6 Reverse Airflow frontal",
+        "localPath": "assets/img/dell-frontal.webp",
+        "sourceSlug": "brave-search-dell"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-dell",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for dell devices",
+        "url": "https://res.cloudinary.com/dmwxtja1g/image/upload/q_1,e_blur:2000/c_lpad,dpr_1.0,f_auto,h_120,q_80,w_180/v1/media/catalog/product/d/e/dell_networking_n2248x-on_48x12.5gb_rj45_4xsfp28_2xqsfp_1xpsu_os6_front_zoom_2_1.jpg?_i=AB",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "dell switch product photo",
+        "originalUrl": "https://res.cloudinary.com/dmwxtja1g/image/upload/q_1,e_blur:2000/c_lpad,dpr_1.0,f_auto,h_120,q_80,w_180/v1/media/catalog/product/d/e/dell_networking_n2248x-on_48x12.5gb_rj45_4xsfp28_2xqsfp_1xpsu_os6_front_zoom_2_1.jpg?_i=AB",
+        "confidence": "low",
+        "width": 180,
+        "height": 120,
+        "webpSize": 272,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "fortinet",
+      "manufacturerSlug": "fortinet",
+      "image": {
+        "kind": "frontal",
+        "caption": "Fortinet Fg-40f Fortigate Fortiwifi 40f Series Firewall frontal",
+        "localPath": "assets/img/fortinet-frontal.webp",
+        "sourceSlug": "brave-search-fortinet"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-fortinet",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for fortinet devices",
+        "url": "https://5.imimg.com/data5/SELLER/Default/2024/4/409010133/OI/JZ/PB/1422641/product-1-250x250.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "fortinet firewall product photo",
+        "originalUrl": "https://5.imimg.com/data5/SELLER/Default/2024/4/409010133/OI/JZ/PB/1422641/product-1-250x250.png",
+        "confidence": "high",
+        "width": 250,
+        "height": 163,
+        "webpSize": 566,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SEC-FW"
+      }
+    },
+    {
+      "deviceSlug": "aruba",
+      "manufacturerSlug": "aruba",
+      "image": {
+        "kind": "frontal",
+        "caption": "HPE Aruba AP-303H Unified Wireless access point inexa frontal",
+        "localPath": "assets/img/aruba-frontal.webp",
+        "sourceSlug": "brave-search-aruba"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-aruba",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for aruba devices",
+        "url": "https://inexa.in/wp-content/uploads/2022/11/product-access-points-remote_595x393.jpeg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "aruba wireless access point product photo",
+        "originalUrl": "https://inexa.in/wp-content/uploads/2022/11/product-access-points-remote_595x393.jpeg",
+        "confidence": "high",
+        "width": 595,
+        "height": 393,
+        "webpSize": 1194,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-WLS-AP"
+      }
+    },
+    {
+      "deviceSlug": "alcatel",
+      "manufacturerSlug": "alcatel",
+      "image": {
+        "kind": "frontal",
+        "caption": "Front view of an Alcatel-Lucent Enterprise OmniSwitch 6370-P24 network switch with 24 Ethernet ports and ventilation grilles on a white background. frontal",
+        "localPath": "assets/img/alcatel-frontal.webp",
+        "sourceSlug": "brave-search-alcatel"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-alcatel",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for alcatel devices",
+        "url": "https://web-assets.al-enterprise.com/-/media/assets/internet/images/os6370-p24-visual-product-page.png?h=1080&iar=0&w=1080&v=1&d=20260630T163632Z&hash=4EFC87342E3291E36300959B86A5C9BF",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "alcatel switch product photo",
+        "originalUrl": "https://web-assets.al-enterprise.com/-/media/assets/internet/images/os6370-p24-visual-product-page.png?h=1080&iar=0&w=1080&v=1&d=20260630T163632Z&hash=4EFC87342E3291E36300959B86A5C9BF",
+        "confidence": "high",
+        "width": 1080,
+        "height": 1080,
+        "webpSize": 7154,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "extreme",
+      "manufacturerSlug": "extreme",
+      "image": {
+        "kind": "frontal",
+        "caption": "Extreme Networks ExtremeSwitching 5320 - switch - 16 ports - managed - rack-mountable frontal",
+        "localPath": "assets/img/extreme-frontal.webp",
+        "sourceSlug": "brave-search-extreme"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-extreme",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for extreme devices",
+        "url": "https://webobjects2.cdw.com/is/image/CDW/6768626?$product-detail$",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "extreme switch product photo",
+        "originalUrl": "https://webobjects2.cdw.com/is/image/CDW/6768626?$product-detail$",
+        "confidence": "high",
+        "width": 820,
+        "height": 480,
+        "webpSize": 4762,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "netgear",
+      "manufacturerSlug": "netgear",
+      "image": {
+        "kind": "frontal",
+        "caption": "NETGEAR network switch product frontal",
+        "localPath": "assets/img/netgear-frontal.webp",
+        "sourceSlug": "brave-search-netgear"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-netgear",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for netgear devices",
+        "url": "https://www.insight.com/content/insight-web/en_US/shop/partner/netgear/jcr:content/root/responsivegrid_235889130/column_layout_1395696424/-column-1/image.img.png/1565230120773.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "netgear switch product photo",
+        "originalUrl": "https://www.insight.com/content/insight-web/en_US/shop/partner/netgear/jcr:content/root/responsivegrid_235889130/column_layout_1395696424/-column-1/image.img.png/1565230120773.png",
+        "confidence": "high",
+        "width": 800,
+        "height": 500,
+        "webpSize": 7288,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "watchguard",
+      "manufacturerSlug": "watchguard",
+      "image": {
+        "kind": "frontal",
+        "caption": "Firebox T40 product photo frontal",
+        "localPath": "assets/img/watchguard-frontal.webp",
+        "sourceSlug": "brave-search-watchguard"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-watchguard",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for watchguard devices",
+        "url": "https://www.watchguard.com/sites/default/files/styles/medium/public/t40_compare.png?itok=pBaky2ud",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "watchguard firewall product photo",
+        "originalUrl": "https://www.watchguard.com/sites/default/files/styles/medium/public/t40_compare.png?itok=pBaky2ud",
+        "confidence": "high",
+        "width": 220,
+        "height": 122,
+        "webpSize": 1960,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SEC-FW"
+      }
+    },
+    {
+      "deviceSlug": "peplink",
+      "manufacturerSlug": "peplink",
+      "image": {
+        "kind": "frontal",
+        "caption": "peplink wireless controller product photo frontal",
+        "localPath": "assets/img/peplink-frontal.webp",
+        "sourceSlug": "brave-search-peplink"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-peplink",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for peplink devices",
+        "url": "https://lian-li.com/wp-content/uploads/2024/10/L-Wireless-Controller_03.webp",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "peplink wireless controller product photo",
+        "originalUrl": "https://lian-li.com/wp-content/uploads/2024/10/L-Wireless-Controller_03.webp",
+        "confidence": "medium",
+        "width": 865,
+        "height": 441,
+        "webpSize": 25518,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-WLS"
+      }
+    },
+    {
+      "deviceSlug": "checkpoint",
+      "manufacturerSlug": "checkpoint",
+      "image": {
+        "kind": "frontal",
+        "caption": "Product Avatar Image frontal",
+        "localPath": "assets/img/checkpoint-frontal.webp",
+        "sourceSlug": "brave-search-checkpoint"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-checkpoint",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for checkpoint devices",
+        "url": "https://images.g2crowd.com/uploads/product/image/8dedb235969bcb553f9e412b16e93d0a/check-point-next-generation-firewalls-ngfws.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "checkpoint next generation firewall product photo",
+        "originalUrl": "https://images.g2crowd.com/uploads/product/image/8dedb235969bcb553f9e412b16e93d0a/check-point-next-generation-firewalls-ngfws.png",
+        "confidence": "high",
+        "width": 985,
+        "height": 209,
+        "webpSize": 5582,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SEC-NGFW"
+      }
+    },
+    {
+      "deviceSlug": "google",
+      "manufacturerSlug": "google",
+      "image": {
+        "kind": "frontal",
+        "caption": "WiFi Wireless RGBW(CW+WW) LED Smart Controller Alexa Google Home IFTTT Compatible,Working with Android,iOS System,RGBW Strip Lights DC 12V 24V frontal",
+        "localPath": "assets/img/google-frontal.webp",
+        "sourceSlug": "brave-search-google"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-google",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for google devices",
+        "url": "https://m.media-amazon.com/images/I/51S2PUgQt+S.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "google wireless controller product photo",
+        "originalUrl": "https://m.media-amazon.com/images/I/51S2PUgQt+S.jpg",
+        "confidence": "high",
+        "width": 1000,
+        "height": 1000,
+        "webpSize": 12038,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-WLS"
+      }
+    },
+    {
+      "deviceSlug": "usrobotics",
+      "manufacturerSlug": "usrobotics",
+      "image": {
+        "kind": "frontal",
+        "caption": "Módem de fax con adaptador U.S.Robotics Sportster 33.6. Número de producto: 000839-09  Foto 1 de 3 frontal",
+        "localPath": "assets/img/usrobotics-frontal.webp",
+        "sourceSlug": "brave-search-usrobotics"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-usrobotics",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for usrobotics devices",
+        "url": "https://i.ebayimg.com/images/g/06UAAOSwDRxZswUR/s-l400.webp",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "usrobotics dial modem product photo",
+        "originalUrl": "https://i.ebayimg.com/images/g/06UAAOSwDRxZswUR/s-l400.webp",
+        "confidence": "high",
+        "width": 400,
+        "height": 300,
+        "webpSize": 2792,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-ACC-DIAL"
+      }
+    },
+    {
+      "deviceSlug": "paloalto",
+      "manufacturerSlug": "paloalto",
+      "image": {
+        "kind": "frontal",
+        "caption": "paloalto next generation firewall product photo frontal",
+        "localPath": "assets/img/paloalto-frontal.webp",
+        "sourceSlug": "brave-search-paloalto"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-paloalto",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for paloalto devices",
+        "url": "https://sitgl.co.uk/wp-content/uploads/2023/04/New-Palo-Alto-PA-850-NextGen-Firewall.png?v=1684332623",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "paloalto next generation firewall product photo",
+        "originalUrl": "https://sitgl.co.uk/wp-content/uploads/2023/04/New-Palo-Alto-PA-850-NextGen-Firewall.png?v=1684332623",
+        "confidence": "low",
+        "width": 2400,
+        "height": 2200,
+        "webpSize": 30142,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SEC-NGFW"
+      }
+    },
+    {
+      "deviceSlug": "nokia",
+      "manufacturerSlug": "nokia",
+      "image": {
+        "kind": "frontal",
+        "caption": "TELECOMCAULIFFE - Nokia Telecom Equipment Guide frontal",
+        "localPath": "assets/img/nokia-frontal.webp",
+        "sourceSlug": "brave-search-nokia"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-nokia",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for nokia devices",
+        "url": "https://telecomcauliffe.com/wp-content/uploads/2026/08/TELECOMCAULIFFE-Nokia-Telecom-Equipment-Guide-1-scaled.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "nokia telecom equipment product photo",
+        "originalUrl": "https://telecomcauliffe.com/wp-content/uploads/2026/08/TELECOMCAULIFFE-Nokia-Telecom-Equipment-Guide-1-scaled.png",
+        "confidence": "high",
+        "width": 2560,
+        "height": 1280,
+        "webpSize": 56914,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-TEL"
+      }
+    },
+    {
+      "deviceSlug": "juniper",
+      "manufacturerSlug": "juniper",
+      "image": {
+        "kind": "frontal",
+        "caption": "product image of a Juniper EX4000 ethernet switch frontal",
+        "localPath": "assets/img/juniper-frontal.webp",
+        "sourceSlug": "brave-search-juniper"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-juniper",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for juniper devices",
+        "url": "https://webobjects2.cdw.com/is/image/CDW/juniper-ex4000-product-756?$transparent$",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "juniper switch product photo",
+        "originalUrl": "https://webobjects2.cdw.com/is/image/CDW/juniper-ex4000-product-756?$transparent$",
+        "confidence": "high",
+        "width": 756,
+        "height": 272,
+        "webpSize": 8488,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "finisar",
+      "manufacturerSlug": "finisar",
+      "image": {
+        "kind": "frontal",
+        "caption": "Finisar FTLX1471D3BCL Fiber Optic Transmitters, Receivers, Transceivers PIN, 10GBASE-LR/LW 1200SM-LL-L 10km ftlx1471d3bcl frontal",
+        "localPath": "assets/img/finisar-frontal.webp",
+        "sourceSlug": "brave-search-finisar"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-finisar",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for finisar devices",
+        "url": "https://m.media-amazon.com/images/I/81SpeOX8BcL.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "finisar fiber optic transceiver product photo",
+        "originalUrl": "https://m.media-amazon.com/images/I/81SpeOX8BcL.jpg",
+        "confidence": "high",
+        "width": 2560,
+        "height": 2288,
+        "webpSize": 45430,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-OPT"
+      }
+    },
+    {
+      "deviceSlug": "belden",
+      "manufacturerSlug": "belden",
+      "image": {
+        "kind": "frontal",
+        "caption": "Belden Cat6A Plenum 10GXS13 Cable Roll frontal",
+        "localPath": "assets/img/belden-frontal.webp",
+        "sourceSlug": "brave-search-belden"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-belden",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for belden devices",
+        "url": "https://www.discountedcables.com/cdn/shop/files/Belden-10GXS13-Roll-product-03.webp?v=1714080109&width=1445",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "belden network cable product photo",
+        "originalUrl": "https://www.discountedcables.com/cdn/shop/files/Belden-10GXS13-Roll-product-03.webp?v=1714080109&width=1445",
+        "confidence": "high",
+        "width": 1048,
+        "height": 1048,
+        "webpSize": 36564,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-ACC-CABLE"
+      }
+    },
+    {
+      "deviceSlug": "moxa",
+      "manufacturerSlug": "moxa",
+      "image": {
+        "kind": "frontal",
+        "caption": "moxa industrial networking product photo frontal",
+        "localPath": "assets/img/moxa-frontal.webp",
+        "sourceSlug": "brave-search-moxa"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-moxa",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for moxa devices",
+        "url": "https://assets.rs-online.com/image/upload/f_auto,q_auto/v1665068911/MKT/LP/Suppliers/moxa/industrial-networking/moxa-industrial_networking-card.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "moxa industrial networking product photo",
+        "originalUrl": "https://assets.rs-online.com/image/upload/f_auto,q_auto/v1665068911/MKT/LP/Suppliers/moxa/industrial-networking/moxa-industrial_networking-card.png",
+        "confidence": "high",
+        "width": 600,
+        "height": 338,
+        "webpSize": 7136,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-IND"
+      }
+    },
+    {
+      "deviceSlug": "ciscoa",
+      "manufacturerSlug": "ciscoa",
+      "image": {
+        "kind": "frontal",
+        "caption": "Cisco CW9176D1-CFG frontal",
+        "localPath": "assets/img/ciscoa-frontal.webp",
+        "sourceSlug": "brave-search-ciscoa"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-ciscoa",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for ciscoa devices",
+        "url": "https://networkwarehouse.co.uk/cdn/shop/files/cisco-wireless-9176-wifi-7-high-performance-directional-indoor-access-point-cw9176d1-cfg-938448_370x.jpg?v=1739313846%20370w",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "ciscoa wireless access point product photo",
+        "originalUrl": "https://networkwarehouse.co.uk/cdn/shop/files/cisco-wireless-9176-wifi-7-high-performance-directional-indoor-access-point-cw9176d1-cfg-938448_370x.jpg?v=1739313846%20370w",
+        "confidence": "low",
+        "width": 370,
+        "height": 370,
+        "webpSize": 766,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-WLS-AP"
+      }
+    },
+    {
+      "deviceSlug": "hpe",
+      "manufacturerSlug": "hpe",
+      "image": {
+        "kind": "frontal",
+        "caption": "HPE Aruba JL685A Instant On 1930 48p 1GB RJ45 4p 10GB SFP+ Switch - Bulk frontal",
+        "localPath": "assets/img/hpe-frontal.webp",
+        "sourceSlug": "brave-search-hpe"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-hpe",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for hpe devices",
+        "url": "https://i.ebayimg.com/images/g/2mMAAeSwlL9ob8vZ/s-l140.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "hpe switch product photo",
+        "originalUrl": "https://i.ebayimg.com/images/g/2mMAAeSwlL9ob8vZ/s-l140.jpg",
+        "confidence": "medium",
+        "width": 140,
+        "height": 77,
+        "webpSize": 618,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "fs",
+      "manufacturerSlug": "fs",
+      "image": {
+        "kind": "frontal",
+        "caption": "HPC Optics Compatible with Fortinet FS-TRAN-SFP+ER 10GBASE-ER SFP+ Transceiver | 10G ER SM 40KM 1550NM FS-TRAN-SFP+ER-HPC frontal",
+        "localPath": "assets/img/fs-frontal.webp",
+        "sourceSlug": "brave-search-fs"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-fs",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for fs devices",
+        "url": "https://m.media-amazon.com/images/I/814j7P3O2sL.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "fs fiber optic transceiver product photo",
+        "originalUrl": "https://m.media-amazon.com/images/I/814j7P3O2sL.jpg",
+        "confidence": "high",
+        "width": 2560,
+        "height": 2560,
+        "webpSize": 58982,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-OPT"
+      }
+    },
+    {
+      "deviceSlug": "digi",
+      "manufacturerSlug": "digi",
+      "image": {
+        "kind": "frontal",
+        "caption": "Meet the Digi IX15 Cellular IoT Gateway and Router frontal",
+        "localPath": "assets/img/digi-frontal.webp",
+        "sourceSlug": "brave-search-digi"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-digi",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for digi devices",
+        "url": "https://www.digi.com/getattachment/a6952adc-89c5-4a27-8d75-7489f48b5637/ix15-web.jpg?lang=en-US&width=480&height=270&ext=.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "digi IoT gateway product photo",
+        "originalUrl": "https://www.digi.com/getattachment/a6952adc-89c5-4a27-8d75-7489f48b5637/ix15-web.jpg?lang=en-US&width=480&height=270&ext=.jpg",
+        "confidence": "high",
+        "width": 480,
+        "height": 270,
+        "webpSize": 2276,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-IOT"
+      }
+    },
+    {
+      "deviceSlug": "zte",
+      "manufacturerSlug": "zte",
+      "image": {
+        "kind": "frontal",
+        "caption": "Optical Telecom F660 V6.0 Latest Version ZTE GPON XPON ONU ONT Fiber Communication Equipment With Competitive Price frontal",
+        "localPath": "assets/img/zte-frontal.webp",
+        "sourceSlug": "brave-search-zte"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-zte",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for zte devices",
+        "url": "https://s.alicdn.com/@sc01/kf/HTB1qStrgb_I8KJjy1Xaq6zsxpXa4.jpg_80x80.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "zte telecom equipment product photo",
+        "originalUrl": "https://s.alicdn.com/@sc01/kf/HTB1qStrgb_I8KJjy1Xaq6zsxpXa4.jpg_80x80.jpg",
+        "confidence": "medium",
+        "width": 80,
+        "height": 80,
+        "webpSize": 336,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-TEL"
+      }
+    },
+    {
+      "deviceSlug": "arista",
+      "manufacturerSlug": "arista",
+      "image": {
+        "kind": "frontal",
+        "caption": "arista switch product photo frontal",
+        "localPath": "assets/img/arista-frontal.webp",
+        "sourceSlug": "brave-search-arista"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-arista",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for arista devices",
+        "url": "https://www.arista.com/assets/images/banner/product/7060_7260-product-1.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "arista switch product photo",
+        "originalUrl": "https://www.arista.com/assets/images/banner/product/7060_7260-product-1.png",
+        "confidence": "medium",
+        "width": 950,
+        "height": 240,
+        "webpSize": 10422,
+        "searchType": "manufacturer",
+        "categoryCode": "CAT-SWT"
+      }
+    },
+    {
+      "deviceSlug": "smf-os2",
+      "manufacturerSlug": "tplink",
+      "image": {
+        "kind": "frontal",
+        "caption": "FLYPROFiber- SC/APC to SC/APC OS2 Single Mode Fiber Optic Cable, 1M/3ft | Simplex 9/125um SMF, Singlemode, Fully Tested Fi... frontal",
+        "localPath": "assets/img/smf-os2-frontal.webp",
+        "sourceSlug": "brave-search-tplink"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-tplink",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for tplink devices",
+        "url": "https://m.media-amazon.com/images/I/61QTaQ1INML.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "SMF OS2 single mode fiber optic cable",
+        "originalUrl": "https://m.media-amazon.com/images/I/61QTaQ1INML.jpg",
+        "confidence": "medium",
+        "width": 1500,
+        "height": 1500,
+        "webpSize": 18312,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "3com-officeconnect-hub-8",
+      "manufacturerSlug": "3com",
+      "image": {
+        "kind": "frontal",
+        "caption": "3Com OfficeConnect 8 port Ethernet Hub / TPO - 3C16700 - Power supply included frontal",
+        "localPath": "assets/img/3com-officeconnect-hub-8-frontal.webp",
+        "sourceSlug": "brave-search-3com"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-3com",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for 3com devices",
+        "url": "https://m.media-amazon.com/images/I/61YE6ww1qQL.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "3Com OfficeConnect Hub 8 port ethernet",
+        "originalUrl": "https://m.media-amazon.com/images/I/61YE6ww1qQL.jpg",
+        "confidence": "high",
+        "width": 1600,
+        "height": 587,
+        "webpSize": 4412,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "usrobotics-sportster-56k",
+      "manufacturerSlug": "usrobotics",
+      "image": {
+        "kind": "frontal",
+        "caption": "US Robotics Sportster 56K V.90 Fax Modem 325686-03 frontal",
+        "localPath": "assets/img/usrobotics-sportster-56k-frontal.webp",
+        "sourceSlug": "brave-search-usrobotics"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-usrobotics",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for usrobotics devices",
+        "url": "https://www.picclickimg.com/Z4EAAOSwUq9n7E~k/US-Robotics-Sportster-56K-V90-Fax-Modem-325686-03.webp",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "US Robotics Sportster 56K modem",
+        "originalUrl": "https://www.picclickimg.com/Z4EAAOSwUq9n7E~k/US-Robotics-Sportster-56K-V90-Fax-Modem-325686-03.webp",
+        "confidence": "high",
+        "width": 640,
+        "height": 480,
+        "webpSize": 2334,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "aruba-ap-515",
+      "manufacturerSlug": "aruba",
+      "image": {
+        "kind": "frontal",
+        "caption": "Aruba AP-515 (US) Unified AP APIN0515 Q9H63A\nProduct Overview\nHPE Aruba Wi-Fi 6 access points provide high-performance connectivity for any business experiencing growing numbers of IoT and mobility requirements. With a maximum aggregate data rate of 2.69Gbps (HE80/HE20), the Aruba 510 Series deliver the speed and reliability needed for any enterprise environment. The 510 Series APs are also designed to optimize user experience by maximizing Wi-Fi efficiency and dramatically reducing airtime cont frontal",
+        "localPath": "assets/img/aruba-ap-515-frontal.webp",
+        "sourceSlug": "brave-search-aruba"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-aruba",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for aruba devices",
+        "url": "https://cdn11.bigcommerce.com/s-e692hdujm7/images/stencil/500x500/products/8016/10536/s-l1600_19__40051.1703280157.jpg?c=2",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "Aruba AP-515 Wi-Fi 6 access point",
+        "originalUrl": "https://cdn11.bigcommerce.com/s-e692hdujm7/images/stencil/500x500/products/8016/10536/s-l1600_19__40051.1703280157.jpg?c=2",
+        "confidence": "medium",
+        "width": 500,
+        "height": 458,
+        "webpSize": 3348,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "utp-cat6a",
+      "manufacturerSlug": "tplink",
+      "image": {
+        "kind": "frontal",
+        "caption": "CAT6A UTP Ethernet RJ45 Plug, 100 pack, C6A-8P8C, CE Compliance frontal",
+        "localPath": "assets/img/utp-cat6a-frontal.webp",
+        "sourceSlug": "brave-search-tplink"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-tplink",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for tplink devices",
+        "url": "https://cdn11.bigcommerce.com/s-kwazlhiil2/images/stencil/1280w/products/2105/39289/00407116_4__30612.1660604088.jpg?c=2",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "UTP Cat6A cable RJ45",
+        "originalUrl": "https://cdn11.bigcommerce.com/s-kwazlhiil2/images/stencil/1280w/products/2105/39289/00407116_4__30612.1660604088.jpg?c=2",
+        "confidence": "high",
+        "width": 1000,
+        "height": 1000,
+        "webpSize": 5310,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "cisco-catalyst-4000",
+      "manufacturerSlug": "cisco",
+      "image": {
+        "kind": "frontal",
+        "caption": "Cisco Catalyst 4500E Series Switch frontal",
+        "localPath": "assets/img/cisco-catalyst-4000-frontal.webp",
+        "sourceSlug": "brave-search-cisco"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-cisco",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for cisco devices",
+        "url": "https://cdn.blueally.com/secureitstore/images/c4500/cisco-switch-4500-series.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "Cisco Catalyst 4000 series switch",
+        "originalUrl": "https://cdn.blueally.com/secureitstore/images/c4500/cisco-switch-4500-series.jpg",
+        "confidence": "medium",
+        "width": 600,
+        "height": 244,
+        "webpSize": 6168,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "usrobotics-5686g-pro",
+      "manufacturerSlug": "usrobotics",
+      "image": {
+        "kind": "frontal",
+        "caption": "U.S. Robotics Courier Lite 56k Dial Up Business Modem - Serial - 56 kbit/s - ITU V.17, ITU-T V.29, ITU-T V.27ter, ITU-T V.21, EIA 578 Class 1, EIA 592 Class 2.0, ITU-T Group III Fax Technology - ITU-T frontal",
+        "localPath": "assets/img/usrobotics-5686g-pro-frontal.webp",
+        "sourceSlug": "brave-search-usrobotics"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-usrobotics",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for usrobotics devices",
+        "url": "https://i5.walmartimages.com/seo/U-S-Robotics-Courier-Lite-56K-Business-Modem-USR5686G-PRO_034df994-b974-4f95-b5db-93a6d2805fd9.fe9b56c2007e0fb356ea77aa51f0b21c.jpeg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "US Robotics Courier Lite 5686G-PRO modem",
+        "originalUrl": "https://i5.walmartimages.com/seo/U-S-Robotics-Courier-Lite-56K-Business-Modem-USR5686G-PRO_034df994-b974-4f95-b5db-93a6d2805fd9.fe9b56c2007e0fb356ea77aa51f0b21c.jpeg",
+        "confidence": "high",
+        "width": 2560,
+        "height": 1920,
+        "webpSize": 33972,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "usrobotics-5686g",
+      "manufacturerSlug": "usrobotics",
+      "image": {
+        "kind": "frontal",
+        "caption": "USRobotics 5686G Data/Fax Modem - Serial - 56 kbit/s frontal",
+        "localPath": "assets/img/usrobotics-5686g-frontal.webp",
+        "sourceSlug": "brave-search-usrobotics"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-usrobotics",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for usrobotics devices",
+        "url": "https://content.etilize.com/500/1017216044.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "US Robotics 5686G 56K serial faxmodem",
+        "originalUrl": "https://content.etilize.com/500/1017216044.jpg",
+        "confidence": "high",
+        "width": 500,
+        "height": 500,
+        "webpSize": 4112,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "panduit-tx6a-utp",
+      "manufacturerSlug": "panduit",
+      "image": {
+        "kind": "frontal",
+        "caption": "Panduit TX6A 10Gig Cat.6a Patch Network Cable frontal",
+        "localPath": "assets/img/panduit-tx6a-utp-frontal.webp",
+        "sourceSlug": "brave-search-panduit"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-panduit",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for panduit devices",
+        "url": "https://webobjects2.cdw.com/is/image/CDW/6709977?$product-detail$",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "Panduit TX6A UTP 10Gig cable",
+        "originalUrl": "https://webobjects2.cdw.com/is/image/CDW/6709977?$product-detail$",
+        "confidence": "high",
+        "width": 820,
+        "height": 480,
+        "webpSize": 2136,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "cisco-catalyst-3000",
+      "manufacturerSlug": "cisco",
+      "image": {
+        "kind": "frontal",
+        "caption": "Used and Refurbished Cisco Catalyst 3000 Series Switches frontal",
+        "localPath": "assets/img/cisco-catalyst-3000-frontal.webp",
+        "sourceSlug": "brave-search-cisco"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-cisco",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for cisco devices",
+        "url": "https://essentialtechinc.com/wp-content/uploads/2016/11/Cisco-3560-Series-300x114.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "Cisco Catalyst 3000 Kalpana switch",
+        "originalUrl": "https://essentialtechinc.com/wp-content/uploads/2016/11/Cisco-3560-Series-300x114.jpg",
+        "confidence": "high",
+        "width": 300,
+        "height": 114,
+        "webpSize": 952,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "belden-10gxe01",
+      "manufacturerSlug": "belden",
+      "image": {
+        "kind": "frontal",
+        "caption": "BELDEN 10GXE01 - CAT6A F/FTP Shielded Cable, 23 AWG Solid Bare Copper, LSZH purple, 500 Meter frontal",
+        "localPath": "assets/img/belden-10gxe01-frontal.webp",
+        "sourceSlug": "brave-search-belden"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-belden",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for belden devices",
+        "url": "https://m.media-amazon.com/images/I/61+ABzabTyL.jpg",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "Belden 10GXE01 Cat6A F/FTP cable",
+        "originalUrl": "https://m.media-amazon.com/images/I/61+ABzabTyL.jpg",
+        "confidence": "high",
+        "width": 2503,
+        "height": 2560,
+        "webpSize": 26240,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    },
+    {
+      "deviceSlug": "belden-10gxe02",
+      "manufacturerSlug": "belden",
+      "image": {
+        "kind": "frontal",
+        "caption": "Belden 10GXE02, CAT-6 A+ LSZH Cable frontal",
+        "localPath": "assets/img/belden-10gxe02-frontal.webp",
+        "sourceSlug": "brave-search-belden"
+      },
+      "sourceEntry": {
+        "slug": "brave-search-belden",
+        "kind": "terceros",
+        "publisher": "Brave Search (product photo)",
+        "title": "Product photo for belden devices",
+        "url": "https://www.paradisespecialitycables.com/wp-content/uploads/2020/12/10GXE02.png",
+        "retrievedOn": "2026-09-13",
+        "authorityLevel": 3
+      },
+      "metadata": {
+        "query": "Belden 10GXE02 Cat6A S/FTP cable",
+        "originalUrl": "https://www.paradisespecialitycables.com/wp-content/uploads/2020/12/10GXE02.png",
+        "confidence": "high",
+        "width": 500,
+        "height": 706,
+        "webpSize": 2186,
+        "searchType": "curated",
+        "categoryCode": null
+      }
+    }
+  ]
+}

@@ -729,6 +729,14 @@
         "sourceSlug": "aruba-ap515-datasheet",
         "localPath": "docs/HPE Aruba Networking 510 Series Campus Access Points data sheet-PSN1011028705WWEN.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Aruba AP-515 (US) Unified AP APIN0515 Q9H63A\nProduct Overview\nHPE Aruba Wi-Fi 6 access points provide high-performance connectivity for any business experiencing growing numbers of IoT and mobility requirements. With a maximum aggregate data rate of 2.69Gbps (HE80/HE20), the Aruba 510 Series deliver the speed and reliability needed for any enterprise environment. The 510 Series APs are also designed to optimize user experience by maximizing Wi-Fi efficiency and dramatically reducing airtime cont frontal",
+        "localPath": "assets/img/aruba-ap-515-frontal.webp",
+        "sourceSlug": "brave-search-aruba"
+      }
     ]
   },
   {
@@ -1077,6 +1085,14 @@
         "sourceSlug": "usrobotics-56k-manual",
         "localPath": "docs/USR Model 5630G 56K.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "US Robotics Sportster 56K V.90 Fax Modem 325686-03 frontal",
+        "localPath": "assets/img/usrobotics-sportster-56k-frontal.webp",
+        "sourceSlug": "brave-search-usrobotics"
+      }
     ]
   },
   {
@@ -1257,6 +1273,14 @@
         "language": "en",
         "sourceSlug": "3com-hub8-datasheet",
         "localPath": "docs/3Com Model 3C16700A Ethernet Hub.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "3Com OfficeConnect 8 port Ethernet Hub / TPO - 3C16700 - Power supply included frontal",
+        "localPath": "assets/img/3com-officeconnect-hub-8-frontal.webp",
+        "sourceSlug": "brave-search-3com"
       }
     ]
   },
@@ -1481,6 +1505,14 @@
         "objectType": "layer",
         "objectSlug": "1"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "CAT6A UTP Ethernet RJ45 Plug, 100 pack, C6A-8P8C, CE Compliance frontal",
+        "localPath": "assets/img/utp-cat6a-frontal.webp",
+        "sourceSlug": "brave-search-tplink"
+      }
     ]
   },
   {
@@ -1519,6 +1551,14 @@
         "predicate": "operates-at-layer",
         "objectType": "layer",
         "objectSlug": "1"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "FLYPROFiber- SC/APC to SC/APC OS2 Single Mode Fiber Optic Cable, 1M/3ft | Simplex 9/125um SMF, Singlemode, Fully Tested Fi... frontal",
+        "localPath": "assets/img/smf-os2-frontal.webp",
+        "sourceSlug": "brave-search-tplink"
       }
     ]
   },
@@ -1706,6 +1746,14 @@
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-4000-series-switches/product_data_sheet0900aecd80192b01.html",
         "sourceSlug": "cisco-cat4000-datasheet"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Cisco Catalyst 4500E Series Switch frontal",
+        "localPath": "assets/img/cisco-catalyst-4000-frontal.webp",
+        "sourceSlug": "brave-search-cisco"
       }
     ]
   },
@@ -3507,6 +3555,14 @@
         "sourceSlug": "cisco-catalyst-3000-overview",
         "localPath": "docs/Cisco 3000 Series kalpana.jpg"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Used and Refurbished Cisco Catalyst 3000 Series Switches frontal",
+        "localPath": "assets/img/cisco-catalyst-3000-frontal.webp",
+        "sourceSlug": "brave-search-cisco"
+      }
     ]
   },
   {
@@ -3672,6 +3728,14 @@
         "sourceSlug": "usrobotics-5686g-datasheet",
         "localPath": "docs/USR datasheet-56k-faxmodem-5686g.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "USRobotics 5686G Data/Fax Modem - Serial - 56 kbit/s frontal",
+        "localPath": "assets/img/usrobotics-5686g-frontal.webp",
+        "sourceSlug": "brave-search-usrobotics"
+      }
     ]
   },
   {
@@ -3759,6 +3823,14 @@
         "language": "en",
         "sourceSlug": "usrobotics-5686g-pro-datasheet",
         "localPath": "docs/USR datasheet-courier-lite-56k-business-modem-5686g-pro.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "U.S. Robotics Courier Lite 56k Dial Up Business Modem - Serial - 56 kbit/s - ITU V.17, ITU-T V.29, ITU-T V.27ter, ITU-T V.21, EIA 578 Class 1, EIA 592 Class 2.0, ITU-T Group III Fax Technology - ITU-T frontal",
+        "localPath": "assets/img/usrobotics-5686g-pro-frontal.webp",
+        "sourceSlug": "brave-search-usrobotics"
       }
     ]
   },
@@ -4028,6 +4100,14 @@
         "sourceSlug": "panduit-tx6a-datasheet",
         "localPath": "docs/Panduit Model TX6A UTP 10Gig.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Panduit TX6A 10Gig Cat.6a Patch Network Cable frontal",
+        "localPath": "assets/img/panduit-tx6a-utp-frontal.webp",
+        "sourceSlug": "brave-search-panduit"
+      }
     ]
   },
   {
@@ -4120,6 +4200,14 @@
         "sourceSlug": "belden-10gxe01-datasheet",
         "localPath": "docs/Belden Model 10GXE01.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "BELDEN 10GXE01 - CAT6A F/FTP Shielded Cable, 23 AWG Solid Bare Copper, LSZH purple, 500 Meter frontal",
+        "localPath": "assets/img/belden-10gxe01-frontal.webp",
+        "sourceSlug": "brave-search-belden"
+      }
     ]
   },
   {
@@ -4211,6 +4299,14 @@
         "language": "en",
         "sourceSlug": "belden-10gxe02-datasheet",
         "localPath": "docs/Belden Model 10GXE02.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Belden 10GXE02, CAT-6 A+ LSZH Cable frontal",
+        "localPath": "assets/img/belden-10gxe02-frontal.webp",
+        "sourceSlug": "brave-search-belden"
       }
     ]
   },

@@ -480,5 +480,302 @@
     "url": null,
     "retrievedOn": "2026-09-13",
     "authorityLevel": 1
+  },
+  {
+    "slug": "brave-search-huawei",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for huawei devices",
+    "url": "https://s.alicdn.com/@sc04/kf/A7a35feff2421469ea7d9a243988d515do.jpg_300x300.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-ruckus",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for ruckus devices",
+    "url": "https://images-na.ssl-images-amazon.com/images/I/51H9UuWLaTL.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-cradlepoint",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for cradlepoint devices",
+    "url": "https://i.ebayimg.com/images/g/13EAAeSwgIBqgWXX/s-l225.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-panduit",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for panduit devices",
+    "url": "https://s7d9.scene7.com/is/image/panduitdm/featured-product-3-image-1?qlt=85&ts=1780344172869&dpr=off",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-fiberhome",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for fiberhome devices",
+    "url": "https://www.hongtelecom.com/wp-content/uploads/sites/270/2018/09/FiberHome_FONST-6000-U-300x300.png",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-amazon",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for amazon devices",
+    "url": "https://i.ebayimg.com/images/g/aNYAAOSwkE5hrR0i/s-l225.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-zyxel",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for zyxel devices",
+    "url": "https://m.media-amazon.com/images/I/51M70MIz7EL.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-dell",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for dell devices",
+    "url": "https://res.cloudinary.com/dmwxtja1g/image/upload/q_1,e_blur:2000/c_lpad,dpr_1.0,f_auto,h_120,q_80,w_180/v1/media/catalog/product/d/e/dell_networking_n2248x-on_48x12.5gb_rj45_4xsfp28_2xqsfp_1xpsu_os6_front_zoom_2_1.jpg?_i=AB",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-fortinet",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for fortinet devices",
+    "url": "https://5.imimg.com/data5/SELLER/Default/2024/4/409010133/OI/JZ/PB/1422641/product-1-250x250.png",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-aruba",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for aruba devices",
+    "url": "https://inexa.in/wp-content/uploads/2022/11/product-access-points-remote_595x393.jpeg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-alcatel",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for alcatel devices",
+    "url": "https://web-assets.al-enterprise.com/-/media/assets/internet/images/os6370-p24-visual-product-page.png?h=1080&iar=0&w=1080&v=1&d=20260630T163632Z&hash=4EFC87342E3291E36300959B86A5C9BF",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-extreme",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for extreme devices",
+    "url": "https://webobjects2.cdw.com/is/image/CDW/6768626?$product-detail$",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-netgear",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for netgear devices",
+    "url": "https://www.insight.com/content/insight-web/en_US/shop/partner/netgear/jcr:content/root/responsivegrid_235889130/column_layout_1395696424/-column-1/image.img.png/1565230120773.png",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-watchguard",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for watchguard devices",
+    "url": "https://www.watchguard.com/sites/default/files/styles/medium/public/t40_compare.png?itok=pBaky2ud",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-peplink",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for peplink devices",
+    "url": "https://lian-li.com/wp-content/uploads/2024/10/L-Wireless-Controller_03.webp",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-checkpoint",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for checkpoint devices",
+    "url": "https://images.g2crowd.com/uploads/product/image/8dedb235969bcb553f9e412b16e93d0a/check-point-next-generation-firewalls-ngfws.png",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-google",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for google devices",
+    "url": "https://m.media-amazon.com/images/I/51S2PUgQt+S.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-usrobotics",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for usrobotics devices",
+    "url": "https://i.ebayimg.com/images/g/06UAAOSwDRxZswUR/s-l400.webp",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-paloalto",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for paloalto devices",
+    "url": "https://sitgl.co.uk/wp-content/uploads/2023/04/New-Palo-Alto-PA-850-NextGen-Firewall.png?v=1684332623",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-nokia",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for nokia devices",
+    "url": "https://telecomcauliffe.com/wp-content/uploads/2026/08/TELECOMCAULIFFE-Nokia-Telecom-Equipment-Guide-1-scaled.png",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-juniper",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for juniper devices",
+    "url": "https://webobjects2.cdw.com/is/image/CDW/juniper-ex4000-product-756?$transparent$",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-finisar",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for finisar devices",
+    "url": "https://m.media-amazon.com/images/I/81SpeOX8BcL.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-belden",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for belden devices",
+    "url": "https://www.discountedcables.com/cdn/shop/files/Belden-10GXS13-Roll-product-03.webp?v=1714080109&width=1445",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-moxa",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for moxa devices",
+    "url": "https://assets.rs-online.com/image/upload/f_auto,q_auto/v1665068911/MKT/LP/Suppliers/moxa/industrial-networking/moxa-industrial_networking-card.png",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-ciscoa",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for ciscoa devices",
+    "url": "https://networkwarehouse.co.uk/cdn/shop/files/cisco-wireless-9176-wifi-7-high-performance-directional-indoor-access-point-cw9176d1-cfg-938448_370x.jpg?v=1739313846%20370w",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-hpe",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for hpe devices",
+    "url": "https://i.ebayimg.com/images/g/2mMAAeSwlL9ob8vZ/s-l140.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-fs",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for fs devices",
+    "url": "https://m.media-amazon.com/images/I/814j7P3O2sL.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-digi",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for digi devices",
+    "url": "https://www.digi.com/getattachment/a6952adc-89c5-4a27-8d75-7489f48b5637/ix15-web.jpg?lang=en-US&width=480&height=270&ext=.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-zte",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for zte devices",
+    "url": "https://s.alicdn.com/@sc01/kf/HTB1qStrgb_I8KJjy1Xaq6zsxpXa4.jpg_80x80.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-arista",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for arista devices",
+    "url": "https://www.arista.com/assets/images/banner/product/7060_7260-product-1.png",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-tplink",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for tplink devices",
+    "url": "https://m.media-amazon.com/images/I/61QTaQ1INML.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-3com",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for 3com devices",
+    "url": "https://m.media-amazon.com/images/I/61YE6ww1qQL.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
+  },
+  {
+    "slug": "brave-search-cisco",
+    "kind": "terceros",
+    "publisher": "Brave Search (product photo)",
+    "title": "Product photo for cisco devices",
+    "url": "https://cdn.blueally.com/secureitstore/images/c4500/cisco-switch-4500-series.jpg",
+    "retrievedOn": "2026-09-13",
+    "authorityLevel": 3
   }
 ]
