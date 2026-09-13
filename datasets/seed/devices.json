@@ -1982,6 +1982,14 @@
         "sourceSlug": "nvidia-connectx6dx-brief",
         "localPath": "docs/NVIDIA Model ConnectX-6 DX.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "ConnectX-6 Dx SmartNIC 100G (4xQSFP56)",
+        "localPath": "assets/img/nvidia-connectx-6dx-frontal.webp",
+        "sourceSlug": "nvidia-connectx6dx-brief"
+      }
     ]
   },
   {
@@ -3302,6 +3310,14 @@
         "sourceSlug": "nvidia-connectx5-brief",
         "localPath": "docs/NVIDIA Model ConnectX-5.pdf"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "ConnectX-5 100GbE/EDR PCIe (2xQSFP28)",
+        "localPath": "assets/img/nvidia-connectx-5-frontal.webp",
+        "sourceSlug": "nvidia-connectx5-brief"
+      }
     ]
   },
   {
@@ -3554,6 +3570,14 @@
         "language": "en",
         "sourceSlug": "cisco-ie3000-datasheet",
         "localPath": "docs/Cisco 3000 Serie Switches.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Cisco IE 3000-8TC industrial (8xRJ45 + consola)",
+        "localPath": "assets/img/cisco-ie-3000-8tc-frontal.webp",
+        "sourceSlug": "cisco-ie3000-datasheet"
       }
     ]
   },
