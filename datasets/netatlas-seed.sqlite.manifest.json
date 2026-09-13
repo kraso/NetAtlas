@@ -1,9 +1,9 @@
 {
   "format": "netatlas-dataset",
   "name": "netatlas-seed",
-  "version": "netatlas-seed-2026-09-04-r1",
+  "version": "netatlas-seed-2026-09-13-r1",
   "schemaVersion": 3,
-  "publishedOn": "2026-09-04",
+  "publishedOn": "2026-09-13",
   "counts": {
     "dispositivos": 341,
     "relaciones": 2162,
@@ -12,8 +12,8 @@
     "categorias": 26,
     "topologias": 3
   },
-  "sha256": "6d8d15b6b089a62648b0d6ce56388098176e829a174453933624298e776f2325",
+  "sha256": "61e3a17e6c7412201ee4717e2e312afb7f52ade0648fa3a2665ea3a8cb39f2e2",
   "changelog": [
-    "dataset:build regenerado (2026-09-04)"
+    "dataset:build regenerado (2026-09-13)"
   ]
 }

@@ -956,6 +956,15 @@
         "title": "SURFboard SB6121 DOCSIS 3.0 Cable Modem — Data Sheet",
         "language": "en",
         "url": "https://gditechnology.com/manuals/Motorola-SB6121_Data_Sheet.pdf",
+        "sourceSlug": "motorola-sb6121-datasheet",
+        "localPath": "docs/Motorola-SB6121-datasheet.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Motorola SURFboard SB6121 DOCSIS 3.0 frontal",
+        "localPath": "assets/img/motorola-sb6121-frontal.png",
         "sourceSlug": "motorola-sb6121-datasheet"
       }
     ]
@@ -1328,6 +1337,15 @@
         "title": "Cisco 10GBASE SFP+ Modules Data Sheet",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/interfaces-modules/transceiver-modules/datasheet-c78-455693.html",
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet",
+        "localPath": "docs/Cisco-10GBASE-SFP-Modules-datasheet.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Cisco SFP-10G-SR 10GBASE-SR transceiver",
+        "localPath": "assets/img/cisco-sfp-10g-sr-frontal.png",
         "sourceSlug": "cisco-sfp-10g-sr-datasheet"
       }
     ]
@@ -1408,7 +1426,16 @@
         "title": "FS SFP-10GLR-31 — 10GBASE-LR SFP+ transceiver datasheet",
         "language": "en",
         "url": "https://www.fs.com/products/100032.html",
-        "sourceSlug": "fs-sfp-10g-lr-datasheet"
+        "sourceSlug": "fs-sfp-10g-lr-datasheet",
+        "localPath": "docs/Cisco-10GBASE-SFP-Modules-datasheet.pdf"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "FS SFP-10GLR-31 10GBASE-LR transceiver (compatible Cisco SFP-10G-LR)",
+        "localPath": "assets/img/fs-sfp-10g-lr-frontal.png",
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet"
       }
     ]
   },
@@ -1589,6 +1616,14 @@
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-6500-series-switches/product_data_sheet0900aecd804a85b4.html",
         "sourceSlug": "cisco-cat6500-datasheet"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Familia Catalyst 6500 (6503 a 6509-E, chassis modulares)",
+        "localPath": "assets/img/cisco-catalyst-6500-frontal.webp",
+        "sourceSlug": "cisco-cat6500-datasheet"
+      }
     ]
   },
   {
@@ -1735,6 +1770,14 @@
         "objectType": "layer",
         "objectSlug": "2"
       }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Kalpana EtherSwitch EPS-1500 (primer switch Ethernet comercial)",
+        "localPath": "assets/img/kalpana-eps-1500-frontal.jpg",
+        "sourceSlug": "kalpana-eifo-historical"
+      }
     ]
   },
   {
@@ -1836,6 +1879,14 @@
         "title": "Cisco NCS 5500 Series Data Sheet (Silicon One / Jericho)",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/routers/network-convergence-system-5500-series/datasheet-c78-737226.html",
+        "sourceSlug": "cisco-ncs5500-datasheet"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Cisco NCS 5500 chassis modular (frontal con line cards)",
+        "localPath": "assets/img/cisco-ncs-5500-frontal.webp",
         "sourceSlug": "cisco-ncs5500-datasheet"
       }
     ]
@@ -3062,6 +3113,14 @@
         "title": "Netgear GS324TP — Soporte, manuales y firmware",
         "language": "en",
         "url": "https://www.netgear.com/support/product/gs324tp",
+        "sourceSlug": "netgear-gs324tp-spec"
+      }
+    ],
+    "images": [
+      {
+        "kind": "frontal",
+        "caption": "Netgear GS324TP S350 24Puertos PoE+ 2SFP",
+        "localPath": "assets/img/netgear-gs324tp-frontal.jpg",
         "sourceSlug": "netgear-gs324tp-spec"
       }
     ]

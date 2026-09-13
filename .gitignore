@@ -39,3 +39,7 @@ datasets/**/*.sqlite-shm
 # SO
 .DS_Store
 Thumbs.db
+
+# Archivos de log
+hardware-v1.md 
+hardware-v2.md
