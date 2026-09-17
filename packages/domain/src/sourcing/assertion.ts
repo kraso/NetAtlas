@@ -14,40 +14,71 @@ export function isConfidence(value: string): value is Confidence {
 }
 
 /**
+ * Vocabulario cerrado de la tabla source (sección 20.2).
+ * Es la única fuente de verdad del union: antes vivía escrito inline en los
+ * mapeos de lectura, que lo repetían sin validarlo.
+ */
+export const SOURCE_KINDS = [
+  'datasheet',
+  'manual',
+  'rfc',
+  'ieee',
+  'web-oficial',
+  'libro',
+  'terceros',
+  'editorial',
+] as const
+
+export type SourceKind = (typeof SOURCE_KINDS)[number]
+
+export function isSourceKind(value: string): value is SourceKind {
+  return (SOURCE_KINDS as readonly string[]).includes(value)
+}
+
+/** Autoridad de la fuente: 1 oficial … 4 comunitario. */
+export const AUTHORITY_LEVELS = [1, 2, 3, 4] as const
+
+export type AuthorityLevel = (typeof AUTHORITY_LEVELS)[number]
+
+export function isAuthorityLevel(value: number): value is AuthorityLevel {
+  return (AUTHORITY_LEVELS as readonly number[]).includes(value)
+}
+
+/**
  * Fuente documental (tabla source, sección 20.2).
  * Toda afirmación crítica cuelga de una fuente con nivel de autoridad.
  */
 export interface SourceProps {
   readonly slug: string
-  readonly kind:
-    | 'datasheet'
-    | 'manual'
-    | 'rfc'
-    | 'ieee'
-    | 'web-oficial'
-    | 'libro'
-    | 'terceros'
-    | 'editorial'
+  readonly kind: SourceKind
   readonly publisher?: string | undefined
   readonly title: string
   readonly url?: string | undefined
   readonly publishedOn?: string | undefined
   readonly retrievedOn?: string | undefined
-  /** 1 oficial … 4 comunitario */
-  readonly authorityLevel: 1 | 2 | 3 | 4
+  readonly authorityLevel: AuthorityLevel
 }
 
 export class Source {
   readonly slug: string
-  readonly kind: SourceProps['kind']
+  readonly kind: SourceKind
   readonly publisher?: string
   readonly title: string
   readonly url?: string
   readonly publishedOn?: string
   readonly retrievedOn?: string
-  readonly authorityLevel: 1 | 2 | 3 | 4
+  readonly authorityLevel: AuthorityLevel
 
   private constructor(props: SourceProps) {
+    if (props.slug.trim().length === 0) {
+      throw new Error('Source: slug no puede estar vacío.')
+    }
+    if (!isSourceKind(props.kind)) {
+      throw new Error(`Source: kind inválido: "${props.kind}". Catálogo: ${SOURCE_KINDS.join(', ')}.`)
+    }
+    if (!isAuthorityLevel(props.authorityLevel)) {
+      throw new Error(`Source: authorityLevel inválido: "${props.authorityLevel}" (1 oficial … 4 comunitario).`)
+    }
     if (props.title.trim().length === 0) {
       throw new Error('Source: title no puede estar vacío.')
     }

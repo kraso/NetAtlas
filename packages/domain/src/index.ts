@@ -17,8 +17,8 @@ export { LIFECYCLE_STATUSES, isLifecycleStatus, requireLifecycleStatus } from '.
 export type { LifecycleStatus } from './value-objects/lifecycle.js'
 
 // Sourcing (sección 20)
-export { Source, Assertion, CONFIDENCE_LEVELS, isConfidence } from './sourcing/assertion.js'
-export type { SourceProps, AssertionProps, Confidence } from './sourcing/assertion.js'
+export { Source, Assertion, CONFIDENCE_LEVELS, isConfidence, SOURCE_KINDS, isSourceKind, AUTHORITY_LEVELS, isAuthorityLevel } from './sourcing/assertion.js'
+export type { SourceProps, AssertionProps, Confidence, SourceKind, AuthorityLevel } from './sourcing/assertion.js'
 export { Datasheet } from './sourcing/datasheet.js'
 export type { DatasheetProps } from './sourcing/datasheet.js'
 export { DeviceImage } from './sourcing/image.js'

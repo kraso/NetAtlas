@@ -17,7 +17,9 @@ dev-dist/
 
 # CodeGraph (índice local generado) y configuración personal del cliente opencode
 .codegraph/
+.gga
 opencode.jsonc
+.atl/
 
 # Hermes session cache (no commit)
 .hermes/
