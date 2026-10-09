@@ -24,6 +24,16 @@ export interface IssueRecurso {
 /** Prefijo, relativo a `public/`, desde el que la app sirve los recursos. */
 const PREFIJO_BUNDLE = 'assets/'
 
+/**
+ * ¿La ruta se sale del bundle? Rechaza rutas absolutas y segmentos `.`/`..`/
+ * vacíos: sin esto, un `assets/../../x` pasaría el invariante y no sería el
+ * fichero que la app sirve.
+ */
+function escapaDelBundle(ruta: string): boolean {
+  if (ruta.startsWith('/')) return true
+  return ruta.split('/').some((segmento) => segmento === '' || segmento === '.' || segmento === '..')
+}
+
 /** Recolecta los `localPath` declarados por los dispositivos, con su dueño. */
 export function recursosLocalesDe(
   devices: readonly {
@@ -59,10 +69,10 @@ export function validarRecursosLocales(
   const issues: IssueRecurso[] = []
   for (const recurso of recursos) {
     const donde = `${recurso.clase} de "${recurso.deviceSlug}"`
-    if (!recurso.ruta.startsWith(PREFIJO_BUNDLE)) {
+    if (!recurso.ruta.startsWith(PREFIJO_BUNDLE) || escapaDelBundle(recurso.ruta)) {
       issues.push({
         rule: 'local-path-fuera-bundle',
-        message: `${donde} apunta a "${recurso.ruta}", fuera del bundle (debe empezar por "${PREFIJO_BUNDLE}").`,
+        message: `${donde} apunta a "${recurso.ruta}", fuera del bundle (debe ser una ruta relativa "${PREFIJO_BUNDLE}…" sin "..").`,
       })
       continue
     }
