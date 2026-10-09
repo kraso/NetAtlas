@@ -241,7 +241,8 @@
         "title": "Aruba 2930F Switch Series Data Sheet",
         "language": "en",
         "url": "https://www.arubanetworks.com/assets/ds/DS_2930F.pdf",
-        "sourceSlug": "aruba-2930f-datasheet"
+        "sourceSlug": "aruba-2930f-datasheet",
+        "localPath": "docs/Aruba 2930F Switch Series - data sheet.pdf"
       }
     ],
     "images": [
@@ -481,7 +482,8 @@
         "title": "Cisco 4000 Series ISR Data Sheet",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/routers/4000-series-integrated-services-routers-isr/datasheet-c78-732543.html",
-        "sourceSlug": "cisco-isr4321-datasheet"
+        "sourceSlug": "cisco-isr4321-datasheet",
+        "localPath": "docs/Cisco ISR4321 datasheet.pdf"
       }
     ],
     "images": [
@@ -1666,7 +1668,8 @@
         "title": "Cisco Catalyst 6500 Series Switches Data Sheet (Supervisor Engine)",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-6500-series-switches/product_data_sheet0900aecd804a85b4.html",
-        "sourceSlug": "cisco-cat6500-datasheet"
+        "sourceSlug": "cisco-cat6500-datasheet",
+        "localPath": "docs/Catalyst 6500-E Serie Chassis.pdf"
       }
     ],
     "images": [
@@ -1947,7 +1950,8 @@
         "title": "Cisco NCS 5500 Series Data Sheet (Silicon One / Jericho)",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/routers/network-convergence-system-5500-series/datasheet-c78-737226.html",
-        "sourceSlug": "cisco-ncs5500-datasheet"
+        "sourceSlug": "cisco-ncs5500-datasheet",
+        "localPath": "docs/Cisco Network Convergence System 5500 Series.pdf"
       }
     ],
     "images": [
@@ -2164,7 +2168,8 @@
         "title": "Cisco Catalyst 9300 Series Switches Data Sheet (UADP 2.0 ASIC)",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-9300-series-switches/datasheet-c78-742519.html",
-        "sourceSlug": "cisco-cat9300-datasheet"
+        "sourceSlug": "cisco-cat9300-datasheet",
+        "localPath": "docs/Catalyst 9300 Series Switches Data Sheet.pdf"
       }
     ],
     "images": [
@@ -2273,7 +2278,8 @@
         "title": "Arista 7050SX Series Datasheet (7050SX-64)",
         "language": "en",
         "url": "https://www.arista.com/assets/data/pdf/Datasheets/7050SX-128_64_Datasheet.pdf",
-        "sourceSlug": "arista-7050sx-datasheet"
+        "sourceSlug": "arista-7050sx-datasheet",
+        "localPath": "docs/7050 Series 1RU (Gen 3) - Overview - Arista.pdf"
       }
     ],
     "images": [
@@ -2380,7 +2386,8 @@
         "title": "FortiGate 200F Series Data Sheet + Hardware acceleration (FortiOS 7.6.2)",
         "language": "en",
         "url": "https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture",
-        "sourceSlug": "fortinet-fg200f-datasheet"
+        "sourceSlug": "fortinet-fg200f-datasheet",
+        "localPath": "docs/FortiGate 200F Series Data Sheet.pdf"
       }
     ],
     "images": [
@@ -3189,7 +3196,8 @@
         "title": "Netgear GS324TP — Soporte, manuales y firmware",
         "language": "en",
         "url": "https://www.netgear.com/support/product/gs324tp",
-        "sourceSlug": "netgear-gs324tp-spec"
+        "sourceSlug": "netgear-gs324tp-spec",
+        "localPath": "docs/NetGear GS324TP - S350 Smart Switch Series.pdf"
       }
     ],
     "images": [
