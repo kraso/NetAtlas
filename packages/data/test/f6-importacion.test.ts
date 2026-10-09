@@ -14,7 +14,7 @@ import {
   applyMigrations,
   loadMigrations,
 } from '../src/index.js'
-import type { DatasetManifest } from '@netatlas/domain'
+import { FUENTE_ASISTIDA, type DatasetManifest } from '@netatlas/domain'
 import { fileURLToPath } from 'node:url'
 
 const migrationsDir = join(dirname(fileURLToPath(import.meta.url)), '..', 'migrations')
@@ -75,6 +75,33 @@ describe('Dashboard de calidad (NET-HW-047)', () => {
     expect(q.dispositivosSinEAV).toBe(1) // sw-2
     expect(q.relaciones).toBe(0)
     expect(q.porCategoria.find((c) => c.categoria === 'CAT-SWT')?.cobertura).toBe(50)
+  })
+
+  // Regresión del bug preexistente: la métrica contaba como «datos críticos
+  // curados» el supports-protocol de las 299 fichas asistidas (fuente
+  // netatlas-assist) y marcaba 59% en vez del 10% real.
+  it('excluye las fuentes sintéticas de los datos críticos (assertion y arista)', () => {
+    const driver = baseDriver()
+    const dao = new CatalogDao(driver)
+    dao.upsertManufacturer({ slug: 'acme', name: 'Acme' })
+    dao.upsertCategory({ code: 'CAT-SWT', nameEs: 'Switching', aliases: [] })
+    dao.upsertSource({ slug: 'real-1', kind: 'datasheet', title: 'Real', authorityLevel: 1 })
+    dao.upsertSource({ slug: FUENTE_ASISTIDA, kind: 'editorial', title: 'Asistido', authorityLevel: 3 })
+    dao.seedPredicates([{ code: 'supports-protocol', domain: ['device'], range: ['protocol'] }])
+
+    dao.upsertDevice({ slug: 'gen-1', name: 'Generado', manufacturerSlug: 'acme', categoryCode: 'CAT-SWT', lifecycleStatus: 'current' })
+    const idGen = dao.addAssertion({ subjectType: 'device', subjectId: dao.deviceId('gen-1')!, predicate: 'supports-protocol', valueJson: '"ospf"', sourceSlug: FUENTE_ASISTIDA, confidence: 'third-party', verifiedOn: '2025-01-01', author: 'assist' })
+    dao.addRelationship({ subjectType: 'device', subjectId: dao.deviceId('gen-1')!, predicate: 'supports-protocol', objectType: 'protocol', objectId: dao.protocolId('ospf'), assertionId: idGen })
+
+    dao.upsertDevice({ slug: 'cur-1', name: 'Curado', manufacturerSlug: 'acme', categoryCode: 'CAT-SWT', lifecycleStatus: 'current' })
+    dao.addAssertion({ subjectType: 'device', subjectId: dao.deviceId('cur-1')!, predicate: 'throughput_gbps', valueJson: '{"gbps":100}', sourceSlug: 'real-1', confidence: 'official', verifiedOn: '2025-01-01', author: 'test' })
+    dao.addAssertion({ subjectType: 'device', subjectId: dao.deviceId('cur-1')!, predicate: 'supports-protocol', valueJson: '"ospf"', sourceSlug: 'real-1', confidence: 'official', verifiedOn: '2025-01-01', author: 'test' })
+
+    const r = new SqliteQualityRepository(driver).qualityReport().coberturaCritica
+    expect(r.elegibles).toBe(2)
+    expect(r.curados).toBe(1) // solo cur-1
+    expect(r.items.find((i) => i.slug === 'gen-1')?.faltan).toContain('protocolos')
+    expect(r.items.find((i) => i.slug === 'cur-1')?.curado).toBe(true)
   })
 })
 
