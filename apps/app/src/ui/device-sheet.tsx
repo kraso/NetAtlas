@@ -597,17 +597,22 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
         <ul>
           {fichas.map((f) => (
             <li key={`${f.title}-${f.language}`}>
-              {f.url ? (
-                <a href={f.url} target="_blank" rel="noreferrer">{f.title}</a>
-              ) : f.localPath ? (
+              {/* La copia local manda: es la que la app sirve siempre, sin red.
+                  La web queda como enlace secundario de procedencia. */}
+              {f.localPath ? (
                 <a href={urlDeBundle(f.localPath)} target="_blank" rel="noreferrer">{f.title}</a>
+              ) : f.url ? (
+                <a href={f.url} target="_blank" rel="noreferrer">{f.title}</a>
               ) : (
                 <span>{f.title}</span>
               )}{' '}
               <span className="mono guia-tecnica">[{f.language}]</span>{' '}
               <span className="guia-tecnica">{f.source.title}</span>
-              {f.url === undefined && f.localPath !== undefined ? (
+              {f.localPath !== undefined ? (
                 <>{' '}<span className="guia-tecnica">· copia local (offline)</span></>
+              ) : null}
+              {f.localPath !== undefined && f.url !== undefined ? (
+                <>{' '}<a href={f.url} target="_blank" rel="noreferrer" className="guia-tecnica">fuente online</a></>
               ) : null}
             </li>
           ))}
