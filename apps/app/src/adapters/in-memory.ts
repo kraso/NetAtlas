@@ -32,7 +32,7 @@ import type {
   Relationship as RelationshipType,
 } from '@netatlas/domain'
 import type { Speed, Confidence } from '@netatlas/domain'
-import { calcularCoberturaCritica, PASIVAS } from '@netatlas/domain'
+import { calcularCoberturaCritica, esFuenteSintetica, PASIVAS } from '@netatlas/domain'
 import type { CoberturaCriticaResultado } from '@netatlas/domain'
 
 /**
@@ -738,7 +738,8 @@ export class InMemoryQualityRepository implements UiQualityRepo {
     }
 
     // Cobertura de datos críticos (F2): assertions y relaciones del demo con la
-    // misma métrica pura del dominio que el SQLite real.
+    // misma métrica pura del dominio que el SQLite real. Igual que allí, las
+    // fuentes sintéticas quedan fuera: no son datos curados.
     const slugDeAssertion = (a: Assertion): string | undefined =>
       a.subjectType === 'device' ? this.data.devices[a.subjectId - 1]?.slug.value : undefined
     const coberturaCritica = calcularCoberturaCritica(
@@ -747,7 +748,9 @@ export class InMemoryQualityRepository implements UiQualityRepo {
         .map((d) => ({
           slug: d.slug.value,
           categoryCode: d.categoryCode,
-          assertionPredicates: this.data.assertions.filter((a) => slugDeAssertion(a) === d.slug.value).map((a) => a.predicate),
+          assertionPredicates: this.data.assertions
+            .filter((a) => slugDeAssertion(a) === d.slug.value && !esFuenteSintetica(a.source.slug))
+            .map((a) => a.predicate),
           relationshipPredicates: this.data.relationships.filter((r) => r.subject.slug === d.slug.value || r.object.slug === d.slug.value).map((r) => r.predicate),
         })),
     )

@@ -4,7 +4,7 @@
  *
  * Datos críticos definidos por el plan: throughput, protocolos, compatibilidades.
  * Esta función pura calcula, por dispositivo, si sus datos críticos están
- * curados (assertion con fuente, no generado sintético) y agrega el % global.
+ * curados (assertion con fuente real, no generada) y agrega el % global.
  *
  * Regla por dispositivo:
  *  - throughput: assertion `*_throughput_*` con fuente ≠ auto-generada.
@@ -13,7 +13,27 @@
  *  - Elementos pasivos (CAT-PAS) se excluyen del denominador (sin electrónica).
  *  - `requiereCompatibilidades` indica si la categoría espera compatibilidades
  *    (p. ej. transceivers frente a medios); si es false, ese ítem no resta.
+ *
+ * CONTRATO DEL INPUT: `assertionPredicates`/`relationshipPredicates` deben
+ * traer solo datos CURADOS. Filtrar las fuentes sintéticas (FUENTES_SINTETICAS)
+ * es responsabilidad del adaptador que lee el dataset: las 299 fichas
+ * asistidas del seed tienen `supports-protocol` con fuente `netatlas-assist`
+ * y contarlas infla la métrica (59% en vez del 10% real).
  */
+
+/** Fuente de los datos generados por `tools/dataset-tools` (importación asistida). */
+export const FUENTE_ASISTIDA = 'netatlas-assist'
+
+/**
+ * Fuentes sintéticas: las escribe una herramienta, no un documento. Un dato
+ * con estas fuentes NO es un dato curado y no puede sostener la métrica.
+ */
+export const FUENTES_SINTETICAS: readonly string[] = [FUENTE_ASISTIDA]
+
+/** ¿El slug de fuente es sintético (generado por herramienta, no verificado)? */
+export function esFuenteSintetica(slug: string): boolean {
+  return FUENTES_SINTETICAS.includes(slug)
+}
 
 export type DatoCritico = 'throughput' | 'protocolos' | 'compatibilidades'
 
