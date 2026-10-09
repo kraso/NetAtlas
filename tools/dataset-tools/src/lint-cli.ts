@@ -6,9 +6,10 @@ import { dirname, join } from 'node:path'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const seedDir = process.argv[2] ?? join(here, '..', '..', '..', 'datasets', 'seed')
+const publicDir = join(here, '..', '..', '..', 'apps', 'app', 'public')
 
 const seed = loadSeed(seedDir)
-const report = lintSeed(seed)
+const report = lintSeed(seed, publicDir)
 for (const issue of report.issues) {
   const tag = issue.severity === 'error' ? 'ERROR' : 'WARN '
   console.log(`[${tag}] [${issue.rule}] ${issue.message}`)
