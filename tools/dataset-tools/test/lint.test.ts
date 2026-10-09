@@ -45,6 +45,42 @@ describe('data:lint — dataset seed', () => {
     expect(conFuente / criticos.length).toBeGreaterThanOrEqual(0.8)
   })
 
+  // Regresión: 42 assertions de 18 dispositivos citaban el criterio editorial del
+  // hub 3Com (el documento de OTRO dispositivo) para justificar protocolos que
+  // ese documento no cubre.
+  it('rechaza que un dispositivo cite el documento declarado por otro (fuente ajena)', () => {
+    const base = {
+      categories: [{ code: 'CAT-SWT', nameEs: 'Switching' }],
+      manufacturers: [{ slug: 'acme', name: 'Acme' }],
+      sources: [
+        { slug: 'doc-a', kind: 'datasheet', title: 'Doc A', authorityLevel: 1 },
+        { slug: 'doc-b', kind: 'datasheet', title: 'Doc B', authorityLevel: 1 },
+        { slug: 'criterio-general', kind: 'editorial', title: 'Criterio', authorityLevel: 3 },
+      ],
+      protocols: [{ code: 'ospf', name: 'OSPF', family: 'internet', osiLayer: 3 }],
+      standards: [],
+      media: [],
+    }
+    const device = (slug: string, sourceSlug: string, declara = 'doc-a') => ({
+      slug,
+      name: slug,
+      manufacturerSlug: 'acme',
+      categoryCode: 'CAT-SWT',
+      lifecycleStatus: 'current',
+      assertions: [{ predicate: 'supports-protocol', value: 'ospf', sourceSlug, confidence: 'third-party' }],
+      datasheets: [{ title: 'Doc', sourceSlug: declara }],
+    })
+    // criterio-general no lo declara ningún dispositivo → fuente compartida.
+    const propios = lintSeed({ ...base, devices: [device('sw-1', 'doc-a'), device('sw-2', 'criterio-general', 'doc-b')] })
+    expect(propios.issues.filter((i) => i.rule === 'assertion-source-ajena')).toEqual([])
+
+    // sw-2 declara doc-b pero cita doc-a, que es de sw-1.
+    const ajenos = lintSeed({ ...base, devices: [device('sw-1', 'doc-a'), device('sw-2', 'doc-a', 'doc-b')] })
+    const problema = ajenos.issues.find((i) => i.rule === 'assertion-source-ajena')
+    expect(problema?.severity).toBe('error')
+    expect(problema?.message).toContain('sw-2')
+  })
+
   it('todo protocolo de assertion supports-protocol existe en el catálogo (8.6-1)', () => {
     const codes = new Set(seed.protocols.map((p) => p.code))
     for (const dev of seed.devices) {

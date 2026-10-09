@@ -13,6 +13,10 @@ import { LIFECYCLE_STATUSES, isConfidence, findPredicate } from '@netatlas/domai
  * 8. Relaciones: predicado conocido y extremos referenciados.
  * 9. `replaced-by` ⇒ estado EoL+ en el sujeto.
  * 10. `evolves-into`/`succeeds` acíclicos.
+ * 11. La fuente de una assertion es propia o compartida: ningún dispositivo
+ *     cita el documento declarado por otro dispositivo (bug real: 42
+ *     assertions de 18 dispositivos citaban el criterio editorial del hub 3Com
+ *     para justificar protocolos que ese documento no cubre).
  */
 
 export interface LintIssue {
@@ -113,6 +117,18 @@ export function lintSeed(input: {
   const mediumCodes = new Set(input.media.map((m) => m.code))
   const deviceSlugs = new Set<string>()
 
+  // Propietarios de cada fuente declarada como documento de un dispositivo.
+  // Una fuente sin propietario es compartida (estándar, certificación, criterio
+  // editorial general, datos asistidos) y cualquier dispositivo puede citarla.
+  const duenosDeFuente = new Map<string, Set<string>>()
+  for (const device of input.devices) {
+    for (const ds of device.datasheets ?? []) {
+      const duenos = duenosDeFuente.get(ds.sourceSlug) ?? new Set<string>()
+      duenos.add(device.slug)
+      duenosDeFuente.set(ds.sourceSlug, duenos)
+    }
+  }
+
   // Catálogos cerrados: códigos únicos (con exclusión de conflictos)
   for (const p of input.protocols) {
     if (!p.code || p.code.trim() === '') push('error', 'protocol-code', 'Protocolo sin código.')
@@ -155,6 +171,11 @@ export function lintSeed(input: {
       }
       if (assertion.confidence !== undefined && !isConfidence(assertion.confidence)) {
         push('error', 'assertion-confidence', `Dispositivo "${device.slug}": confianza inválida "${assertion.confidence}".`)
+      }
+      // 11. Fuente ajena: el documento de otro dispositivo no sostiene este dato.
+      const duenos = duenosDeFuente.get(assertion.sourceSlug)
+      if (duenos !== undefined && !duenos.has(device.slug)) {
+        push('error', 'assertion-source-ajena', `Dispositivo "${device.slug}": assertion "${assertion.predicate}" cita el documento de "${[...duenos].join('/')}" ("${assertion.sourceSlug}").`)
       }
       // 8.6-1: supports-protocol en assertion debe apuntar a catálogo cerrado
       if (assertion.predicate === 'supports-protocol' && typeof assertion.value === 'string') {
