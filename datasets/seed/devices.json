@@ -548,7 +548,7 @@
       {
         "predicate": "routing_throughput_mbps",
         "value": 1000,
-        "sourceSlug": "wi-fi-6-alliance",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party",
         "note": "Rendimiento medido por comunidad, no oficial"
       },
@@ -573,19 +573,19 @@
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lldp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party"
       }
     ],
@@ -681,7 +681,7 @@
           },
           "summary": "Punto de acceso empresarial Wi-Fi 6: el SoC integra el procesamiento de las radios 4x4:4 (2.4/5 GHz), la agilidad de RF y los servicios de red; los detalles de CPU/RAM no se publican en el datasheet."
         },
-        "sourceSlug": "aruba-2930f-datasheet",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "experimental",
         "note": "SoC no publicado por Aruba; la arquitectura Wi-Fi 6 4x4:4 es oficial pero la electrónica interna no."
       },
@@ -694,19 +694,19 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ac",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "capwap",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "wpa3",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "third-party"
       }
     ],
@@ -820,13 +820,13 @@
       {
         "predicate": "supports-protocol",
         "value": "tr069",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "huawei-hg8245h-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "huawei-hg8245h-datasheet",
         "confidence": "third-party"
       },
       {
@@ -922,7 +922,7 @@
       {
         "predicate": "docsis_version",
         "value": "3.0",
-        "sourceSlug": "usrobotics-56k-manual",
+        "sourceSlug": "motorola-sb6121-datasheet",
         "confidence": "third-party"
       },
       {
@@ -942,13 +942,13 @@
       {
         "predicate": "supports-protocol",
         "value": "docsis",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "motorola-sb6121-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "motorola-sb6121-datasheet",
         "confidence": "third-party"
       }
     ],
@@ -1043,7 +1043,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ppp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "usrobotics-56k-manual",
         "confidence": "third-party"
       },
       {
@@ -1084,6 +1084,12 @@
         "language": "en",
         "sourceSlug": "usrobotics-56k-manual",
         "localPath": "docs/USR Model 5630G 56K.pdf"
+      },
+      {
+        "title": "Sportster 56K Voice Faxmodem — arquitectura módem (DSP + controlador)",
+        "language": "es",
+        "url": null,
+        "sourceSlug": "usrobotics-56k-historical"
       }
     ],
     "images": [
@@ -1142,14 +1148,14 @@
       {
         "predicate": "firewall_throughput_gbps",
         "value": 20,
-        "sourceSlug": "aruba-2930f-datasheet",
+        "sourceSlug": "fortinet-fg100f-docs",
         "confidence": "third-party",
         "note": "Dato pendiente de fuente oficial"
       },
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "aruba-2930f-datasheet",
+        "sourceSlug": "fortinet-fg100f-docs",
         "confidence": "third-party"
       },
       {
@@ -1249,7 +1255,7 @@
           },
           "summary": "Hub Ethernet de capa 1: funciona como repetidor multipuerto que retransmite las tramas a todos los puertos (CSMA/CD, un único dominio de colisión); no hay conmutación ni CPU de plano de datos."
         },
-        "sourceSlug": "kalpana-eifo-historical",
+        "sourceSlug": "3com-hub-editorial",
         "confidence": "historical",
         "note": "Arquitectura de hub 10BASE-T estándar de la época (IEEE 802.3); el repetidor no requiere CPU de reenvío."
       },
@@ -1273,6 +1279,12 @@
         "language": "en",
         "sourceSlug": "3com-hub8-datasheet",
         "localPath": "docs/3Com Model 3C16700A Ethernet Hub.pdf"
+      },
+      {
+        "title": "Criterio editorial: hubs y dominios de colisión",
+        "language": "es",
+        "url": null,
+        "sourceSlug": "3com-hub-editorial"
       }
     ],
     "images": [
@@ -1314,13 +1326,13 @@
       {
         "predicate": "reach_m",
         "value": 300,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet",
         "confidence": "official"
       },
       {
         "predicate": "wavelength_nm",
         "value": 850,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet",
         "confidence": "official"
       },
       {
@@ -1403,13 +1415,13 @@
       {
         "predicate": "reach_m",
         "value": 10000,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "fs-sfp-10g-lr-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "wavelength_nm",
         "value": 1310,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "fs-sfp-10g-lr-datasheet",
         "confidence": "third-party"
       },
       {
@@ -1592,7 +1604,7 @@
       {
         "predicate": "throughput_gbps",
         "value": 2560,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "historical"
       },
       {
@@ -1615,25 +1627,25 @@
       {
         "predicate": "supports-protocol",
         "value": "mpls",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lldp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       }
     ],
@@ -1710,19 +1722,19 @@
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat4000-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat4000-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lldp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat4000-datasheet",
         "confidence": "third-party"
       },
       {
@@ -1787,7 +1799,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ethernet",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "kalpana-eifo-historical",
         "confidence": "historical"
       },
       {
@@ -1824,6 +1836,14 @@
         "kind": "frontal",
         "caption": "Kalpana EtherSwitch EPS-1500 (primer switch Ethernet comercial)",
         "localPath": "assets/img/kalpana-eps-1500-frontal.jpg",
+        "sourceSlug": "kalpana-eifo-historical"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Kalpana EtherSwitch EIFO-8+ — primer switch Ethernet (1990), arquitectura del conmutador",
+        "language": "es",
+        "url": "https://en.wikipedia.org/wiki/Ethernet_switch",
         "sourceSlug": "kalpana-eifo-historical"
       }
     ]
@@ -1876,20 +1896,20 @@
       {
         "predicate": "routing_throughput_mbps",
         "value": 1000000,
-        "sourceSlug": "cisco-isr4321-datasheet",
+        "sourceSlug": "cisco-ncs5500-datasheet",
         "confidence": "third-party",
         "note": "Throughput agregado; pendiente datasheet oficial"
       },
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "cisco-isr4321-datasheet",
+        "sourceSlug": "cisco-ncs5500-datasheet",
         "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
         "value": "mpls",
-        "sourceSlug": "cisco-isr4321-datasheet",
+        "sourceSlug": "cisco-ncs5500-datasheet",
         "confidence": "official"
       },
       {
@@ -2091,20 +2111,20 @@
       {
         "predicate": "throughput_gbps",
         "value": 256,
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat9300-datasheet",
         "confidence": "third-party",
         "note": "Switching capacity aprox.; validar con datasheet oficial en F2"
       },
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat9300-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "vxlan-evpn",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat9300-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2204,13 +2224,13 @@
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "arista-7050sx-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "vxlan-evpn",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "arista-7050sx-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2312,14 +2332,14 @@
       {
         "predicate": "firewall_throughput_gbps",
         "value": 18,
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "fortinet-fg200f-datasheet",
         "confidence": "third-party",
         "note": "Validar con datasheet oficial en F2"
       },
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "fortinet-fg200f-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2420,13 +2440,13 @@
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubiquiti-techspecs",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubiquiti-techspecs",
         "confidence": "third-party"
       },
       {
@@ -2526,7 +2546,7 @@
       {
         "predicate": "terminates-medium",
         "value": "wifi-6",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2540,7 +2560,7 @@
           },
           "summary": "Punto de acceso Wi-Fi 6 de largo alcance: el SoC Qualcomm integra las radios 4x4 (2.4/5 GHz AX) y la CPU ARM procesa el plano de control Wi-Fi; 512 MB de RAM según especificación de plataforma."
         },
-        "sourceSlug": "ubiquiti-techspecs",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "experimental",
         "note": "SoC de la plataforma UniFi 6 documentado por la comunidad (techspecs.ui.com); Ubiquiti no publica el modelo exacto del SoC."
       },
@@ -2553,13 +2573,13 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ac",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "wpa3",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2662,7 +2682,7 @@
       {
         "predicate": "supports-protocol",
         "value": "802.1q",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-crs328-spec",
         "confidence": "third-party"
       },
       {
@@ -2764,7 +2784,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "juniper-ex2300-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2992,7 +3012,7 @@
       {
         "predicate": "wifi_standard",
         "value": "802.11ax",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
@@ -3013,19 +3033,19 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ax",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "nat",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
@@ -3128,25 +3148,25 @@
       {
         "predicate": "supports-protocol",
         "value": "stp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "mstp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lacp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "snmp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
@@ -3229,7 +3249,7 @@
       {
         "predicate": "supports-protocol",
         "value": "profinet",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "siemens-scalance-xc206-2-datasheet",
         "confidence": "third-party"
       },
       {
@@ -3490,7 +3510,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ethernet",
-        "sourceSlug": "kalpana-eifo-historical",
+        "sourceSlug": "cisco-catalyst-3000-overview",
         "confidence": "historical",
         "note": "Ficha histórica documental; no hay datasheet digital conservado."
       },
@@ -4568,7 +4588,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ethernet",
-        "sourceSlug": "kalpana-eifo-historical",
+        "sourceSlug": "kalpana-eps2115-datasheet",
         "confidence": "historical"
       }
     ],
