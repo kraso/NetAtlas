@@ -41,6 +41,9 @@ jobs:
       - name: data:lint (invariantes del seed)
         run: pnpm data:lint
 
+      - name: 'data:manifiesto (integridad + compatibilidad de esquema del seed)'
+        run: pnpm --filter @netatlas/dataset-tools run data:manifiesto
+
       - name: 'Benchmark FTS5 (SLO F0: p95 bajo 50 ms sobre 10k)'
         run: pnpm bench
 

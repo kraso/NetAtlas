@@ -28,8 +28,13 @@ export type { DeltaApplyResult } from './delta.js'
 export { composeRuntime, disposeRuntime } from './composition-root.js'
 export type { RuntimeContext, CompositionOptions } from './composition-root.js'
 
-/** Versión de esquema del dataset que esta app soporta (sección 19.4). */
-export const DATASET_SCHEMA_VERSION = 2
+/**
+ * Versión de esquema del dataset que esta app soporta (sección 19.4).
+ * Debe seguir a la última migración aplicable: hoy 0003_manufacturer_snmp.
+ * Un desfase aquí rechaza el seed propio con «Esquema N > máximo M» en
+ * data:manifiesto (ver test de regresión).
+ */
+export const DATASET_SCHEMA_VERSION = 3
 
 // Sincronización (F8A, §23.4 / NET-HW-063) — tablas runtime-only (fuera del manifiesto)
 export { SqliteOutboxRepository, SqliteReplicaRepository } from './sync/sqlite-sync.js'
