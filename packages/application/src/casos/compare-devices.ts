@@ -8,6 +8,8 @@
  * Extraído de apps/app/src/ui/comparar.tsx (líneas 55-149) para que:
  *  - la UI solo proyecta el `ComparisonReport` recibido;
  *  - el servidor (F8B) puede producir comparativas vía API sin duplicar.
+ *
+ * Los insumos por dispositivo viven en `compare-devices-insumos.ts`.
  */
 import { compareDevices, evaluateCompatibilidad } from '@netatlas/domain'
 import type {
@@ -22,10 +24,27 @@ import type {
   DevicePort,
   AttributesPort,
 } from '../index.js'
+import { insumosDeDispositivo } from './compare-devices-insumos.js'
 
 export interface CompareInput {
   /** Slugs de los dispositivos a comparar (2–N). */
   readonly slugs: readonly string[]
+}
+
+/** Puertos que necesita el caso de uso (el grafo se usa solo por `edgesOf`). */
+interface PuertosComparacion {
+  devices: DevicePort
+  attributes: AttributesPort
+  /** Solo `edgesOf` (segregación de interfaces): el BFS de neighbors/paths no se usa. */
+  graph: Pick<GraphRepository, 'edgesOf'>
+}
+
+/** Insumos de todos los dispositivos más los mapas por slug. */
+interface ContextoComparacion {
+  readonly inputs: CompareDeviceInput[]
+  readonly puertosPorSlug: Map<string, number[]>
+  readonly mediosPorSlug: Map<string, string[]>
+  readonly poePorSlug: Map<string, { budget?: number; required?: number }>
 }
 
 /**
@@ -34,110 +53,90 @@ export interface CompareInput {
  * `ComparisonReport` final con compatibilidades/incompatibilidades adjuntas.
  */
 export async function compareDevicesUseCase(
-  ports: {
-    devices: DevicePort
-    attributes: AttributesPort
-    graph: GraphRepository
-  },
+  ports: PuertosComparacion,
   input: CompareInput,
 ): Promise<ComparisonReport | null> {
   if (input.slugs.length < 2) return null
 
-  const dispositivos: Device[] = []
-  for (const slug of input.slugs) {
-    const d = await ports.devices.findBySlug(slug)
-    if (d) dispositivos.push(d)
-  }
+  const dispositivos = await resolverDispositivos(ports.devices, input.slugs)
   if (dispositivos.length < 2) return null
 
-  const puertosPorSlug = new Map<string, number[]>()
-  const mediosPorSlug = new Map<string, string[]>()
-  const poePorSlug = new Map<string, { budget?: number; required?: number }>()
+  const ctx = await construirInsumos(ports, dispositivos)
+  if (ctx.inputs.length < 2) return null
 
-  const inputs: CompareDeviceInput[] = []
+  const { curadas, declarativos } = await evaluarPares(ports.graph, ctx)
+  return adjuntarDeclarativos(compareDevices({ devices: ctx.inputs, curatedCompatible: curadas }), declarativos)
+}
 
-  const parseNumero = (s: string): number | undefined => {
-    const n = Number(String(s).replace(/[^\d.\-]/g, ''))
-    return Number.isFinite(n) ? n : undefined
+/** Resuelve los slugs existentes en el dataset (los ausentes se ignoran). */
+async function resolverDispositivos(devices: DevicePort, slugs: readonly string[]): Promise<Device[]> {
+  const dispositivos: Device[] = []
+  for (const slug of slugs) {
+    const d = await devices.findBySlug(slug)
+    if (d) dispositivos.push(d)
   }
+  return dispositivos
+}
 
+/** Reúne los insumos de cada dispositivo en un contexto indexado por slug. */
+async function construirInsumos(ports: PuertosComparacion, dispositivos: readonly Device[]): Promise<ContextoComparacion> {
+  const ctx: ContextoComparacion = {
+    inputs: [],
+    puertosPorSlug: new Map(),
+    mediosPorSlug: new Map(),
+    poePorSlug: new Map(),
+  }
   for (const d of dispositivos) {
-    const slug = d.slug.value
-    const vals = await ports.attributes.attributeValuesForDevice(slug)
-    const aristas = await ports.graph.edgesOf({ type: 'device', slug })
-    const medios = aristas.filter((r) => r.predicate === 'terminates-medium').map((r) => r.object.slug)
-
-    const poeBudget = vals.find((v) => v.key === 'poe_budget_w')
-    const poeRequired = vals.find((v) => v.key === 'poe_required_w')
-    const puertosPoe = d.ports.reduce((acc, p) => acc + (p.poeStandard ? p.quantity : 0), 0)
-
-    inputs.push({
-      slug,
-      name: d.name,
-      categoryCode: d.categoryCode,
-      categoryName: d.categoryCode, // la UI resuelve el nombre legible; el reporte lo muestra
-      attributes: [
-        ...vals.map((v) => ({
-          def: { key: v.key, labelEs: v.labelEs, valueType: mapValueType(v.valueType) as any, unit: v.unit, compareRule: 'higher-better' as const },
-          display: v.display,
-          valueNumber: parseNumero(v.display),
-        })),
-        {
-          def: { key: 'puertos_totales', labelEs: 'Puertos totales', valueType: 'number' as const, compareRule: 'higher-better' as const },
-          display: String(d.portCount()),
-          valueNumber: d.portCount(),
-        },
-        {
-          def: { key: 'puertos_poe', labelEs: 'Puertos con PoE', valueType: 'number' as const, compareRule: 'higher-better' as const },
-          display: String(puertosPoe),
-          valueNumber: puertosPoe,
-        },
-        ...(medios.length > 0
-          ? [{ def: { key: 'medios', labelEs: 'Medios que termina', valueType: 'text' as const, compareRule: 'none' as const }, display: medios.join(', ') }]
-          : []),
-      ],
-    })
-
-    puertosPorSlug.set(slug, d.ports.flatMap((p) => p.speedsMbps))
-    mediosPorSlug.set(slug, medios)
-    poePorSlug.set(slug, {
-      budget: poeBudget ? parseNumero(poeBudget.display) : undefined,
-      required: poeRequired ? parseNumero(poeRequired.display) : undefined,
-    })
+    const insumos = await insumosDeDispositivo(ports, d)
+    ctx.inputs.push(insumos.input)
+    ctx.puertosPorSlug.set(insumos.input.slug, insumos.puertos)
+    ctx.mediosPorSlug.set(insumos.input.slug, insumos.medios)
+    ctx.poePorSlug.set(insumos.input.slug, insumos.poe)
   }
+  return ctx
+}
 
-  if (inputs.length < 2) return null
-
-  // Aristas compatible-with curadas + incompatibilidades declarativas por par
+/** Evalúa cada par: aristas curadas `compatible-with` + reglas declarativas. */
+async function evaluarPares(
+  graph: Pick<GraphRepository, 'edgesOf'>,
+  ctx: ContextoComparacion,
+): Promise<{ curadas: Array<readonly [string, string]>; declarativos: { a: string; b: string; note?: string }[] }> {
   const curadas: Array<readonly [string, string]> = []
   const declarativos: { a: string; b: string; note?: string }[] = []
-
-  for (let i = 0; i < inputs.length; i++) {
-    for (let j = i + 1; j < inputs.length; j++) {
-      const x = inputs[i]!
-      const y = inputs[j]!
-      const aristasX = await ports.graph.edgesOf({ type: 'device', slug: x.slug })
-      if (aristasX.some((r) => r.predicate === 'compatible-with' && r.object.type === 'device' && r.object.slug === y.slug)) {
-        curadas.push([x.slug, y.slug])
-      }
+  for (let i = 0; i < ctx.inputs.length; i++) {
+    for (let j = i + 1; j < ctx.inputs.length; j++) {
+      const x = ctx.inputs[i]!
+      const y = ctx.inputs[j]!
+      if (await esParCurado(graph, x.slug, y.slug)) curadas.push([x.slug, y.slug])
       const res = evaluateCompatibilidad({
         a: x.slug,
         b: y.slug,
-        speedsA: puertosPorSlug.get(x.slug) ?? [],
-        speedsB: puertosPorSlug.get(y.slug) ?? [],
-        mediumsA: mediosPorSlug.get(x.slug) ?? [],
-        mediumsB: mediosPorSlug.get(y.slug) ?? [],
-        poeBudgetAW: poePorSlug.get(x.slug)?.budget,
-        poeBudgetBW: poePorSlug.get(y.slug)?.budget,
-        poeRequiredAW: poePorSlug.get(x.slug)?.required,
-        poeRequiredBW: poePorSlug.get(y.slug)?.required,
-      } as any)
+        speedsA: ctx.puertosPorSlug.get(x.slug) ?? [],
+        speedsB: ctx.puertosPorSlug.get(y.slug) ?? [],
+        mediumsA: ctx.mediosPorSlug.get(x.slug) ?? [],
+        mediumsB: ctx.mediosPorSlug.get(y.slug) ?? [],
+        poeBudgetAW: ctx.poePorSlug.get(x.slug)?.budget,
+        poeBudgetBW: ctx.poePorSlug.get(y.slug)?.budget,
+        poeRequiredAW: ctx.poePorSlug.get(x.slug)?.required,
+        poeRequiredBW: ctx.poePorSlug.get(y.slug)?.required,
+      })
       if (!res.compatible) declarativos.push({ a: x.slug, b: y.slug, note: res.note })
     }
   }
+  return { curadas, declarativos }
+}
 
-  const informe = compareDevices({ devices: inputs, curatedCompatible: curadas })
+/** ¿Existe una arista curada `compatible-with` entre los dos dispositivos? */
+async function esParCurado(graph: Pick<GraphRepository, 'edgesOf'>, a: string, b: string): Promise<boolean> {
+  const aristas = await graph.edgesOf({ type: 'device', slug: a })
+  return aristas.some((r) => r.predicate === 'compatible-with' && r.object.type === 'device' && r.object.slug === b)
+}
 
+/** Adjunta al informe las incompatibilidades declarativas detectadas. */
+function adjuntarDeclarativos(
+  informe: ComparisonReport,
+  declarativos: readonly { a: string; b: string; note?: string }[],
+): ComparisonReport {
   return {
     ...informe,
     compatibilidades: [
@@ -148,17 +147,6 @@ export async function compareDevicesUseCase(
       ...declarativos.map((d) => `Incompatibilidad declarada: ${d.note ?? 'sin detalle'}`),
       ...informe.veredicto,
     ],
-  }
-}
-
-/** Mapea valueType del contrato UI al tipo del dominio (el UIAttributeDefinition es un supertipo). */
-function mapValueType(vt: string): 'number' | 'text' | 'enum' | 'bool' | 'range' {
-  switch (vt) {
-    case 'number': return 'number'
-    case 'enum': return 'enum'
-    case 'bool': return 'bool'
-    case 'range': return 'range'
-    default: return 'text'
   }
 }
 
