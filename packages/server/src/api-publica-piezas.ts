@@ -20,5 +20,6 @@ export { creaVerificadorClaveApi } from './verifica-clave.js'
 // Contexto y utilidades compartidas.
 export { auditar, extraerClave, responderJson, responderNoAutorizado } from './api-publica-ctx.js'
 export type { ContextoV1 } from './api-publica-ctx.js'
-// Despachador de rutas V1.
+// Despachador de rutas V1 y delegación a las rutas internas.
 export { manejarRutaV1 } from './api-publica-rutas.js'
+export { delegarO404, type DelegacionPublica } from './api-publica-delegacion.js'
