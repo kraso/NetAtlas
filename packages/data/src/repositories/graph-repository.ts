@@ -1,12 +1,15 @@
 import type { SqliteDriver, SqlRow } from '../driver.js'
-import { Relationship, graphNodeId, requirePredicate } from '@netatlas/domain'
-import type { GraphNode, GraphRepository, NeighborsQuery, Path } from '@netatlas/domain'
+import { graphNodeId } from '@netatlas/domain'
+import type { GraphNode, GraphRepository, NeighborsQuery, Path, Relationship } from '@netatlas/domain'
+import { SqlSlugResolver } from './graph-resolve.js'
+import { dedup, peerDe, rowToRelationship } from './graph-mapeo.js'
 
 /**
  * Adaptador SQLite del puerto GraphRepository (NET-HW-003 / §9.5).
  *
  * La tabla `relationship` es genérica: (subject_type, subject_id, predicate,
- * object_type, object_id) con ids INTEGER resueltos por tabla catálogo.
+ * object_type, object_id) con ids INTEGER resueltos por tabla catálogo
+ * (`graph-resolve.ts`) y normalizados a aristas del dominio (`graph-mapeo.ts`).
  *
  * Convención del plan maestro (§8.3.2):
  *  - Aristas salientes: (nodo === sujeto) → se leen tal cual.
@@ -17,44 +20,18 @@ import type { GraphNode, GraphRepository, NeighborsQuery, Path } from '@netatlas
  *    la consulta bidireccional los devuelve con su mismo código.
  */
 
-const RESOLVE_SQL: Record<string, { table: string; slugCol: string; idCol?: string }> = {
-  device: { table: 'device', slugCol: 'slug' },
-  manufacturer: { table: 'manufacturer', slugCol: 'slug' },
-  'product-family': { table: 'product_family', slugCol: 'slug' },
-  category: { table: 'category', slugCol: 'code' },
-  interface: { table: 'interface', slugCol: 'code' },
-  protocol: { table: 'protocol', slugCol: 'code' },
-  // standard no tiene columna code: el slug canónico es "org/identifier"
-  // (misma convención que suggestGrouped, StandardSheet y snapshotDetail).
-  standard: { table: 'standard', slugCol: "org || '/' || identifier" },
-  technology: { table: 'technology', slugCol: 'slug' },
-  medium: { table: 'medium', slugCol: 'code' },
-  component: { table: 'component', slugCol: 'model' },
-  layer: { table: 'osi_layer', slugCol: 'number', idCol: 'number' },
-  firmware: { table: 'firmware', slugCol: 'version', idCol: 'id' },
-  topology: { table: 'topology', slugCol: 'slug' },
-  'speed-grade': { table: 'speed_grade', slugCol: 'code' },
+/** Estado de una búsqueda de caminos (BFS acíclico con tope de resultados). */
+interface PasoCamino {
+  readonly nodo: GraphNode
+  readonly nodos: readonly GraphNode[]
+  readonly aristas: readonly Relationship[]
 }
 
 export class SqliteGraphRepository implements GraphRepository {
-  constructor(private readonly db: SqliteDriver) {}
+  private readonly resolver: SqlSlugResolver
 
-  private resolveId(node: GraphNode): number | undefined {
-    const def = RESOLVE_SQL[node.type]
-    if (!def) return undefined
-    const row = this.db
-      .prepare(`SELECT ${def.idCol ?? 'id'} AS id FROM ${def.table} WHERE ${def.slugCol} = ?`)
-      .get(node.slug) as { id: number } | undefined
-    return row ? Number(row.id) : undefined
-  }
-
-  private slugById(type: GraphNode['type'], id: number): string | undefined {
-    const def = RESOLVE_SQL[type]
-    if (!def) return undefined
-    const row = this.db
-      .prepare(`SELECT ${def.slugCol} AS slug FROM ${def.table} WHERE ${def.idCol ?? 'id'} = ?`)
-      .get(id) as { slug: string | number } | undefined
-    return row ? String(row.slug) : undefined
+  constructor(private readonly db: SqliteDriver) {
+    this.resolver = new SqlSlugResolver(db)
   }
 
   /**
@@ -62,7 +39,7 @@ export class SqliteGraphRepository implements GraphRepository {
    * salientes como están; entrantes invertidas con predicado inverso.
    */
   async edgesOf(node: GraphNode): Promise<readonly Relationship[]> {
-    const id = this.resolveId(node)
+    const id = this.resolver.idDe(node)
     if (id === undefined) return []
 
     const salientes = this.db
@@ -73,75 +50,78 @@ export class SqliteGraphRepository implements GraphRepository {
       .all(node.type, id) as SqlRow[]
 
     const out: Relationship[] = []
-    for (const row of salientes) out.push(this.rowToRelationship(row, false))
-    for (const row of entrantes) out.push(this.rowToRelationship(row, true))
+    for (const row of salientes) out.push(rowToRelationship(row, this.resolver, false))
+    for (const row of entrantes) out.push(rowToRelationship(row, this.resolver, true))
     return out
   }
 
   /** Vecindad a profundidad N por BFS sobre aristas indexadas (§9.5). */
   async neighbors(query: NeighborsQuery): Promise<readonly Relationship[]> {
-    const start = this.resolveId(query.node)
-    if (start === undefined) return []
+    if (this.resolver.idDe(query.node) === undefined) return []
 
-    const visitado = new Set<string>(`${query.node.type}:${start}`)
+    const visitado = new Set<string>([claveNodo(query.node)])
     const frontier: GraphNode[] = [query.node]
     const acumulado: Relationship[] = []
 
     for (let depth = 0; depth < query.maxDepth && frontier.length > 0; depth++) {
-      const actual = [...frontier]
+      const nivel = await this.aristasDeNivel(frontier, query, visitado, depth)
+      acumulado.push(...nivel.aristas)
       frontier.length = 0
-      const resultadosNivel: Relationship[] = []
-      for (const nodo of actual) {
-        const aristas = await this.edgesOf(nodo)
-        for (const arista of aristas) {
-          if (query.predicates && !query.predicates.includes(arista.predicate)) continue
-          resultadosNivel.push(arista)
-          const peer = arista.subject.slug === nodo.slug && arista.subject.type === nodo.type ? arista.object : arista.subject
-          const key = `${peer.type}:${peer.slug}`
-          if (visitado.has(key)) continue
-          visitado.add(key)
-          if (depth < query.maxDepth - 1) frontier.push(peer)
-        }
-      }
-      acumulado.push(...resultadosNivel)
+      frontier.push(...nivel.siguientes)
     }
     return dedup(acumulado)
   }
 
+  /** Aristas de un nivel de BFS + los vecinos aún no visitados del siguiente. */
+  private async aristasDeNivel(
+    frontier: readonly GraphNode[],
+    query: NeighborsQuery,
+    visitado: Set<string>,
+    depth: number,
+  ): Promise<{ aristas: Relationship[]; siguientes: GraphNode[] }> {
+    const aristas: Relationship[] = []
+    const siguientes: GraphNode[] = []
+    for (const nodo of frontier) {
+      for (const arista of await this.edgesOf(nodo)) {
+        if (query.predicates && !query.predicates.includes(arista.predicate)) continue
+        aristas.push(arista)
+        const peer = peerDe(arista, nodo)
+        if (visitado.has(claveNodo(peer))) continue
+        visitado.add(claveNodo(peer))
+        if (depth < query.maxDepth - 1) siguientes.push(peer)
+      }
+    }
+    return { aristas, siguientes }
+  }
+
   /** Caminos entre dos nodos con profundidad máxima (BFS acíclico). */
   async paths(from: GraphNode, to: GraphNode, maxDepth: number): Promise<readonly Path[]> {
-    const fromId = this.resolveId(from)
-    const toId = this.resolveId(to)
-    if (fromId === undefined || toId === undefined || maxDepth < 1) return []
+    if (this.resolver.idDe(from) === undefined || this.resolver.idDe(to) === undefined || maxDepth < 1) return []
 
     const results: Path[] = []
-    const cola: { nodo: GraphNode; nodos: GraphNode[]; aristas: Relationship[] }[] = [
-      { nodo: from, nodos: [from], aristas: [] },
-    ]
-    const visitado = new Set<string>(`${from.type}:${fromId}`)
+    const cola: PasoCamino[] = [{ nodo: from, nodos: [from], aristas: [] }]
+    const visitado = new Set<string>([claveNodo(from)])
 
     while (cola.length > 0 && results.length < 20) {
       const actual = cola.shift()!
       if (actual.nodo.type === to.type && actual.nodo.slug === to.slug) {
-        results.push({ nodes: actual.nodos, edges: actual.aristas })
+        results.push({ nodes: [...actual.nodos], edges: [...actual.aristas] })
         continue
       }
-      if (actual.nodos.length > maxDepth) continue
-
-      const aristas = await this.edgesOf(actual.nodo)
-      for (const arista of aristas) {
-        const peer = arista.subject.type === actual.nodo.type && arista.subject.slug === actual.nodo.slug ? arista.object : arista.subject
-        const key = `${peer.type}:${peer.slug}`
-        if (visitado.has(key)) continue
-        visitado.add(key)
-        cola.push({
-          nodo: peer,
-          nodos: [...actual.nodos, peer],
-          aristas: [...actual.aristas, arista],
-        })
-      }
+      if (actual.nodos.length <= maxDepth) await this.extenderCamino(actual, cola, visitado)
     }
     return results
+  }
+
+  /** Añade a la cola los vecinos no visitados de un paso del BFS de caminos. */
+  private async extenderCamino(paso: PasoCamino, cola: PasoCamino[], visitado: Set<string>): Promise<void> {
+    for (const arista of await this.edgesOf(paso.nodo)) {
+      const peer = peerDe(arista, paso.nodo)
+      const key = claveNodo(peer)
+      if (visitado.has(key)) continue
+      visitado.add(key)
+      cola.push({ nodo: peer, nodos: [...paso.nodos, peer], aristas: [...paso.aristas, arista] })
+    }
   }
 
   /**
@@ -151,17 +131,29 @@ export class SqliteGraphRepository implements GraphRepository {
    * resuelve slugs después. Más eficiente que BFS-JS para subgrafos densos.
    */
   async vecindadCte(node: GraphNode, maxDepth: number, predicates?: readonly string[]): Promise<readonly number[]> {
-    const start = this.resolveId(node)
+    const start = this.resolver.idDe(node)
     if (start === undefined || maxDepth < 1) return []
 
-    const predFilter =
-      predicates && predicates.length > 0
-        ? `AND r.predicate IN (${predicates.map(() => '?').join(',')})`
-        : ''
-
     const rows = this.db
-      .prepare(
-        `WITH RECURSIVE alcanzable(id, tipo, profundidad) AS (
+      .prepare(consultaVecindadRecursiva(predicates))
+      .all(start, node.type, ...(predicates ?? []), maxDepth) as SqlRow[]
+
+    return rows.filter((r) => String(r.tipo) === node.type).map((r) => Number(r.id))
+  }
+}
+
+/** Clave de deduplicación de un nodo (tipo + slug). */
+function claveNodo(node: GraphNode): string {
+  return `${node.type}:${node.slug}`
+}
+
+/** CTE recursiva de vecindad con filtro opcional de predicados. */
+function consultaVecindadRecursiva(predicates?: readonly string[]): string {
+  const predFilter =
+    predicates && predicates.length > 0
+      ? `AND r.predicate IN (${predicates.map(() => '?').join(',')})`
+      : ''
+  return `WITH RECURSIVE alcanzable(id, tipo, profundidad) AS (
            SELECT ?, ?, 0
            UNION
            SELECT
@@ -178,65 +170,9 @@ export class SqliteGraphRepository implements GraphRepository {
            ${predFilter}
            WHERE a.profundidad < ?
          )
-         SELECT DISTINCT id, tipo, profundidad FROM alcanzable`,
-      )
-      .all(
-        start,
-        node.type,
-        ...(predicates ?? []),
-        maxDepth,
-      ) as SqlRow[]
-
-    return rows.filter((r) => String(r.tipo) === node.type).map((r) => Number(r.id))
-  }
-
-  /** Convierte una fila a Relationship del dominio; invertida = entrante. */
-  private rowToRelationship(row: SqlRow, invertida: boolean): Relationship {
-    const spec = requirePredicate(String(row.predicate))
-    const subjectType = String(row.subject_type) as GraphNode['type']
-    const objectType = String(row.object_type) as GraphNode['type']
-    const subject: GraphNode = {
-      type: subjectType,
-      slug: this.slugById(subjectType, Number(row.subject_id)) ?? `#${row.subject_id}`,
-    }
-    const object: GraphNode = {
-      type: objectType,
-      slug: this.slugById(objectType, Number(row.object_id)) ?? `#${row.object_id}`,
-    }
-
-    if (!invertida) {
-      return Relationship.create({
-        subject,
-        predicate: spec.code,
-        object,
-        weight: row.weight !== null ? Number(row.weight) : undefined,
-        validFrom: String(row.valid_from),
-        validTo: row.valid_to !== null ? String(row.valid_to) : undefined,
-      })
-    }
-
-    // Entrante → invertimos; si el predicado tiene inverso, lo usamos;
-    // si es simétrico, conservamos el mismo (compatible-with ↔ compatible-with).
-    const code = spec.inverseCode ?? spec.code
-    return Relationship.create({
-      subject: object,
-      predicate: code,
-      object: subject,
-      weight: row.weight !== null ? Number(row.weight) : undefined,
-      validFrom: String(row.valid_from),
-      validTo: row.valid_to !== null ? String(row.valid_to) : undefined,
-    })
-  }
+         SELECT DISTINCT id, tipo, profundidad FROM alcanzable`
 }
 
-function dedup(rels: readonly Relationship[]): Relationship[] {
-  const unicos = new Map<string, Relationship>()
-  for (const r of rels) {
-    const k = `${r.subject.type}:${r.subject.slug}|${r.predicate}|${r.object.type}:${r.object.slug}`
-    if (!unicos.has(k)) unicos.set(k, r)
-  }
-  return [...unicos.values()]
-}
-
+// Re-export para consumidores del puerto (composition root y casos de uso).
 export { graphNodeId }
 export type { GraphNode, Path }
