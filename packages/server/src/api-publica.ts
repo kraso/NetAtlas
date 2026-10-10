@@ -16,6 +16,7 @@ import {
   crearPerfil,
   crearRateLimiter,
   crearRateLimiterPersistente,
+  delegarO404,
   documentoOpenApi,
   esFormatoClaveApi,
   extraerClave,
@@ -93,15 +94,7 @@ async function atenderV1(
   const verificada = await autenticar(verificaClave, req, res)
   if (!verificada) return
 
-  const ctx: ContextoV1 = {
-    req,
-    res,
-    path: url.pathname,
-    url,
-    verificada,
-    store: opts.store,
-    publicStore: opts.publicStore,
-  }
+  const ctx: ContextoV1 = { req, res, path: url.pathname, url, verificada, store: opts.store, publicStore: opts.publicStore }
   if (!(await permiteRateLimit(rateLimiter, ctx))) return
   await asegurarPerfil(ctx)
   if (await manejarRutaV1(ctx)) return
@@ -174,32 +167,3 @@ async function asegurarPerfil(ctx: ContextoV1): Promise<void> {
   await ctx.publicStore.guardar(nuevo)
 }
 
-/**
- * Consultas públicas delegadas al store del catálogo (con clave válida).
- * El middleware base habla `/api/*`; aquí se traduce la versión pública a esas
- * rutas internas. Si nada encaja: 404 auditado.
- */
-async function delegarO404(opts: ApiPublicaOptions, ctx: ContextoV1): Promise<void> {
-  const traducida = traducirV1(ctx.url)
-  if (traducida) {
-    ctx.req.url = traducida
-    await auditar(ctx, 200)
-    await opts.base(ctx.req, ctx.res)
-    return
-  }
-  await auditar(ctx, 404)
-  responderJson(ctx.res, 404, { error: 'ruta no encontrada' })
-}
-
-/** Traduce una ruta /v1/* a la ruta interna /api/* equivalente. */
-function traducirV1(targetUrl: URL): string | undefined {
-  const p = targetUrl.pathname
-  const suf = targetUrl.search
-  if (p === '/v1/health') return `/api/health${suf}`
-  if (p === '/v1/search') return `/api/search${suf}`
-  if (p === '/v1/categories') return `/api/categories${suf}`
-  if (p === '/v1/snapshot') return `/api/snapshot${suf}`
-  const device = p.match(/^\/v1\/devices\/([^/]+)$/)
-  if (device) return `/api/device/${device[1]}${suf}`
-  return undefined
-}
