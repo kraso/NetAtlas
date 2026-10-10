@@ -37,10 +37,16 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   límite: su tamaño es la superficie pública del paquete, no lógica, y partirlos
   agrega indirección sin beneficio. Un barrel al que se le agregue cualquier
   cosa que no sea `export` deja de estar exento.
-- **Funciones de menos de 30 líneas, una sola responsabilidad.**
+- **Funciones de menos de 30 líneas, una sola responsabilidad.** Aplica a la
+  lógica: hooks (`use*`), manejadores de eventos, carga de datos y
+  transformaciones. El cuerpo JSX de un componente no se mide con esta regla
+  —los componentes se juzgan por el límite de módulo—, pero su lógica debe
+  vivir en hooks o utilidades que sí la cumplen.
 - **Nomenclatura**: `camelCase` para variables y funciones, `PascalCase` para
   tipos y clases, `snake_case` para columnas SQL.
-- **Imports**: si un archivo supera 5 imports, reestructurar dependencias.
+- **Imports**: se cuentan las declaraciones `import`, no los símbolos que
+  traen. Si un archivo supera 5 declaraciones, reestructurar dependencias
+  (barrel `*-piezas.ts` cuando el barrel simplifique el grafo).
 - **Error handling explícito, nunca silencioso.** Un dato inválido rompe fuerte
   y temprano (es el criterio de los constructores de VOs del dominio).
 - **Comentarios de dominio en español**, convención del repositorio.
