@@ -65,6 +65,8 @@ describe('sincronizar (F8A, NET-HW-063) — orquestación pura', () => {
     expect(r.replicados).toBe(2)
     expect(r.versionReplica).toBe(1)
     expect(r.contribucionesPendientes).toBe(0)
+    expect(r.pullOk).toBe(true)
+    expect(r.pushOk).toBe(true)
   })
 
   it('LWW: la versión mayor gana y no regresan dispositivos peores', async () => {
@@ -128,6 +130,9 @@ describe('sincronizar (F8A, NET-HW-063) — orquestación pura', () => {
     expect(r.contribucionesEnviadas).toBe(0)
     expect(r.contribucionesPendientes).toBe(1)
     expect(r.versionReplica).toBe(0)
+    // El ciclo fallido queda marcado: la UI puede avisar (no silenciar).
+    expect(r.pullOk).toBe(false)
+    expect(r.pushOk).toBe(false)
   })
 })
 
