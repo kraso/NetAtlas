@@ -1,17 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { NodeSqliteDriver, applyMigrations, loadMigrations } from '@netatlas/data'
 import { SqliteExecutor, crearRateLimiter, crearRateLimiterPersistente, SqlRateLimitStore } from '../src/index.js'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const migrationsDir = join(root, 'packages', 'data', 'migrations')
+import { crearDriverMemoria } from './sqlite-prueba.js'
 
 describe('Rate limit compartido multi-nodo (F8B futuro, §31.3)', () => {
   it('respaldo en BD: dos instancias comparten el mismo límite', async () => {
     // Multi-nodo = dos limiter sobre la MISMA BD (ruta compartida).
-    const driver = new NodeSqliteDriver(':memory:')
-    applyMigrations(driver, loadMigrations(migrationsDir))
+    const driver = crearDriverMemoria()
     const executor = new SqliteExecutor(driver)
     const store = new SqlRateLimitStore(executor)
 

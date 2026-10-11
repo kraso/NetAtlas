@@ -1,63 +1,31 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
-import { createServer } from 'node:http'
-import type { Server } from 'node:http'
-import type { AddressInfo } from 'node:net'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { copyFileSync, rmSync } from 'node:fs'
-import { NodeSqliteDriver, applyMigrations, loadMigrations } from '@netatlas/data'
-import { Fts5SearchIndex } from '@netatlas/search'
 import { generarClaveApi } from '../src/api-keys.js'
-import {
-  SqliteServidorStore,
-  SqliteExecutor,
-  SqlitePublicStore,
-  crearServidor,
-  crearApiPublica,
-  StaticBearerVerifier,
-} from '../src/index.js'
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const migrationsDir = join(root, 'packages', 'data', 'migrations')
-const seedPath = join(root, 'datasets', 'netatlas-seed.sqlite')
+import { levantarServidorPrueba, type ServidorPrueba } from './servidor-prueba.js'
 
 describe('F8B futuro — conjuntos de datos descargables firmados (§31.3)', () => {
-  let base: string
-  let closeServer: () => void
+  let url: string
+  let servidor: ServidorPrueba
   let clave: string
 
   beforeAll(async () => {
-    const tmp = join(root, 'datasets', `.server-f8b-ds-${process.pid}-${Math.random().toString(36).slice(2)}.sqlite`)
-    copyFileSync(seedPath, tmp)
-    const db = new NodeSqliteDriver(tmp)
-    applyMigrations(db, loadMigrations(migrationsDir))
-    const search = new Fts5SearchIndex(db)
-    const store = new SqliteServidorStore(db, new SqliteExecutor(db), search, tmp)
-    const publicStore = new SqlitePublicStore(db)
-    const baseMid = crearServidor(store, new StaticBearerVerifier('token-sync'), '0.2.0-ds')
-    const api = crearApiPublica({ store, publicStore, base: baseMid, limitePorMinuto: 200 })
-
-    const server: Server = createServer((req, res) => void api(req, res))
-    await new Promise<void>((resolve) =>
-      server.listen(0, '127.0.0.1', () => {
-        const port = (server.address() as AddressInfo).port
-        base = `http://127.0.0.1:${port}`
-        resolve()
-      }),
-    )
-    closeServer = () => {
-      server.close()
-      db.close()
-      rmSync(tmp, { force: true })
-    }
+    // El dataset firmado se sirve desde el fichero, así que el store necesita
+    // la ruta real del SQLite temporal.
+    servidor = await levantarServidorPrueba({
+      prefijo: 'server-f8b-ds',
+      version: '0.2.0-ds',
+      apiPublica: true,
+      limitePorMinuto: 200,
+      conRutaDbEnStore: true,
+    })
+    url = servidor.url
     clave = generarClaveApi()
-    await publicStore.registrarClave('key-ds-1', clave)
+    await servidor.publicStore.registrarClave('key-ds-1', clave)
   })
 
-  afterAll(() => closeServer())
+  afterAll(() => servidor.cerrar())
 
   it('lista el conjunto firmado con sha256', async () => {
-    const r = await fetch(`${base}/v1/datasets`, { headers: { authorization: `Bearer ${clave}` } })
+    const r = await fetch(`${url}/v1/datasets`, { headers: { authorization: `Bearer ${clave}` } })
     expect(r.status).toBe(200)
     const cuerpo = (await r.json()) as { datasets: { nombre: string; sha256: string }[] }
     const seed = cuerpo.datasets.find((d) => d.nombre === 'netatlas-seed')
@@ -66,7 +34,7 @@ describe('F8B futuro — conjuntos de datos descargables firmados (§31.3)', () 
   })
 
   it('descarga el SQLite con sha256 en la cabecera', async () => {
-    const r = await fetch(`${base}/v1/datasets/netatlas-seed`, { headers: { authorization: `Bearer ${clave}` } })
+    const r = await fetch(`${url}/v1/datasets/netatlas-seed`, { headers: { authorization: `Bearer ${clave}` } })
     expect(r.status).toBe(200)
     expect(r.headers.get('content-disposition')).toContain('netatlas-seed.sqlite')
     const sha = r.headers.get('x-content-sha256')
@@ -77,7 +45,7 @@ describe('F8B futuro — conjuntos de datos descargables firmados (§31.3)', () 
   })
 
   it('dataset inexistente → 404', async () => {
-    const r = await fetch(`${base}/v1/datasets/no-existe`, { headers: { authorization: `Bearer ${clave}` } })
+    const r = await fetch(`${url}/v1/datasets/no-existe`, { headers: { authorization: `Bearer ${clave}` } })
     expect(r.status).toBe(404)
   })
 })
