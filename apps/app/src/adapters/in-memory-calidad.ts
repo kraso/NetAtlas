@@ -1,6 +1,5 @@
-import { calcularCoberturaCritica, esFuenteSintetica, PASIVAS } from '@netatlas/domain'
-import type { Assertion } from '@netatlas/domain'
-import type { CoberturaCriticaResultado } from '@netatlas/domain'
+import { calcularCoberturaCritica, claveArista, esFuenteSintetica, PASIVAS } from '@netatlas/domain'
+import type { Assertion, CoberturaCriticaResultado, Relationship } from '@netatlas/domain'
 import type { InMemoryDataset } from './in-memory-tipos.js'
 import { storageGet, storageSet } from './in-memory-almacenamiento.js'
 
@@ -72,7 +71,8 @@ export class InMemoryQualityRepository implements UiQualityRepo {
   /**
    * Cobertura de datos críticos (F2): assertions y relaciones del demo con la
    * misma métrica pura del dominio que el SQLite real. Igual que allí, las
-   * fuentes sintéticas quedan fuera: no son datos curados.
+   * fuentes sintéticas quedan fuera —tanto assertions como aristas (el pull
+   * HTTP marca en `relacionesSinteticas` las que solo constan por herramienta).
    */
   private coberturaCritica(): CoberturaCriticaResultado {
     const slugDeAssertion = (a: Assertion): string | undefined =>
@@ -87,10 +87,16 @@ export class InMemoryQualityRepository implements UiQualityRepo {
             .filter((a) => slugDeAssertion(a) === d.slug.value && !esFuenteSintetica(a.source.slug))
             .map((a) => a.predicate),
           relationshipPredicates: this.data.relationships
+            .filter((r) => !this.esAristaSintetica(r))
             .filter((r) => r.subject.slug === d.slug.value || r.object.slug === d.slug.value)
             .map((r) => r.predicate),
         })),
     )
+  }
+
+  /** ¿La arista solo consta por fuente sintética (importación asistida)? */
+  private esAristaSintetica(r: Relationship): boolean {
+    return this.data.relacionesSinteticas?.has(claveArista(r)) ?? false
   }
 
   private distribucionConfianza(): readonly { confianza: string; n: number }[] {
@@ -125,7 +131,10 @@ export class InMemoryQualityRepository implements UiQualityRepo {
     try {
       const lista = JSON.parse(raw) as UiReconciliationRow[]
       return lista.filter((r) => r.status === 'pending')
-    } catch {
+    } catch (error) {
+      // Cola local ilegible: se registra con contexto y la vista sigue con la
+      // cola vacía, en vez de tragarse el fallo sin dejar rastro.
+      console.warn('[WARN] cola de reconciliación ilegible; se muestra vacía', { error })
       return []
     }
   }

@@ -5,6 +5,7 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { fetchDatasetRemoto } from '../src/adapters/http-ui.js'
+import { buildServices } from '../src/composition-root.js'
 
 const CUERPO = {
   version: 2,
@@ -47,13 +48,25 @@ const CUERPO = {
   },
 }
 
-function fetchMock(): typeof fetch {
+/**
+ * Copia del cuerpo con la fuente de la primera arista declarada (el fixture
+ * base no la trae: la ausencia equivale a arista curada sin assertion).
+ */
+function conFuenteDeArista(sourceSlug: string): unknown {
+  const copia = JSON.parse(JSON.stringify(CUERPO)) as {
+    detalle: { devices: { relations: { predicate: string; objectType: string; objectCode: string; sourceSlug?: string }[] }[] }
+  }
+  copia.detalle.devices[0]!.relations[0]!.sourceSlug = sourceSlug
+  return copia
+}
+
+function fetchMock(cuerpo: unknown = CUERPO): typeof fetch {
   return (async (url: unknown) => {
     const u = String(url)
     if (u.endsWith('/api/categories')) {
       return { ok: true, json: async () => ({ categorias: [] }) }
     }
-    return { ok: true, json: async () => CUERPO }
+    return { ok: true, json: async () => cuerpo }
   }) as unknown as typeof fetch
 }
 
@@ -94,14 +107,28 @@ describe('fetchDatasetRemoto con detalle F8B', () => {
     const roto = JSON.parse(JSON.stringify(CUERPO)) as typeof CUERPO
     roto.detalle.devices[0]!.relations.push({ predicate: 'no-existe', objectType: 'protocol', objectCode: 'x' })
     roto.detalle.devices[0]!.ports.push({ label: '', interfaceCode: 'rj45', quantity: 0, speedsMbps: [] })
-    const fetchRoto = (async (url: unknown) => {
-      const u = String(url)
-      if (u.endsWith('/api/categories')) return { ok: true, json: async () => ({ categorias: [] }) }
-      return { ok: true, json: async () => roto }
-    }) as unknown as typeof fetch
-    const data = await fetchDatasetRemoto('http://127.0.0.1:8787', fetchRoto)
+    const data = await fetchDatasetRemoto('http://127.0.0.1:8787', fetchMock(roto))
     expect(data.devices).toHaveLength(1)
     expect(data.devices[0]!.ports).toHaveLength(1)
     expect(data.relationships.filter((r) => r.predicate === 'supports-protocol')).toHaveLength(1)
+  })
+
+  it('marca como sintética la arista que solo consta por importación asistida (F2)', async () => {
+    const data = await fetchDatasetRemoto('http://127.0.0.1:8787', fetchMock(conFuenteDeArista('netatlas-assist')))
+
+    // La arista sigue en el dataset (la ficha la muestra), pero la métrica de
+    // cobertura crítica NO la acepta como dato curado.
+    expect(data.relationships.filter((r) => r.predicate === 'supports-protocol')).toHaveLength(1)
+    expect(data.relacionesSinteticas?.size).toBe(1)
+    const informe = await buildServices(data).quality.report()
+    expect(informe.coberturaCritica.curados).toBe(0)
+    expect(informe.coberturaCritica.items[0]?.faltan).toEqual(['protocolos'])
+  })
+
+  it('la misma arista con fuente curada sí sostiene la cobertura crítica', async () => {
+    const data = await fetchDatasetRemoto('http://127.0.0.1:8787', fetchMock(conFuenteDeArista('acme-ds')))
+    expect(data.relacionesSinteticas?.size).toBe(0)
+    const informe = await buildServices(data).quality.report()
+    expect(informe.coberturaCritica.curados).toBe(1)
   })
 })

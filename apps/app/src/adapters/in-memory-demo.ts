@@ -1,16 +1,19 @@
 import type { InMemoryDataset } from './in-memory-tipos.js'
 import {
+  demoAssertions,
   demoAttributeDefinitions,
   demoCategories,
   demoDeviceAttributeValues,
+  demoDatasheets,
+  demoDevices,
   demoManufacturers,
   demoMedia,
   demoProtocols,
+  demoRelaciones,
   demoStandards,
-} from './in-memory-demo-catalogos.js'
-import { demoDatasheets, demoDevices } from './in-memory-demo-dispositivos.js'
-import { demoRelaciones, demoTopologias } from './in-memory-demo-relaciones.js'
-import { demoAssertions, demoSources } from './in-memory-demo-assertions.js'
+  demoSources,
+  demoTopologias,
+} from './in-memory-demo-piezas.js'
 
 /**
  * Fábrica de dataset de demostración (determinista para tests/UI).

@@ -1,6 +1,4 @@
-import { Datasheet, Device, OsiProfileValue, Port } from '@netatlas/domain'
-import type { Source } from '@netatlas/domain'
-
+import { Device, OsiProfileValue, Port } from '@netatlas/domain'
 
 // ── Dispositivos del dataset de demostración ────────────────────────────────
 
@@ -51,31 +49,5 @@ export function demoDevices(): Device[] {
     dev('mikrotik-ccr1036', 'MikroTik CCR1036-8G-2S+', 'mikrotik', 'CAT-RTR', [[1, 2, 3, 4], [5, 6, 7], 3]),
     dev('fortinet-200f', 'FortiGate 200F', 'fortinet', 'CAT-SEC', [[1, 2, 3, 4, 5, 6, 7], [], 4]),
     dev('cisco-9120axi', 'Cisco Catalyst 9120AXI', 'cisco', 'CAT-WLS', [[1, 2], [3, 4, 5, 6, 7], 2]),
-  ]
-}
-
-
-// ── Datasheets demo (F2-Documentación): reutilizan la fuente demo-datasheet ──
-
-export function demoDatasheets(sources: readonly Source[]): Datasheet[] {
-  const fuenteDemo = sources.find((s) => s.slug === 'demo-datasheet')
-  if (!fuenteDemo) throw new Error('Falta la fuente demo-datasheet del dataset de demostración.')
-  return [
-    Datasheet.create({
-      deviceSlug: 'fortinet-200f',
-      title: 'FortiGate 200F Series Data Sheet',
-      language: 'en',
-      url: 'https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture',
-      // Copia local en el bundle (la misma que sirve la app en modo offline).
-      localPath: 'assets/docs/FortiGate 200F Series Data Sheet.pdf',
-      source: fuenteDemo,
-    }),
-    Datasheet.create({
-      deviceSlug: 'cisco-c9300-48p',
-      title: 'Cisco Catalyst 9300 Series — Hoja de datos',
-      language: 'es',
-      localPath: 'assets/docs/Catalyst 9300 Series Switches Data Sheet.pdf',
-      source: fuenteDemo,
-    }),
   ]
 }

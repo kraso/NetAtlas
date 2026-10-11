@@ -29,12 +29,14 @@ export function construirDataset(
   const fuentes = construirFuentes(body)
   const catalogs = body.detalle?.catalogs
   const { attributeDefinitions, deviceAttributeValues } = construirEav(body, known)
+  const { relaciones, sinteticas } = construirRelaciones(body, known)
 
   return {
     devices: dispositivos,
     manufacturers,
     categories,
-    relationships: construirRelaciones(body, known),
+    relationships: relaciones,
+    relacionesSinteticas: sinteticas,
     assertions: construirAfirmaciones(dispositivos, detPorSlug, fuentes),
     sources: [...fuentes.values()],
     protocols: (catalogs?.protocols ?? []).map((p) => ({ ...p })),

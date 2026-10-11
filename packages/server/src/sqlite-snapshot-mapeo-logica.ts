@@ -54,6 +54,7 @@ export function agruparRelaciones(relaciones: readonly RelacionRow[]): Map<strin
       predicate: r.predicate,
       objectType: r.object_type as SyncDeviceRelation['objectType'],
       objectCode: r.object_code,
+      sourceSlug: r.source_slug ?? undefined,
     })
     porRelacion.set(r.device_slug, lista)
   }

@@ -5,12 +5,14 @@
  */
 export {
   calcularCoberturaCritica,
+  claveArista,
   esFuenteSintetica,
   FUENTE_ASISTIDA,
   FUENTES_SINTETICAS,
   PASIVAS,
 } from './cobertura.js'
 export type {
+  AristaIdentificable,
   DatoCritico,
   DispositivoCriticoInput,
   CoberturaCriticaItem,
