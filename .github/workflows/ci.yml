@@ -113,11 +113,14 @@ jobs:
       - name: 'Build app (el webServer sirve dist/ con vite preview)'
         run: pnpm --filter @netatlas/app build
 
+      # Los dos paquetes del workspace se llaman @netatlas/app: el filtro por
+      # nombre resuelve también packages/app, que no declara los bins (el job de
+      # Tauri moría con «Command "tauri" not found»). Se selecciona por ruta.
       - name: Install browsers
-        run: pnpm --filter @netatlas/app exec playwright install --with-deps chromium firefox
+        run: pnpm --filter ./apps/app exec playwright install --with-deps chromium firefox
 
       - name: E2E (flujo crítico 28.1.6#3 + 404 + offline PWA)
-        run: pnpm --filter @netatlas/app test:e2e
+        run: pnpm --filter ./apps/app test:e2e
 
   tauri:
     name: Tauri — build binario escritorio
@@ -141,8 +144,9 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       # https://github.com/tauri-apps/tauri-action — compila binario sin bundle para CI
+      # El filtro va por ruta: por nombre cogería también packages/app (sin tauri).
       - name: Build Tauri (release, sin bundle NSIS/MSI)
-        run: pnpm --filter @netatlas/app exec tauri build --no-bundle
+        run: pnpm --filter ./apps/app exec tauri build --no-bundle
 
       - name: Verificar binario
         shell: pwsh
