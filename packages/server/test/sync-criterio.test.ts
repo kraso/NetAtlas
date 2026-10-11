@@ -1,18 +1,8 @@
 import { describe, expect, it, beforeAll, afterAll } from 'vitest'
-import { createServer } from 'node:http'
-import type { Server } from 'node:http'
-import type { AddressInfo } from 'node:net'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { copyFileSync, rmSync } from 'node:fs'
-import { NodeSqliteDriver, applyMigrations, loadMigrations, SqliteOutboxRepository, SqliteReplicaRepository } from '@netatlas/data'
-import { Fts5SearchIndex } from '@netatlas/search'
+import { NodeSqliteDriver, SqliteOutboxRepository, SqliteReplicaRepository } from '@netatlas/data'
 import { crearOutboxEntry, sincronizar } from '@netatlas/domain'
-import { SqliteServidorStore, SqliteExecutor, crearServidor, StaticBearerVerifier, HttpSyncServer } from '../src/index.js'
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const migrationsDir = join(root, 'packages', 'data', 'migrations')
-const seedPath = join(root, 'datasets', 'netatlas-seed.sqlite')
+import { HttpSyncServer } from '../src/index.js'
+import { levantarServidorPrueba, type ServidorPrueba } from './servidor-prueba.js'
 
 /**
  * CRITERIO F8A (§27): "la app funciona offline y sincroniza al recuperar red"
@@ -25,35 +15,17 @@ const seedPath = join(root, 'datasets', 'netatlas-seed.sqlite')
  *   3) La cola queda vacía y la réplica contiene los dispositivos del servidor.
  */
 describe('F8A — rèplica offline + outbox (NET-HW-063, criterio offline+sync)', () => {
-  let base: string
-  let closeServer: () => void
+  let url: string
+  let servidor: ServidorPrueba
   const TOKEN = 'token-sync'
 
   beforeAll(async () => {
-    // Copia temporal del seed: el push de contribuciones muta la BD servidor.
-    const tmp = join(root, 'datasets', `.server-sync-${process.pid}-${Math.random().toString(36).slice(2)}.sqlite`)
-    copyFileSync(seedPath, tmp)
-    const db = new NodeSqliteDriver(tmp)
-    applyMigrations(db, loadMigrations(migrationsDir))
-    const search = new Fts5SearchIndex(db)
-    const store = new SqliteServidorStore(db, new SqliteExecutor(db), search)
-    const mid = crearServidor(store, new StaticBearerVerifier(TOKEN), '0.1.0-sync')
-    const server: Server = createServer((req, res) => void mid(req, res))
-    await new Promise<void>((resolve) =>
-      server.listen(0, '127.0.0.1', () => {
-        const port = (server.address() as AddressInfo).port
-        base = `http://127.0.0.1:${port}`
-        resolve()
-      }),
-    )
-    closeServer = () => {
-      server.close()
-      db.close()
-      rmSync(tmp, { force: true })
-    }
+    // El helper copia el seed: el push de contribuciones muta la BD servidor.
+    servidor = await levantarServidorPrueba({ prefijo: 'server-sync', token: TOKEN, version: '0.1.0-sync' })
+    url = servidor.url
   })
 
-  afterAll(() => closeServer())
+  afterAll(() => servidor.cerrar())
 
   it('offline: las contribuciones se encolan localmente y no se pierden sin red', async () => {
     const outbox = new SqliteOutboxRepository(new NodeSqliteDriver(':memory:'))
@@ -95,9 +67,8 @@ describe('F8A — rèplica offline + outbox (NET-HW-063, criterio offline+sync)'
     await outbox.enqueue(e2)
     expect((await outbox.pendientes()).length).toBe(2)
 
-    const servidor = new HttpSyncServer(base, TOKEN)
-    const resultado = await sincronizar(outbox, servidor, replica)
-    console.log('[debug-sync] resultado:', JSON.stringify(resultado))
+    const servidorHttp = new HttpSyncServer(url, TOKEN)
+    const resultado = await sincronizar(outbox, servidorHttp, replica)
 
     expect(resultado.contribucionesEnviadas).toBe(2)
     expect(resultado.contribucionesPendientes).toBe(0)
@@ -118,7 +89,7 @@ describe('F8A — rèplica offline + outbox (NET-HW-063, criterio offline+sync)'
     await outbox.enqueue(e)
 
     // Token erróneo → el servidor responde 401 → sincronizar no marca enviada.
-    const servidorMalo = new HttpSyncServer(base, 'token-invalido')
+    const servidorMalo = new HttpSyncServer(url, 'token-invalido')
     const resultado = await sincronizar(outbox, servidorMalo, replica)
     expect(resultado.contribucionesEnviadas).toBe(0)
     expect(resultado.contribucionesPendientes).toBe(1)

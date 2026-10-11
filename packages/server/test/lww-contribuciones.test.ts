@@ -1,23 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { join, dirname } from 'node:path'
-import { fileURLToPath } from 'node:url'
-import { NodeSqliteDriver, applyMigrations, loadMigrations } from '@netatlas/data'
-import { Fts5SearchIndex } from '@netatlas/search'
-import { SqliteServidorStore, SqliteExecutor } from '../src/index.js'
-
-const root = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-const migrationsDir = join(root, 'packages', 'data', 'migrations')
-
-/** Store sobre SQLite en memoria con las migraciones aplicadas. */
-function crearStore(): { db: NodeSqliteDriver; store: SqliteServidorStore } {
-  const db = new NodeSqliteDriver(':memory:')
-  applyMigrations(db, loadMigrations(migrationsDir))
-  return { db, store: new SqliteServidorStore(db, new SqliteExecutor(db), new Fts5SearchIndex(db)) }
-}
+import { crearStoreMemoria } from './sqlite-prueba.js'
 
 describe('F8A futuro — merge LWW por entidad en recibirContribuciones (§31.5)', () => {
   it('un lote con varias revisiones de la misma entidad solo persiste la más alta', async () => {
-    const { db, store } = crearStore()
+    const { db, store } = crearStoreMemoria()
 
     const base = { tipo: 'nota' as const, entidad: 'device:sw-a', autor: 'u', status: 'pendiente' as const }
     const lotes = [
@@ -36,7 +22,7 @@ describe('F8A futuro — merge LWW por entidad en recibirContribuciones (§31.5)
   })
 
   it('una revisión entrante menor que la persistida de la misma entidad se rechaza', async () => {
-    const { db, store } = crearStore()
+    const { db, store } = crearStoreMemoria()
     const base = { tipo: 'nota' as const, entidad: 'device:sw-b', autor: 'u', status: 'pendiente' as const }
 
     await store.recibirContribuciones([{ ...base, id: 'a-2', revision: 2, payload: {}, createdAt: '2025-01-01' }])
