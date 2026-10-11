@@ -39,6 +39,9 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   compilador es el linter.
 - **Comandos obligatorios antes de commitear**: `pnpm lint`, `pnpm typecheck`,
   `pnpm test`. Si se tocó el dataset: además `pnpm data:lint`.
+- El límite de 200 líneas de los módulos está automatizado:
+  `pnpm modules:lint` falla si algún módulo de `src` lo supera (los barrels
+  exentos del punto siguiente quedan fuera del recuento).
 
 ### Convenciones
 
