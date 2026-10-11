@@ -2,6 +2,7 @@ import React from 'react'
 import { Link } from 'react-router-dom'
 import { useSyncStore } from '../viewmodels/sync-store.js'
 import { Breadcrumbs } from './breadcrumbs.js'
+import { estadoCola, estadoReplica, motivosCiclo } from './sincronizar-mensajes.js'
 
 /**
  * Sincronización (F8A, §23.4[3]): cola outbox local + réplica + ciclo de sync
@@ -62,8 +63,9 @@ export function Sincronizar(): React.JSX.Element {
             </p>
             {!ultimoResultado.pullOk || !ultimoResultado.pushOk ? (
               <p className="empty-state" role="alert" data-testid="sync-parcial">
-                Ciclo incompleto: {!ultimoResultado.pullOk ? 'pull de catálogo sin red' : 'push de cola sin confirmación'}.
-                {ultimoResultado.pushOk ? ' La réplica quedó actualizada.' : ' La cola local queda intacta.'}
+                Ciclo incompleto: {motivosCiclo(ultimoResultado).join(' y ')}.
+                {estadoReplica(ultimoResultado.pullOk)}
+                {estadoCola(ultimoResultado)}
               </p>
             ) : null}
           </>

@@ -33,8 +33,11 @@ export function VisorTopologia({ topologia, onCambio }: VisorTopologiaProps): Re
     setActivas((prev) => (prev.includes(num) ? prev.filter((c) => c !== num) : [...prev, num]))
   }
 
+  const [errorExport, setErrorExport] = React.useState<string | null>(null)
+
   const exportar = (formato: 'svg' | 'png'): void => {
-    exportarDiagrama(cyRef.current, topologia.slug.value, formato)
+    const resultado = exportarDiagrama(cyRef.current, topologia.slug.value, formato)
+    setErrorExport(resultado.ok ? null : resultado.motivo)
   }
 
   return (
@@ -62,6 +65,11 @@ export function VisorTopologia({ topologia, onCambio }: VisorTopologiaProps): Re
         ) : null}
         <button type="button" onClick={() => exportar('svg')}>Exportar SVG</button>
         <button type="button" onClick={() => exportar('png')}>Exportar PNG</button>
+        {errorExport ? (
+          <span className="empty-state" role="alert" data-testid="error-export">
+            No se pudo exportar el diagrama: {errorExport}
+          </span>
+        ) : null}
         <button type="button" aria-pressed={flujoActivo} onClick={alternarFlujo}>
           {flujoActivo ? 'Cancelar flujo de paquetes' : 'Simular flujo de paquetes'}
         </button>
