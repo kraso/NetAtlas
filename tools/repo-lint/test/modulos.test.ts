@@ -29,9 +29,20 @@ describe('esBarrel', () => {
     expect(esBarrel('packages/x/src/index.ts', contenido)).toBe(true)
   })
 
+  it('acepta las formas de re-exportación de la casa', () => {
+    expect(esBarrel('packages/x/src/index.ts', "export * from './a.js'\n")).toBe(true)
+    expect(esBarrel('packages/x/src/index.ts', "export type * from './a.js'\n")).toBe(true)
+    expect(esBarrel('packages/x/src/index.ts', "export * as ns from './a.js'\n")).toBe(true)
+  })
+
   it('rechaza un index.ts con lógica', () => {
     expect(esBarrel('packages/x/src/index.ts', "export { a } from './a.js'\nexport const b = 1\n")).toBe(false)
     expect(esBarrel('packages/x/src/index.ts', "import { a } from './a.js'\n")).toBe(false)
+  })
+
+  it('rechaza código colado tras la re-exportación en la misma línea', () => {
+    expect(esBarrel('packages/x/src/index.ts', "export { a } from './a.js'; sideEffect()\n")).toBe(false)
+    expect(esBarrel('packages/x/src/index.ts', "export * from './a.js'\nconst x = 1\n")).toBe(false)
   })
 
   it('no exime a ficheros que no son index', () => {
@@ -75,10 +86,12 @@ describe('revisarRepo', () => {
   it('los barrels solo se eximen si de verdad son re-exportaciones', () => {
     const raiz = crearRepo({
       'packages/x/src/index.ts': `export { a } from './a.js'\n${fuenteDe(MAX_LINEAS + 5)}`,
+      'packages/x/src/otro/index.ts': `export { b } from './b.js'; arrancar()\n${barrelDe(MAX_LINEAS)}`,
     })
     const informe = revisarRepo(raiz)
     expect(informe.barrels).toBe(0)
-    expect(informe.violaciones.map((v) => v.ruta)).toEqual(['packages/x/src/index.ts'])
+    // El informe ordena por líneas: se compara como conjunto.
+    expect(informe.violaciones.map((v) => v.ruta).sort()).toEqual(['packages/x/src/index.ts', 'packages/x/src/otro/index.ts'].sort())
   })
 
   it('el repositorio real no tiene ningún módulo por encima del máximo', () => {

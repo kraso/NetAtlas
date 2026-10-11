@@ -94,6 +94,15 @@ describe('Visor de topologías (NET-HW-033)', () => {
     expect(typeof cyMock.handlers['dragfree']).toBe('function')
   })
 
+  it('avisa en la UI cuando la exportación del diagrama falla', async () => {
+    renderApp('/topology/clos-demo')
+    // El mock de Cytoscape no implementa svg(): la exportación falla y el
+    // usuario debe verlo (no basta con el log en consola).
+    fireEvent.click(await screen.findByRole('button', { name: 'Exportar SVG' }))
+    const aviso = await screen.findByTestId('error-export')
+    expect(aviso.textContent).toContain('No se pudo exportar el diagrama')
+  })
+
   it('reordenar con el layout determinista por capas persiste como layout de usuario', async () => {
     renderApp('/topology/clos-demo')
     await waitFor(() => expect(cyMock.calls.length).toBeGreaterThan(0))

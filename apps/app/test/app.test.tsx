@@ -1,9 +1,10 @@
 import React from 'react'
 import { describe, expect, it, beforeEach } from 'vitest'
-import { render, screen, within, fireEvent } from '@testing-library/react'
+import { render, screen, within, fireEvent, act, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { App } from '../src/App.js'
 import { setServices, buildServices } from '../src/composition-root.js'
+import { buildDemoDataset } from '../src/adapters/in-memory.js'
 
 function renderApp(initialRoute = '/'): void {
   render(
@@ -49,6 +50,25 @@ describe('Explorador (NET-HW-019)', () => {
   it('muestra estado vacío sin consulta ni categoría', async () => {
     renderApp('/explore')
     expect(await screen.findByText(/Sin resultados/i)).toBeDefined()
+  })
+
+  it('recarga los resultados cuando el dataset remoto sustituye al demo', async () => {
+    renderApp('/explore?cat=CAT-SWT')
+    expect(await screen.findByText('Cisco Catalyst 9300-48P')).toBeDefined()
+
+    // El pull remoto llama a setServices con un dataset sin switches: si el
+    // explorador solo leyera los servicios al vuelo, seguiría mostrando el demo.
+    const demo = buildDemoDataset()
+    const sinSwitches: ReturnType<typeof buildDemoDataset> = {
+      ...demo,
+      devices: demo.devices.filter((d) => !d.categoryCode.startsWith('CAT-SWT')),
+    }
+    await act(async () => {
+      setServices(buildServices(sinSwitches))
+    })
+
+    await waitFor(() => expect(screen.queryByText('Cisco Catalyst 9300-48P')).toBeNull())
+    expect(screen.getByText(/Sin resultados/i)).toBeDefined()
   })
 })
 
