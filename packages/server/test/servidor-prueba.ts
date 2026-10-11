@@ -60,7 +60,12 @@ export async function levantarServidorPrueba(opciones: OpcionesServidorPrueba = 
       })
     : base
   const server = createServer((req, res) => void handler(req, res))
-  const url = await escuchar(server)
+  // Si el bind falla no hay nada que devolver: se limpia la base temporal antes
+  // de propagar el error para no dejar ficheros ni handles abiertos.
+  const url = await escuchar(server).catch((error: unknown) => {
+    sqlite.cerrar()
+    throw error
+  })
   return {
     ...sqlite,
     url,

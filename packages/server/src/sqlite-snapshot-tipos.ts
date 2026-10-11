@@ -44,6 +44,8 @@ export interface RelacionRow {
   predicate: string
   object_type: string
   object_code: string
+  /** Fuente que respalda la arista; NULL si es curada (sin assertion). */
+  source_slug: string | null
 }
 
 export interface ValorRow {

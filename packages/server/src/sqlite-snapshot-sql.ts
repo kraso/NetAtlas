@@ -13,37 +13,45 @@ JOIN device d ON d.id = p.device_id
 JOIN interface i ON i.id = p.interface_id
 ORDER BY d.id, p.id`
 
-export const SQL_RELACIONES = `SELECT d.slug AS device_slug, r.predicate, 'protocol' AS object_type, p.code AS object_code
-FROM relationship r
-JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
-JOIN protocol p ON p.id = r.object_id AND r.object_type = 'protocol'
-WHERE r.predicate = 'supports-protocol'
-UNION ALL
-SELECT d.slug, r.predicate, 'layer', CAST(o.number AS TEXT)
-FROM relationship r
-JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
-JOIN osi_layer o ON o.number = r.object_id AND r.object_type = 'layer'
-WHERE r.predicate = 'operates-at-layer'
-UNION ALL
-SELECT d.slug, r.predicate, 'standard', s.org || '/' || s.identifier
-FROM relationship r
-JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
-JOIN standard s ON s.id = r.object_id AND r.object_type = 'standard'
-WHERE r.predicate = 'implements-standard'
-UNION ALL
-SELECT d.slug, r.predicate, 'medium', m.code
-FROM relationship r
-JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
-JOIN medium m ON m.id = r.object_id AND r.object_type = 'medium'
-WHERE r.predicate = 'terminates-medium'
-UNION ALL
-SELECT d.slug, r.predicate, 'device', do.slug
-FROM relationship r
-JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
-JOIN device do ON do.id = r.object_id AND r.object_type = 'device'
-WHERE r.predicate IN ('succeeds', 'precedes', 'replaced-by', 'variant-of')
-  AND do.slug <> d.slug
-ORDER BY device_slug, predicate, object_code`
+// Cada rama arrastra `assertion_id`: la arista generada por la importación
+// asistida apunta a su assertion (fuente sintética); la curada del seed no
+// lleva assertion, por eso el LEFT JOIN resuelve el slug de fuente como NULL.
+export const SQL_RELACIONES = `SELECT u.device_slug, u.predicate, u.object_type, u.object_code, s.slug AS source_slug
+FROM (
+  SELECT d.slug AS device_slug, r.predicate, 'protocol' AS object_type, p.code AS object_code, r.assertion_id AS assertion_id
+  FROM relationship r
+  JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
+  JOIN protocol p ON p.id = r.object_id AND r.object_type = 'protocol'
+  WHERE r.predicate = 'supports-protocol'
+  UNION ALL
+  SELECT d.slug, r.predicate, 'layer', CAST(o.number AS TEXT), r.assertion_id
+  FROM relationship r
+  JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
+  JOIN osi_layer o ON o.number = r.object_id AND r.object_type = 'layer'
+  WHERE r.predicate = 'operates-at-layer'
+  UNION ALL
+  SELECT d.slug, r.predicate, 'standard', s.org || '/' || s.identifier, r.assertion_id
+  FROM relationship r
+  JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
+  JOIN standard s ON s.id = r.object_id AND r.object_type = 'standard'
+  WHERE r.predicate = 'implements-standard'
+  UNION ALL
+  SELECT d.slug, r.predicate, 'medium', m.code, r.assertion_id
+  FROM relationship r
+  JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
+  JOIN medium m ON m.id = r.object_id AND r.object_type = 'medium'
+  WHERE r.predicate = 'terminates-medium'
+  UNION ALL
+  SELECT d.slug, r.predicate, 'device', do.slug, r.assertion_id
+  FROM relationship r
+  JOIN device d ON d.id = r.subject_id AND r.subject_type = 'device'
+  JOIN device do ON do.id = r.object_id AND r.object_type = 'device'
+  WHERE r.predicate IN ('succeeds', 'precedes', 'replaced-by', 'variant-of')
+    AND do.slug <> d.slug
+) u
+LEFT JOIN assertion a ON a.id = u.assertion_id
+LEFT JOIN source s ON s.id = a.source_id
+ORDER BY u.device_slug, u.predicate, u.object_code`
 
 export const SQL_VALORES = `SELECT d.slug AS device_slug, ad.key, ad.value_type,
        da.value_number, da.value_text, da.value_bool

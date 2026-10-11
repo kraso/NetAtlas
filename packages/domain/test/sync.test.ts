@@ -98,6 +98,7 @@ describe('sincronizar (F8A, NET-HW-063) — orquestación pura', () => {
     const r1 = await sincronizar(outbox, servidorOk, new ReplicaMem())
     expect(r1.contribucionesEnviadas).toBe(1)
     expect(r1.contribucionesPendientes).toBe(0)
+    expect(r1.pushOk).toBe(true)
 
     // Servidor que no confirma: la cola queda para el siguiente ciclo.
     const servidorSordo: SyncServer = {
@@ -112,6 +113,29 @@ describe('sincronizar (F8A, NET-HW-063) — orquestación pura', () => {
     const r2 = await sincronizar(outbox2, servidorSordo, new ReplicaMem())
     expect(r2.contribucionesEnviadas).toBe(0)
     expect(r2.contribucionesPendientes).toBe(1)
+    // Sin confirmación el ciclo NO está completo: la UI debe poder avisarlo.
+    expect(r2.pushOk).toBe(false)
+  })
+
+  it('confirmación parcial: el ciclo queda incompleto y solo se marcan las confirmadas', async () => {
+    const outbox = new OutboxMem()
+    await outbox.enqueue(
+      crearOutboxEntry({ tipo: 'nota', entidad: 'device:a', autor: 'u', payload: { nota: 'a' }, revision: 1 }, 'id-a', '2025-03-01'),
+    )
+    await outbox.enqueue(
+      crearOutboxEntry({ tipo: 'nota', entidad: 'device:b', autor: 'u', payload: { nota: 'b' }, revision: 2 }, 'id-b', '2025-03-01'),
+    )
+    // El servidor descarta la revisión vieja y confirma solo la nueva.
+    const servidorParcial: SyncServer = {
+      serverVersion: async () => 0,
+      pullSnapshot: async () => [],
+      pushContribuciones: async () => ['id-b'],
+    }
+    const r = await sincronizar(outbox, servidorParcial, new ReplicaMem())
+    expect(r.contribucionesEnviadas).toBe(1)
+    expect(r.contribucionesPendientes).toBe(1)
+    expect(r.pushOk).toBe(false)
+    expect((await outbox.pendientes()).map((e) => e.id)).toEqual(['id-a'])
   })
 
   it('sin red (fallo de pull y push) la réplica conserva versión y la cola queda', async () => {

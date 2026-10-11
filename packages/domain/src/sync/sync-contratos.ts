@@ -64,11 +64,16 @@ export interface SyncPort {
   readonly notes?: string | undefined
 }
 
-/** Arista de catálogo (protocolos, capas, estándares, medios) con objeto por código. */
+/**
+ * Arista de catálogo (protocolos, capas, estándares, medios) con objeto por
+ * código. `sourceSlug` viaja para que el cliente distinga las aristas curadas
+ * de las generadas por herramienta (fuente sintética).
+ */
 export interface SyncDeviceRelation {
   readonly predicate: string
   readonly objectType: 'protocol' | 'standard' | 'layer' | 'medium' | 'interface' | 'technology' | 'device'
   readonly objectCode: string
+  readonly sourceSlug?: string | undefined
 }
 
 /** Afirmación con fuente por slug (el cliente resuelve el objeto Source). */

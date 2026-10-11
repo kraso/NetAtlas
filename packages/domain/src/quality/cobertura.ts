@@ -35,6 +35,26 @@ export function esFuenteSintetica(slug: string): boolean {
   return FUENTES_SINTETICAS.includes(slug)
 }
 
+/**
+ * Forma mínima de una arista para identificarla (subject/predicate/object).
+ * Sirve para transportar la procedencia de una relación desde los adaptadores
+ * (qué fuente la respalda) sin acoplarlos al tipo completo del dominio.
+ */
+export interface AristaIdentificable {
+  readonly subject: { readonly type: string; readonly slug: string }
+  readonly predicate: string
+  readonly object: { readonly type: string; readonly slug: string }
+}
+
+/**
+ * Clave estable de una arista (misma arista → misma clave). Los adaptadores la
+ * usan para marcar qué aristas solo constan por fuente sintética y excluirlas
+ * de la métrica; el formato es un detalle interno compartido.
+ */
+export function claveArista(a: AristaIdentificable): string {
+  return `${a.subject.type}:${a.subject.slug}|${a.predicate}|${a.object.type}:${a.object.slug}`
+}
+
 export type DatoCritico = 'throughput' | 'protocolos' | 'compatibilidades'
 
 export interface DispositivoCriticoInput {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { calcularCoberturaCritica, PASIVAS } from '../src/index.js'
+import { calcularCoberturaCritica, claveArista, PASIVAS } from '../src/index.js'
 import type { DispositivoCriticoInput } from '../src/index.js'
 
 /**
@@ -62,5 +62,13 @@ describe('cobertura de datos críticos (F2, ≥80%)', () => {
     expect(r.elegibles).toBe(4)
     expect(r.curados).toBe(3)
     expect(r.porcentaje).toBe(75)
+  })
+
+  it('claveArista identifica la arista de forma estable (subject + predicado + object)', () => {
+    const arista = { subject: { type: 'device', slug: 'sw-a' }, predicate: 'supports-protocol', object: { type: 'protocol', slug: 'ospf' } }
+    expect(claveArista(arista)).toBe('device:sw-a|supports-protocol|protocol:ospf')
+    // Misma arista → misma clave; distinto objeto → clave distinta.
+    expect(claveArista({ ...arista, object: { type: 'protocol', slug: 'ospf' } })).toBe(claveArista(arista))
+    expect(claveArista({ ...arista, object: { type: 'protocol', slug: 'bgp' } })).not.toBe(claveArista(arista))
   })
 })
