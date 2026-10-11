@@ -29,6 +29,9 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
+      - name: 'modules:lint (ningún módulo de src supera 200 líneas; barrels exentos)'
+        run: pnpm modules:lint
+
       - name: Typecheck
         run: pnpm typecheck
 
