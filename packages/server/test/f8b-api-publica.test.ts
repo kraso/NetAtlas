@@ -1,7 +1,10 @@
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
+import { describe, expect, it, inject } from 'vitest'
 import { generarClaveApi, hashClaveApi } from '../src/api-keys.js'
 import { rutaAbierta } from '../src/index.js'
-import { levantarServidorPrueba, type ServidorPrueba } from './servidor-prueba.js'
+
+// Servidor y claves comunes a los tres archivos F8B (ver f8b-setup.ts).
+const { url, claves } = inject('f8b')
+const claveTercero = claves.tercero
 
 /**
  * CRITERIO F8B (§27): "Terceros consumen la API con clave" (§31.3).
@@ -9,27 +12,9 @@ import { levantarServidorPrueba, type ServidorPrueba } from './servidor-prueba.j
  * Sin clave → los endpoints /v1 rechazan.
  */
 describe('F8B — API pública con clave (NET-HW-065/064, criterio)', () => {
-  let url: string
-  let servidor: ServidorPrueba
-  let claveTercero: string
-
-  beforeAll(async () => {
-    servidor = await levantarServidorPrueba({
-      prefijo: 'server-f8b',
-      token: 'token-sync',
-      version: '0.2.0-f8b',
-      apiPublica: true,
-      limitePorMinuto: 10,
-    })
-    url = servidor.url
-
-    // El "admin" emite una clave para el tercero (solo se guarda el hash).
-    claveTercero = generarClaveApi()
-    await servidor.publicStore.registrarClave('key-tercero-1', claveTercero)
+  it('la clave emitida al tercero tiene el prefijo público (solo se guarda el hash)', () => {
     expect(claveTercero.startsWith('na_')).toBe(true)
   })
-
-  afterAll(() => servidor.cerrar())
 
   it('el documento OpenAPI 3.1 se sirve sin clave y declara las rutas', async () => {
     const r = await fetch(`${url}/openapi.json`)

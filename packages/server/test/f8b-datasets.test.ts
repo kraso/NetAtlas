@@ -1,28 +1,11 @@
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
-import { generarClaveApi } from '../src/api-keys.js'
-import { levantarServidorPrueba, type ServidorPrueba } from './servidor-prueba.js'
+import { describe, expect, it, inject } from 'vitest'
+
+// Servidor y claves comunes a los tres archivos F8B (ver f8b-setup.ts). El
+// store se levantó con la ruta del SQLite, así que el dataset se puede firmar.
+const { url, claves } = inject('f8b')
+const clave = claves.datasets
 
 describe('F8B futuro — conjuntos de datos descargables firmados (§31.3)', () => {
-  let url: string
-  let servidor: ServidorPrueba
-  let clave: string
-
-  beforeAll(async () => {
-    // El dataset firmado se sirve desde el fichero, así que el store necesita
-    // la ruta real del SQLite temporal.
-    servidor = await levantarServidorPrueba({
-      prefijo: 'server-f8b-ds',
-      version: '0.2.0-ds',
-      apiPublica: true,
-      limitePorMinuto: 200,
-      conRutaDbEnStore: true,
-    })
-    url = servidor.url
-    clave = generarClaveApi()
-    await servidor.publicStore.registrarClave('key-ds-1', clave)
-  })
-
-  afterAll(() => servidor.cerrar())
 
   it('lista el conjunto firmado con sha256', async () => {
     const r = await fetch(`${url}/v1/datasets`, { headers: { authorization: `Bearer ${clave}` } })

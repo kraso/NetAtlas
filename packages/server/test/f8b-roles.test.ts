@@ -1,38 +1,13 @@
-import { describe, expect, it, beforeAll, afterAll } from 'vitest'
-import { crearPerfil } from '@netatlas/domain'
-import { generarClaveApi } from '../src/api-keys.js'
-import { levantarServidorPrueba, type ServidorPrueba } from './servidor-prueba.js'
+import { describe, expect, it, inject } from 'vitest'
+
+// El servidor y los perfiles curator/reviewer los prepara f8b-setup.ts.
+const { url, claves } = inject('f8b')
+const { lector: claveLector, curator: claveCurator, reviewer: claveReviewer } = claves
+
+/** Dispositivo propio de este archivo: nadie más escribe sus contribuciones. */
+const ENTIDAD_PRUEBA = 'device:aruba-2930f-48g-poeplus'
 
 describe('F8B futuro — roles curator/reviewer en la API pública (§20.5)', () => {
-  let url: string
-  let servidor: ServidorPrueba
-  let claveLector: string
-  let claveCurator: string
-  let claveReviewer: string
-
-  beforeAll(async () => {
-    servidor = await levantarServidorPrueba({
-      prefijo: 'server-f8b-rol',
-      version: '0.2.0-rol',
-      apiPublica: true,
-      limitePorMinuto: 500,
-    })
-    url = servidor.url
-
-    claveLector = generarClaveApi()
-    claveCurator = generarClaveApi()
-    claveReviewer = generarClaveApi()
-    await servidor.publicStore.registrarClave('key-leg-1', claveLector)
-    await servidor.publicStore.registrarClave('key-cur-1', claveCurator)
-    await servidor.publicStore.registrarClave('key-rev-1', claveReviewer)
-    // Promoción inicial: el "admin" establece curator y reviewer con el store.
-    const curator = crearPerfil({ id: 'key-cur-1', nick: 'curador', rol: 'curator' })
-    const reviewer = crearPerfil({ id: 'key-rev-1', nick: 'revisor', rol: 'reviewer' })
-    await servidor.publicStore.guardar(curator)
-    await servidor.publicStore.guardar(reviewer)
-  })
-
-  afterAll(() => servidor.cerrar())
 
   it('un lector no puede contribuir (403 en /v1/contributions)', async () => {
     const r = await fetch(`${url}/v1/contributions`, {
@@ -47,7 +22,7 @@ describe('F8B futuro — roles curator/reviewer en la API pública (§20.5)', ()
     const entrada = {
       id: 'rev-1',
       tipo: 'nota',
-      entidad: 'device:cisco-c9300-48p',
+      entidad: ENTIDAD_PRUEBA,
       autor: 'key-rev-1',
       payload: { nota: 'revisar PoE' },
       createdAt: '2025-01-01',
