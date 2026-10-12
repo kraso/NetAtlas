@@ -1,4 +1,3 @@
-import React from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
@@ -30,7 +29,13 @@ describe('Warmezo HTTP hermético (F8B)', () => {
 
     // El warmezo SÍ se intentó contra el API local...
     expect(String(espia.mock.calls[0]?.[0])).toContain('/api/snapshot')
-    // ...y al fallar no tocó los servicios: sigue el demo de 6 dispositivos.
+    // ...y lo que rechaza es el guardarraíl de la suite (ver `test/setup.ts`), no
+    // una red ausente: sin él, con el puerto cerrado, este test seguiría verde y
+    // la suite volvería a depender de la máquina.
+    await expect(globalThis.fetch('http://127.0.0.1:8787/api/snapshot')).rejects.toThrow(
+      /fetch bloqueado en unit tests/,
+    )
+    // Al fallar no tocó los servicios: sigue el demo de 6 dispositivos.
     const { dataset } = useServices.getState().services
     expect(dataset.devices).toHaveLength(6)
     expect(dataset.devices.map((d) => d.slug.value)).toContain('cisco-c9300-48p')
