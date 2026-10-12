@@ -35,6 +35,19 @@ describe('esBarrel', () => {
     expect(esBarrel('packages/x/src/index.ts', "export * as ns from './a.js'\n")).toBe(true)
   })
 
+  it('acepta también las comillas dobles, que son la otra grafía válida', () => {
+    expect(esBarrel('packages/x/src/index.ts', 'export * from "./a.js"\n')).toBe(true)
+    expect(esBarrel('packages/x/src/index.ts', 'export { a } from "./a.js"\n')).toBe(true)
+    expect(esBarrel('packages/x/src/index.ts', 'export * as ns from "./a.js"\n')).toBe(true)
+    // Grafía rota (comillas desparejadas): no es una re-exportación.
+    expect(esBarrel('packages/x/src/index.ts', "export * from './a.js\"\n")).toBe(false)
+  })
+
+  it('no exime un index.ts sin ninguna re-exportación', () => {
+    expect(esBarrel('packages/x/src/index.ts', '// solo un comentario\n')).toBe(false)
+    expect(esBarrel('packages/x/src/index.ts', '')).toBe(false)
+  })
+
   it('rechaza un index.ts con lógica', () => {
     expect(esBarrel('packages/x/src/index.ts', "export { a } from './a.js'\nexport const b = 1\n")).toBe(false)
     expect(esBarrel('packages/x/src/index.ts', "import { a } from './a.js'\n")).toBe(false)

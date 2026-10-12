@@ -31,7 +31,7 @@ export function contarLineas(contenido: string): number {
 }
 
 /** Una re-exportación completa: `export [type] (*|{…}) [as X] from '…'` ya cerrada. */
-const RE_EXPORTACION = /^export\s+(?:type\s+)?(?:\*|\{[^}]*\})(?:\s+as\s+[A-Za-z_$][\w$]*)?\s+from\s*'[^']*'\s*;?/
+const RE_EXPORTACION = /^export\s+(?:type\s+)?(?:\*|\{[^}]*\})(?:\s+as\s+[A-Za-z_$][\w$]*)?\s+from\s*(?:'[^']*'|"[^"]*")\s*;?/
 
 /**
  * Un barrel es un `index.ts` cuyas sentencias son todas re-exportaciones. Se
@@ -42,12 +42,15 @@ const RE_EXPORTACION = /^export\s+(?:type\s+)?(?:\*|\{[^}]*\})(?:\s+as\s+[A-Za-z
 export function esBarrel(ruta: string, contenido: string): boolean {
   if (!/^index\.tsx?$/.test(ruta.split(/[\\/]/).pop() ?? '')) return false
   let resto = contenidoSinComentarios(contenido)
+  let exportaciones = 0
   while (resto !== '') {
     const coincidencia = RE_EXPORTACION.exec(resto)
     if (!coincidencia) return false
+    exportaciones++
     resto = resto.slice(coincidencia[0].length).trim()
   }
-  return true
+  // Un `index.ts` sin ninguna re-exportación no es la superficie de nada.
+  return exportaciones > 0
 }
 
 /** Texto sin comentarios ni espacios repetidos, para analizar por sentencias. */
