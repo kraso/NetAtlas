@@ -3,6 +3,13 @@
 Fecha: 2025-01-15
 Status: Aceptado — Implementado
 
+> Nota (2026-10-13): el paquete se renombró a `@netatlas/application` y su directorio a
+> `packages/application`. Compartía nombre con `apps/app` (`@netatlas/app`), así que
+> `pnpm --filter @netatlas/app` resolvía en los dos paquetes: el job de Tauri moría con
+> «Command "tauri" not found» y los jobs de typecheck/test/build de la app trabajaban
+> también sobre la capa de aplicación sin decirlo. El cuerpo de este ADR se conserva tal
+> cual: describe la decisión original.
+
 ## Contexto
 El PLAN MAESTRO (§26) propone un paquete `packages/app` que no existía físicamente.
 La orquestación estaba dispersa en tres lugares:

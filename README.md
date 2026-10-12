@@ -45,7 +45,7 @@ docs/           # Documentación viva + ADRs
 > Nota de estructura: según el plan maestro (§26), las herramientas de datos
 > (`datagen`, `dataset-build` → aquí `dataset-tools`, `import-cli`) viven bajo
 > `tools/`, no bajo `packages/`; los paquetes reutilizables por la app son
-> `domain`, `data`, `search` (y en F1+, `app`, `diagrams`, `importers`, …).
+> `domain`, `data`, `search` (y en F1+, `application`, `diagrams`, `importers`, …).
 
 ## Comandos
 

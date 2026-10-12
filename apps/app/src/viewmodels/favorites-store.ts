@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import { manageFavorites } from '@netatlas/app/casos/manage-favorites'
-import type { FavoritesPort, Favorito } from '@netatlas/app'
+import { manageFavorites } from '@netatlas/application/casos/manage-favorites'
+import type { FavoritesPort, Favorito } from '@netatlas/application'
 
 const K_FAVORITOS = 'netatlas.favorites.v1'
 
@@ -9,12 +9,32 @@ function normalizar(entidad: string): string {
   return entidad.startsWith('device:') ? entidad : `device:${entidad}`
 }
 
+/** Guardarraíl del cast: un `Favorito` exige sus tres campos textuales. */
+function esFavorito(valor: unknown): valor is Favorito {
+  const f = valor as Partial<Favorito> | undefined
+  return (
+    typeof f?.perfilId === 'string' &&
+    typeof f?.entidad === 'string' &&
+    typeof f?.createdAt === 'string'
+  )
+}
+
 const localStorageAdapter: FavoritesPort = {
   async list(): Promise<readonly Favorito[]> {
     try {
       const raw = localStorage.getItem(K_FAVORITOS)
-      return raw ? (JSON.parse(raw) as Favorito[]) : []
-    } catch {
+      if (!raw) return []
+      const parsed: unknown = JSON.parse(raw)
+      // El cast no valida: una forma inesperada se descarta y se registra.
+      if (!Array.isArray(parsed) || parsed.some((f) => !esFavorito(f))) {
+        console.warn('[favoritos] la lista guardada tiene forma inválida; se descarta')
+        return []
+      }
+      return parsed
+    } catch (error) {
+      // Best-effort explícito: sin lista legible se parte de cero, pero el
+      // fallo se registra en lugar de tragarse (AGENTS.md).
+      console.warn('[favoritos] la lista guardada es ilegible; se parte de cero', { error })
       return []
     }
   },
@@ -41,15 +61,24 @@ export const useFavoritosStore = create<FavoritosState>((set) => ({
   loading: false,
   alternar: async (entidad: string) => {
     set({ loading: true })
-    const res = await manageFavorites(
-      { favorites: localStorageAdapter },
-      { entidad: normalizar(entidad), action: 'toggle' },
-    )
-    set({ favoritos: res.favoritos, loading: false })
+    try {
+      const res = await manageFavorites(
+        { favorites: localStorageAdapter },
+        { entidad: normalizar(entidad), action: 'toggle' },
+      )
+      set({ favoritos: res.favoritos, loading: false })
+    } catch (error) {
+      // El fallo se registra y el estado no se queda cargando para siempre.
+      console.warn('[favoritos] la operación falló; la lista no cambia', { error })
+      set({ loading: false })
+    }
   },
   sincronizar: async () => {
-    const actuales = await localStorageAdapter.list()
-    set({ favoritos: actuales })
+    try {
+      set({ favoritos: await localStorageAdapter.list() })
+    } catch (error) {
+      console.warn('[favoritos] no se pudo leer la lista guardada', { error })
+    }
   },
 }))
 

@@ -316,7 +316,7 @@ flowchart TB
 | Capa | Responsabilidad | Ubicación en el monorepo |
 |---|---|---|
 | Presentación | Componentes React, ViewModels, stores (Zustand), routing, temas | `apps/app/src/ui`, `packages/ui` |
-| Aplicación | Casos de uso orquestadores (`GetDeviceSheet`, `CompareDevices`, `SearchCatalog`, `BuildTopology`, `ImportDataset`…) | `packages/app` |
+| Aplicación | Casos de uso orquestadores (`GetDeviceSheet`, `CompareDevices`, `SearchCatalog`, `BuildTopology`, `ImportDataset`…) | `packages/application` |
 | Dominio | Entidades, value objects, servicios puros (comparador, DSL, genealogía, OSI, validación) | `packages/domain` |
 | Infraestructura | Adaptadores SQLite/FTS5/archivos/red, reloj, ids, logging | `packages/data`, `packages/search` |
 | Persistencia | Esquema SQL, migraciones (versionadas), DAOs, transacciones | `packages/data/migrations` |
@@ -355,7 +355,7 @@ Cada módulo exporta su API pública por `index.ts`; las dependencias entre mód
 
 ## 6.7 Evolución a cliente-servidor (Fase 8) sin reescritura
 
-1. Se publica un servicio Node que **reutiliza `packages/app` y `packages/domain`** tal cual, con un adaptador `PostgresRepository`.
+1. Se publica un servicio Node que **reutiliza `packages/application` y `packages/domain`** tal cual, con un adaptador `PostgresRepository`.
 2. El frontend cambia la composición: `DeviceRepository` pasa de SQLite local a `HttpRepository` (misma interfaz).
 3. El dataset local queda como **caché offline sincronizable** (estrategia en sección 23.4): réplica de solo lectura + cola de contribuciones.
 4. Nada del dominio, buscador (DSL), comparador, diagramas o UI cambia. Coste de la migración: adaptadores + API + auth, no reescritura.

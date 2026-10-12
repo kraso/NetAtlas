@@ -108,7 +108,7 @@ jobs:
         run: pnpm --filter @netatlas/app build
 
       - name: Install browsers
-        run: pnpm --filter @netatlas/app exec playwright install --with-deps chromium firefox
+        run: pnpm --filter ./apps/app exec playwright install --with-deps chromium firefox
 
       - name: E2E (flujo crítico 28.1.6#3 + 404 + offline PWA)
         run: pnpm --filter @netatlas/app test:e2e
@@ -136,7 +136,7 @@ jobs:
 
       # https://github.com/tauri-apps/tauri-action — compila binario sin bundle para CI
       - name: Build Tauri (release, sin bundle NSIS/MSI)
-        run: pnpm --filter @netatlas/app exec tauri build --no-bundle
+        run: pnpm --filter ./apps/app exec tauri build --no-bundle
 
       - name: Verificar binario
         shell: pwsh
