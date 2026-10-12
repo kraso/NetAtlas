@@ -2,7 +2,7 @@
   "name": "@netatlas/repo-lint",
   "version": "0.0.0",
   "private": true,
-  "description": "NetAtlas — modules:lint (ningún módulo de src supera 200 líneas; barrels exentos)",
+  "description": "NetAtlas — modules:lint (ningún módulo de src supera 200 líneas, barrels exentos; y ningún par de proyectos del workspace comparte nombre)",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

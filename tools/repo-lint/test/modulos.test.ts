@@ -1,39 +1,9 @@
 import { describe, expect, it, afterEach } from 'vitest'
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
-import { tmpdir } from 'node:os'
-import { join, dirname, sep } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { sep } from 'node:path'
 import { MAX_LINEAS, contarLineas, esBarrel, listarModulos, revisarRepo } from '../src/modulos.js'
+import { RAIZ_REPO, barrelDe, crearRepo, fuenteDe, limpiarRepos } from './soporte-repo-falso.js'
 
-const raizRepo = join(dirname(fileURLToPath(import.meta.url)), '..', '..', '..')
-
-/** Crea un repo de mentira con los archivos indicados (ruta → contenido). */
-function crearRepo(archivos: Readonly<Record<string, string>>): string {
-  const raiz = mkdtempSync(join(tmpdir(), 'repo-lint-'))
-  for (const [ruta, contenido] of Object.entries(archivos)) {
-    const destino = join(raiz, ruta)
-    mkdirSync(dirname(destino), { recursive: true })
-    writeFileSync(destino, contenido)
-  }
-  return raiz
-}
-
-/** Fuente TS de N líneas exactas (cada línea es una sentencia válida inofensiva). */
-function fuenteDe(lineas: number): string {
-  return `${Array.from({ length: lineas }, (_, i) => `const x${i} = ${i}`).join('\n')}\n`
-}
-
-/** Barrel de N líneas exactas: solo re-exportaciones. */
-function barrelDe(lineas: number): string {
-  return `${Array.from({ length: lineas }, (_, i) => `export { a${i} } from './a.js'`).join('\n')}\n`
-}
-
-let temporales: string[] = []
-
-afterEach(() => {
-  for (const t of temporales) rmSync(t, { recursive: true, force: true })
-  temporales = []
-})
+afterEach(limpiarRepos)
 
 describe('contarLineas', () => {
   it('no cuenta el salto final', () => {
@@ -82,7 +52,6 @@ describe('listarModulos', () => {
       'tools/z/src/cli.ts': 'export const c = 1\n',
       'datasets/seed/otro.ts': 'export const o = 1\n',
     })
-    temporales.push(raiz)
     const modulos = listarModulos(raiz).map((m) => m.slice(raiz.length + 1).split(sep).join('/'))
     expect(modulos).toEqual(['packages/x/src/a.ts', 'packages/x/src/b.tsx', 'tools/z/src/cli.ts'])
   })
@@ -96,7 +65,6 @@ describe('revisarRepo', () => {
       'packages/x/src/index.ts': barrelDe(MAX_LINEAS + 50),
       'packages/x/src/largo.test.ts': fuenteDe(MAX_LINEAS + 100),
     })
-    temporales.push(raiz)
     const informe = revisarRepo(raiz)
     expect(informe.violaciones.map((v) => v.ruta)).toEqual(['packages/x/src/largo.ts'])
     expect(informe.violaciones[0]!.lineas).toBe(MAX_LINEAS + 1)
@@ -108,14 +76,13 @@ describe('revisarRepo', () => {
     const raiz = crearRepo({
       'packages/x/src/index.ts': `export { a } from './a.js'\n${fuenteDe(MAX_LINEAS + 5)}`,
     })
-    temporales.push(raiz)
     const informe = revisarRepo(raiz)
     expect(informe.barrels).toBe(0)
     expect(informe.violaciones.map((v) => v.ruta)).toEqual(['packages/x/src/index.ts'])
   })
 
   it('el repositorio real no tiene ningún módulo por encima del máximo', () => {
-    const informe = revisarRepo(raizRepo)
+    const informe = revisarRepo(RAIZ_REPO)
     expect(informe.violaciones).toEqual([])
     expect(informe.revisados).toBeGreaterThan(100)
   })

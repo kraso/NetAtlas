@@ -24,6 +24,23 @@ aunque el código esté bien.
   puede ir al final del análisis. Lo que no puede es faltar, ni aparecer dos
   veces con valores distintos.
 
+## Alcance del gate
+
+Qué archivos entran al review del hook `pre-commit`.
+
+- El gate revisa también los **archivos de test**: `*.test.ts`, `*.test.tsx`,
+  `*.spec.ts`, `*.spec.tsx` y `apps/app/e2e/*.spec.ts`. Son la red que valida
+  casi todos los movimientos del repositorio y antes quedaban fuera del gate.
+- Quedan fuera los **fixtures** (`*-fixtures.ts`, `*.fixtures.ts`,
+  `*-fixture.ts`, `*.fixture.ts`, `fixtures/`, `__fixtures__/`) y los
+  **snapshots** (`*.snap`, `__snapshots__/`): son material de apoyo de los
+  tests, no código de test. También siguen fuera los `*.d.ts` generados.
+- Se configura en el `.gga` local (`FILE_PATTERNS` / `EXCLUDE_PATTERNS`), no en
+  este archivo. Al tocarlo, ojo con el matching de GGA: un patrón que empieza
+  por `*` se compara como **sufijo literal** sobre la ruta completa (no como
+  «contiene»), así que los directorios se cubren con un glob que empiece por
+  `?` (`?*fixtures/*`) y no con `*fixtures*`.
+
 ## Estándares de código
 
 Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
@@ -42,6 +59,10 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
 - El límite de 200 líneas de los módulos está automatizado:
   `pnpm modules:lint` falla si algún módulo de `src` lo supera (los barrels
   exentos del punto siguiente quedan fuera del recuento).
+- El mismo `pnpm modules:lint` recorre los proyectos que declara
+  `pnpm-workspace.yaml` (más la raíz) y falla si dos comparten `name`: un nombre
+  duplicado deja `pnpm --filter <nombre>` ambiguo y la tarea se ejecuta en el
+  proyecto equivocado o muere por un binario que ese proyecto no declara.
 
 ### Convenciones
 
@@ -49,12 +70,21 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   barrels (`index.ts` cuyo único contenido son re-exports) no están sujetos al
   límite: su tamaño es la superficie pública del paquete, no lógica, y partirlos
   agrega indirección sin beneficio. Un barrel al que se le agregue cualquier
-  cosa que no sea `export` deja de estar exento.
+  cosa que no sea `export` deja de estar exento. Los **ficheros de test**
+  (`*.test.ts`, `*.spec.tsx`, `apps/app/e2e/*.spec.ts`) tampoco entran en el
+  recuento: `modules:lint` los omite y su tamaño se juzga por el suite, no por
+  el límite de la lógica de `src`.
 - **Funciones de menos de 30 líneas, una sola responsabilidad.** Aplica a la
   lógica: hooks (`use*`), manejadores de eventos, carga de datos y
   transformaciones. El cuerpo JSX de un componente no se mide con esta regla
   —los componentes se juzgan por el límite de módulo—, pero su lógica debe
-  vivir en hooks o utilidades que sí la cumplen.
+  vivir en hooks o utilidades que sí la cumplen. **El cuerpo de un caso de test
+  (`it`/`test`) tampoco se mide**: su responsabilidad es el caso que nombra el
+  título, y su cuerpo es la secuencia arrange/act/assert que se lee de corrido;
+  un caso que no cabe en una lectura razonable son dos casos, no una función
+  extraída. La regla sí aplica dentro de los tests a lo que es lógica como
+  cualquier otra: **fábricas y dobles, helpers de espera, utilidades de
+  aserción y hooks de prueba** (`use*`).
 - **Nomenclatura**: `camelCase` para variables y funciones, `PascalCase` para
   tipos y clases, `snake_case` para columnas SQL.
 - **Imports**: se cuentan las declaraciones `import`, no los símbolos que
