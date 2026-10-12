@@ -58,14 +58,18 @@ describe('Favoritos de usuario (F8B, NET-HW-064)', () => {
     expect(btn.getAttribute('aria-pressed')).toBe('true')
   })
 
-  it('una entrada con forma inválida se descarta y se registra', async () => {
+  it('una entrada con forma inválida se descarta, se registra y se avisa en la ficha', async () => {
     const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
     localStorage.setItem('netatlas.favorites.v1', JSON.stringify([{ entidad: 'device:cisco-c9300-48p' }]))
 
     renderFicha()
     const btn = await screen.findByTestId('favorito-cisco-c9300-48p')
     expect(btn.textContent).toContain('☆')
-    expect(warn).toHaveBeenCalledWith(expect.stringContaining('forma inválida'))
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('forma inválida'), expect.anything())
+    // El dato corrupto no se traga: la ficha lo comunica con role="alert".
+    const aviso = await screen.findByTestId('error-favorito')
+    expect(aviso.getAttribute('role')).toBe('alert')
+    expect(aviso.textContent).toContain('No se pudieron leer los favoritos guardados.')
     warn.mockRestore()
   })
 })
