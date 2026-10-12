@@ -1,4 +1,10 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './baseline-demo.js'
+import {
+  activarSoloDiferencias,
+  comprobarVeredictoPoe,
+  exportarPdfDescargable,
+  marcarTresSwitches,
+} from './apoyo-comparador.js'
 
 /**
  * F5 — CU-02 (criterio de fase): «Desde el explorador (filtro cat:sw) selecciona 3 →
@@ -8,37 +14,21 @@ import { test, expect } from '@playwright/test'
 test.describe('Comparador de dispositivos — CU-02 (F5)', () => {
   test('selecciona 3 switches en el explorador y obtiene el veredicto con diferencias reales', async ({ page }) => {
     // 1) Explorador con la macrocategoría Switching (incluye L2 y L3)
-    await page.goto('/explore?cat=CAT-SWT')
-    await expect(page.getByRole('checkbox', { name: 'Comparar Cisco Catalyst 9300-48P' })).toBeVisible()
-    await page.getByRole('checkbox', { name: 'Comparar Cisco Catalyst 9300-48P' }).check()
-    await page.getByRole('checkbox', { name: 'Comparar Aruba 6300M 48G' }).check()
-    await page.getByRole('checkbox', { name: 'Comparar Aruba 2930F 48G PoE+' }).check()
+    await marcarTresSwitches(page)
 
-    // 2) → comparador
+    // 2) → comparador (aviso de comparación transversal L2/L3 incluido)
     await page.getByRole('button', { name: /Comparar seleccionados \(3\)/ }).click()
     await expect(page.getByRole('heading', { level: 1, name: 'Comparación de dispositivos' })).toBeVisible()
-
-    // Comparación transversal L2/L3 avisada, con atributos específicos
     await expect(page.getByText(/Comparación transversal entre categorías/i).first()).toBeVisible()
 
     // 3) Veredicto con diferencias reales según los datos: PoE (0 frente a 48)
-    await expect(page.getByText(/En «Puertos con PoE»/)).toBeVisible()
-    await expect(page.getByText(/cisco-c9300-48p: 0 frente a 48/i)).toBeVisible()
-    // Atributos específicos listados (span y veredicto lo repiten)
-    await expect(page.getByText(/Presupuesto PoE/).first()).toBeVisible()
-    await expect(page.getByText(/Apilable/).first()).toBeVisible()
+    await comprobarVeredictoPoe(page)
 
-    // 4) Solo diferencias: la fila idéntica (Puertos totales) desaparece
-    await page.getByRole('checkbox', { name: 'Modo solo diferencias' }).check()
-    await expect(page.getByRole('button', { name: /Puertos totales/ })).toHaveCount(0)
-    await expect(page.getByRole('button', { name: /Puertos con PoE/ })).toBeVisible()
+    // 4) Solo diferencias: la fila idéntica desaparece
+    await activarSoloDiferencias(page)
 
-    // 5) Exportación CSV (descargable) y PDF descargable real con jsPDF
-    await page.getByRole('button', { name: 'Exportar CSV' }).click()
-    const pdf = page.waitForEvent('download')
-    await page.getByRole('button', { name: 'Exportar PDF' }).click()
-    const descarga = await pdf
-    expect(descarga.suggestedFilename()).toMatch(/^netatlas-comparacion-\d{4}-\d{2}-\d{2}\.pdf$/)
+    // 5) Exportación CSV y PDF descargable real con jsPDF
+    await exportarPdfDescargable(page)
   })
 
   test('enlace compartible con veredicto: copiar y verificar al recargar (F5 refinamiento)', async ({ page }) => {

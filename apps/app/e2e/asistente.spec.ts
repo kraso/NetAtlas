@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './baseline-demo.js'
 
 /**
  * F7 — asistente IA (§21): flag `ai.enabled` off por defecto, chat con citas

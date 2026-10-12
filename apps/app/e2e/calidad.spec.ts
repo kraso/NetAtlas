@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './baseline-demo.js'
 
 /**
  * F6 — NET-HW-047/049: dashboard de calidad con cobertura de fuentes,
