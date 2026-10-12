@@ -42,8 +42,50 @@ function esSyncDevice(v: unknown): v is SyncDevice {
     typeof v.categoryCode === 'string' &&
     typeof v.lifecycleStatus === 'string' &&
     typeof v.updatedAt === 'string' &&
-    typeof v.version === 'number'
+    // La versión ordena el merge LWW: un no-entero (NaN, Infinity, 1.5) no es una
+    // versión servida por el snapshot y no puede entrar a competir por el orden.
+    Number.isInteger(v.version) &&
+    (v.version as number) >= 0
   )
+}
+
+/** Texto persistido, o `undefined` si no hay nada legible (con su registro). */
+function leerCrudo(key: string): string | undefined {
+  try {
+    const raw = localStorage.getItem(key)
+    return raw ? raw : undefined
+  } catch (error) {
+    console.warn('[WARN] no se pudo leer el valor persistido; se usa el respaldo', { key, error })
+    return undefined
+  }
+}
+
+/** Lista JSON del texto persistido, o `undefined` si no es una lista. */
+function leerListaCruda(key: string, raw: string): readonly unknown[] | undefined {
+  let parseado: unknown
+  try {
+    parseado = JSON.parse(raw)
+  } catch (error) {
+    console.warn('[WARN] JSON ilegible en localStorage; se usa el respaldo', { key, error })
+    return undefined
+  }
+  if (!Array.isArray(parseado)) {
+    console.warn('[WARN] se esperaba una lista JSON; se usa el respaldo', { key, valor: parseado })
+    return undefined
+  }
+  return parseado
+}
+
+/** Filas que cumplen el contrato; las demás se descartan y se registran. */
+function filasValidas<T>(key: string, lista: readonly unknown[], esFila: (v: unknown) => v is T): readonly T[] {
+  const validas = lista.filter(esFila)
+  if (validas.length !== lista.length) {
+    console.warn('[WARN] filas con forma inválida descartadas de la persistencia', {
+      key,
+      descartadas: lista.length - validas.length,
+    })
+  }
+  return validas
 }
 
 /**
@@ -52,43 +94,22 @@ function esSyncDevice(v: unknown): v is SyncDevice {
  * sin tratar datos crudos como si fueran del tipo del contrato.
  */
 function leerLista<T>(key: string, fallback: readonly T[], esFila: (v: unknown) => v is T): readonly T[] {
-  let raw: string | null
-  try {
-    raw = localStorage.getItem(key)
-  } catch (error) {
-    console.warn('[WARN] no se pudo leer el valor persistido; se usa el respaldo', { key, error })
-    return fallback
-  }
-  if (!raw) return fallback
-
-  let parseado: unknown
-  try {
-    parseado = JSON.parse(raw)
-  } catch (error) {
-    console.warn('[WARN] JSON ilegible en localStorage; se usa el respaldo', { key, error })
-    return fallback
-  }
-  if (!Array.isArray(parseado)) {
-    console.warn('[WARN] se esperaba una lista JSON; se usa el respaldo', { key, valor: parseado })
-    return fallback
-  }
-  const validas = parseado.filter(esFila)
-  if (validas.length !== parseado.length) {
-    console.warn('[WARN] filas con forma inválida descartadas de la persistencia', {
-      key,
-      descartadas: parseado.length - validas.length,
-    })
-  }
-  return validas
+  const raw = leerCrudo(key)
+  if (raw === undefined) return fallback
+  const lista = leerListaCruda(key, raw)
+  if (lista === undefined) return fallback
+  return filasValidas(key, lista, esFila)
 }
 
-function guardarJson(key: string, valor: unknown): void {
+function guardarJson(key: string, valor: unknown): boolean {
   try {
     localStorage.setItem(key, JSON.stringify(valor))
+    return true
   } catch (error) {
-    // Persistencia best-effort (cola y réplica): no bloquea el ciclo, pero el
-    // fallo queda registrado con contexto en lugar de silenciado.
+    // El fallo queda registrado con contexto en lugar de silenciado; quien
+    // decida si el dato es best-effort o no recibe el resultado.
     console.warn('[WARN] no se pudo persistir; el dato vive solo en memoria', { key, error })
+    return false
   }
 }
 
@@ -97,7 +118,11 @@ export class OutboxLocalRepo implements OutboxRepository {
   async enqueue(entry: OutboxEntry): Promise<void> {
     const actuales = leerLista(claveOutbox, [], esOutboxEntry)
     if (actuales.some((e) => e.id === entry.id)) return
-    guardarJson(claveOutbox, [...actuales, entry])
+    // La aportación que el usuario acaba de escribir no es best-effort: si no se
+    // persiste, no se da por encolada y el fallo sube a quien la orquesta.
+    if (!guardarJson(claveOutbox, [...actuales, entry])) {
+      throw new Error('No se pudo guardar la aportación en el navegador.')
+    }
   }
 
   async pendientes(): Promise<readonly OutboxEntry[]> {

@@ -9,6 +9,17 @@ import { OutboxLocalRepo, ReplicaLocalRepo } from '../src/viewmodels/sync-repos-
 const claveOutbox = 'netatlas.sync.outbox.v1'
 const claveReplica = 'netatlas.sync.replica.v1'
 
+/** Fila de réplica válida; el test varía solo la versión a probar. */
+const filaReplica = {
+  slug: 'sw-a',
+  name: 'Switch A',
+  manufacturerSlug: 'acme',
+  categoryCode: 'CAT-RED',
+  lifecycleStatus: 'current',
+  updatedAt: '2025-01-01',
+  version: 1,
+}
+
 beforeEach(() => {
   localStorage.clear()
   vi.restoreAllMocks()
@@ -63,5 +74,45 @@ describe('adaptadores locales de sincronización (localStorage validado)', () =>
     vi.spyOn(console, 'warn').mockImplementation(() => {})
     const replica = new ReplicaLocalRepo()
     expect(await replica.count()).toBe(0)
+  })
+
+  it('una versión que no es un entero no negativo no entra a la réplica', async () => {
+    localStorage.setItem(
+      claveReplica,
+      JSON.stringify([
+        { ...filaReplica, version: Number.NaN },
+        { ...filaReplica, version: Number.POSITIVE_INFINITY },
+        { ...filaReplica, version: 1.5 },
+        { ...filaReplica, version: -1 },
+      ]),
+    )
+    vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const replica = new ReplicaLocalRepo()
+    expect(await replica.count()).toBe(0)
+    expect(await replica.version()).toBe(0)
+  })
+
+  it('si el almacenamiento rechaza la escritura, encolar rompe y no da la nota por guardada', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('cuota agotada')
+    })
+    const repo = new OutboxLocalRepo()
+    await expect(
+      repo.enqueue({
+        id: 'n1',
+        tipo: 'nota',
+        entidad: 'device:x',
+        autor: 'u',
+        payload: {},
+        createdAt: '2025-01-01',
+        revision: 1,
+        status: 'pendiente',
+      }),
+    ).rejects.toThrow(/No se pudo guardar la aportación/)
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining('no se pudo persistir'),
+      expect.objectContaining({ key: claveOutbox }),
+    )
   })
 })
