@@ -14,7 +14,7 @@ import { useComparador } from './comparar-hooks.js'
  *  - Exportación CSV (real) y PDF vía imprimir del navegador (042)
  *
  * La orquestación vive en el caso de uso compartido `compareDevicesUseCase`
- * (packages/app) y el estado en `useComparador`; esta vista solo proyecta.
+ * (packages/application) y el estado en `useComparador`; esta vista solo proyecta.
  */
 
 export function Comparar(): React.JSX.Element {

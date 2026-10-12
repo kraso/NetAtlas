@@ -5,7 +5,7 @@
 // Dominio y casos de uso compartidos.
 export { etiquetaDeReporte } from '@netatlas/domain'
 export type { ComparisonReport } from '@netatlas/domain'
-export { compareDevicesUseCase } from '@netatlas/app'
+export { compareDevicesUseCase } from '@netatlas/application'
 // UI de apoyo: breadcrumbs, barra, informe y exportaciones.
 export { Breadcrumbs } from './breadcrumbs.js'
 export { generarPdfComparacion } from './exportar-pdf.js'
