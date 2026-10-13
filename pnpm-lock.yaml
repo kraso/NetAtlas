@@ -27,7 +27,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/search
       '@netatlas/server':
-        specifier: workspace:^
+        specifier: workspace:*
         version: link:../../packages/server
       '@netatlas/ui':
         specifier: workspace:*

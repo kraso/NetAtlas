@@ -76,7 +76,12 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   `pnpm-workspace.yaml` (más la raíz) y falla si dos comparten `name`: un nombre
   duplicado deja `pnpm --filter <nombre>` ambiguo y la tarea se ejecuta en el
   proyecto equivocado o muere por un binario que ese proyecto no declara.
-
+- El mismo `pnpm modules:lint` falla si una **dependencia interna** del
+  workspace no se declara `workspace:*` (`workspace:^`, `^0.0.0`, `file:…`,
+  `link:…`): con un rango, pnpm la resuelve fuera del repo. Mira las cuatro
+  secciones del manifiesto y saca la lista de proyectos de
+  `pnpm-workspace.yaml`, así que un proyecto nuevo entra en la regla por existir
+  — el estándar ya no depende de un grep a mano.
 ### Convenciones
 
 - **Módulos de menos de 200 líneas.** Si excede, dividir. **Excepción:** los

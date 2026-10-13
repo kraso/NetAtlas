@@ -1,11 +1,20 @@
 #!/usr/bin/env tsx
-// modules:lint — ningún módulo de src supera 200 líneas (barrels exentos) y
-// ningún par de proyectos del workspace comparte nombre.
+// modules:lint — ningún módulo de src supera 200 líneas (barrels exentos),
+// ningún par de proyectos del workspace comparte nombre, y ninguna dependencia
+// interna se declara fuera de `workspace:*`.
 // Uso: pnpm modules:lint [raízRepo]
+//
+// Las reglas viven en módulos aparte y se consumen por el barrel del paquete:
+// el CLI solo las recorre y decide el exit code.
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
-import { MAX_LINEAS, revisarRepo } from './modulos.js'
-import { revisarNombres } from './nombres.js'
+import {
+  ESPECIFICADOR_INTERNO,
+  MAX_LINEAS,
+  revisarDependencias,
+  revisarNombres,
+  revisarRepo,
+} from './index.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const raiz = process.argv[2] ?? join(here, '..', '..', '..')
@@ -28,4 +37,25 @@ console.log(
   `modules:lint: ${nombres.duplicados.length} nombres duplicados sobre ${nombres.revisados} proyectos del workspace.`,
 )
 
-if (informe.violaciones.length > 0 || nombres.duplicados.length > 0) process.exitCode = 1
+const dependencias = revisarDependencias(raiz)
+for (const v of dependencias.violaciones) {
+  if (v.motivo === 'especificador-invalido') {
+    console.log(
+      `[ERROR] [dependencia-invalida] ${v.ruta}: ${v.dependencia} en ${v.seccion} declara ${v.declarada}, que no es una cadena; una dependencia de otro proyecto del workspace va con "${v.esperada}".`,
+    )
+    continue
+  }
+  console.log(
+    `[ERROR] [dependencia-interna] ${v.ruta}: ${v.dependencia} declarada "${v.declarada}" en ${v.seccion}; una dependencia de otro proyecto del workspace va con "${v.esperada}". Con un rango, pnpm la resuelve fuera del repo.`,
+  )
+}
+console.log(
+  `modules:lint: ${dependencias.violaciones.length} dependencias internas fuera de "${ESPECIFICADOR_INTERNO}" sobre ${dependencias.internas} revisadas en ${dependencias.revisados} proyectos.`,
+)
+
+if (
+  informe.violaciones.length > 0 ||
+  nombres.duplicados.length > 0 ||
+  dependencias.violaciones.length > 0
+)
+  process.exitCode = 1

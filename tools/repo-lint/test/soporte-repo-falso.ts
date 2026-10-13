@@ -51,6 +51,14 @@ export function paquete(nombre: string): string {
   return `${JSON.stringify({ name: nombre, version: '0.0.0', private: true }, null, 2)}\n`
 }
 
+/** Manifiesto con nombre y dependencias, una entrada por sección del manifiesto. */
+export function paqueteConDeps(
+  nombre: string,
+  secciones: Readonly<Record<string, Readonly<Record<string, unknown>>>>,
+): string {
+  return `${JSON.stringify({ name: nombre, version: '0.0.0', private: true, ...secciones }, null, 2)}\n`
+}
+
 /** `pnpm-workspace.yaml` con los globs indicados. */
 export function workspace(globs: readonly string[]): string {
   return `packages:\n${globs.map((g) => `  - "${g}"`).join('\n')}\n`

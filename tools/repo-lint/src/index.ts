@@ -1,6 +1,12 @@
 export { MAX_LINEAS, contarLineas, esBarrel, listarModulos, revisarRepo } from './modulos.js'
 export type { InformeModulos, ViolacionModulo } from './modulos.js'
-export { leerGlobsWorkspace, listarManifiestos, revisarNombres } from './nombres.js'
+export { leerGlobsWorkspace, listarManifiestos, listarProyectos, revisarNombres } from './nombres.js'
 export { DIR_DIST, importsDesnudos, resolublePorElNavegador, revisarBundle } from './bundle.js'
 export type { InformeBundle, ViolacionBundle } from './bundle.js'
 export type { InformeNombres, NombreDuplicado, NombreProyecto } from './nombres.js'
+export {
+  ESPECIFICADOR_INTERNO,
+  SECCIONES_DEPENDENCIAS,
+  revisarDependencias,
+} from './dependencias.js'
+export type { InformeDependencias, SeccionDependencias, ViolacionDependencia } from './dependencias.js'
