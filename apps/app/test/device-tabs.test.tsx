@@ -72,6 +72,29 @@ describe('Ficha de dispositivo — 13 pestañas (§10.5)', () => {
     expect((await screen.findAllByText(/TILE-Gx36/)).length).toBeGreaterThanOrEqual(1)
   })
 
+  // Regresión: el entry del datasheet traía `url` de la web y la pestaña enlazaba
+  // solo eso, así que las 32 copias locales del bundle quedaban inalcanzables (F2).
+  it('Documentación: la copia local del bundle es el enlace principal', async () => {
+    renderApp('/device/cisco-c9300-48p')
+    fireEvent.click(await screen.findByRole('tab', { name: 'Documentación' }))
+    const enlace = await screen.findByRole('link', { name: /Hoja de datos/ })
+    expect(enlace.getAttribute('href')).toBe(
+      '/assets/docs/Catalyst%209300%20Series%20Switches%20Data%20Sheet.pdf',
+    )
+    expect(screen.getByText(/copia local \(offline\)/)).toBeDefined()
+  })
+
+  it('Documentación: con copia local y url, la web queda como fuente secundaria', async () => {
+    renderApp('/device/fortinet-200f')
+    fireEvent.click(await screen.findByRole('tab', { name: 'Documentación' }))
+    const principal = await screen.findByRole('link', { name: /FortiGate 200F Series Data Sheet/ })
+    expect(principal.getAttribute('href')).toBe(
+      '/assets/docs/FortiGate%20200F%20Series%20Data%20Sheet.pdf',
+    )
+    const fuente = screen.getByRole('link', { name: 'fuente online' })
+    expect(fuente.getAttribute('href')).toContain('fortinet.com')
+  })
+
   it('Arquitectura curada: el FortiGate 200F del demo muestra CPU/SoC/CP/NP/almacenamiento con fuente', async () => {
     renderApp('/device/fortinet-200f')
     fireEvent.click(await screen.findByRole('tab', { name: 'Arquitectura' }))

@@ -1,7 +1,7 @@
 import { describe, expect, it, beforeAll } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { dirname, join, resolve } from 'node:path'
-import { loadMigrations, applyMigrations, NodeSqliteDriver, CatalogDao } from '../src/index.js'
+import { loadMigrations, applyMigrations, NodeSqliteDriver, CatalogDao, DATASET_SCHEMA_VERSION } from '../src/index.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const migrationsDir = resolve(here, '..', 'migrations')
@@ -23,6 +23,14 @@ describe('Migraciones (0001_init + 0002_reconciliation + 0003_manufacturer_snmp)
     expect(Number(row?.v)).toBe(3)
     const col = driver.prepare("SELECT name FROM pragma_table_info('manufacturer') WHERE name = 'snmp_enterprise'").get()
     expect(col).toBeDefined()
+  })
+
+  // Regresión del bug preexistente: la constante quedó en 2 mientras había 3
+  // migraciones, y data:manifiesto rechazaba el seed propio («Esquema 3 > máx 2»).
+  it('DATASET_SCHEMA_VERSION sigue a la última migración (no puede quedar desfasado)', () => {
+    const migrations = loadMigrations(migrationsDir)
+    const ultima = Math.max(...migrations.map((m) => m.version))
+    expect(DATASET_SCHEMA_VERSION).toBe(ultima)
   })
 
   it('re-aplicar es idempotente (skipped, sin error)', () => {

@@ -308,6 +308,14 @@ function SimilaresComparar({
   )
 }
 
+/**
+ * URL de un recurso servido desde el bundle (`public/assets/…`). Codifica cada
+ * segmento: hay datasheets con espacios, `+` y paréntesis en el nombre.
+ */
+function urlDeBundle(ruta: string): string {
+  return `/${ruta.split('/').map(encodeURIComponent).join('/')}`
+}
+
 function PestanaContent({ device, pestaña }: { device: Device; pestaña: string }): React.JSX.Element {
   const { relaciones, assertions, fichas, imagenes, loading } = useDeviceRelations(device)
   const fabricante = useFabricante(device.manufacturerSlug)
@@ -330,7 +338,7 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
         <div className="stack">
           {imagenes.filter((g) => g.kind === 'frontal').slice(0, 1).map((g) => (
             <figure key={g.localPath ?? g.url ?? g.caption ?? 'foto'} className="foto-producto">
-              <img src={g.url ?? `/${g.localPath ?? ''}`} alt={`Foto de ${device.name}`} loading="lazy" />
+              <img src={g.url ?? urlDeBundle(g.localPath ?? '')} alt={`Foto de ${device.name}`} loading="lazy" />
               <figcaption className="guia-tecnica">
                 {g.caption ?? device.name} — {g.source.title}
               </figcaption>
@@ -589,13 +597,23 @@ function PestanaContent({ device, pestaña }: { device: Device; pestaña: string
         <ul>
           {fichas.map((f) => (
             <li key={`${f.title}-${f.language}`}>
-              {f.url ? (
+              {/* La copia local manda: es la que la app sirve siempre, sin red.
+                  La web queda como enlace secundario de procedencia. */}
+              {f.localPath ? (
+                <a href={urlDeBundle(f.localPath)} target="_blank" rel="noreferrer">{f.title}</a>
+              ) : f.url ? (
                 <a href={f.url} target="_blank" rel="noreferrer">{f.title}</a>
               ) : (
                 <span>{f.title}</span>
               )}{' '}
               <span className="mono guia-tecnica">[{f.language}]</span>{' '}
               <span className="guia-tecnica">{f.source.title}</span>
+              {f.localPath !== undefined ? (
+                <>{' '}<span className="guia-tecnica">· copia local (offline)</span></>
+              ) : null}
+              {f.localPath !== undefined && f.url !== undefined ? (
+                <>{' '}<a href={f.url} target="_blank" rel="noreferrer" className="guia-tecnica">fuente online</a></>
+              ) : null}
             </li>
           ))}
         </ul>

@@ -2,9 +2,12 @@ import { describe, expect, it, beforeAll } from 'vitest'
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import { lintSeed, loadSeed } from '../src/lint.js'
+import { recursosLocalesDe, validarRecursosLocales } from '../src/lint-recursos.js'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const seedDir = join(here, '..', '..', '..', 'datasets', 'seed')
+// Bundle que publica la app (Vite copia apps/app/public → dist).
+const publicDir = join(here, '..', '..', '..', 'apps', 'app', 'public')
 
 let seed: ReturnType<typeof loadSeed>
 
@@ -25,10 +28,27 @@ describe('data:lint — dataset seed', () => {
   })
 
   it('no produce errores de invariantes', () => {
-    const report = lintSeed(seed)
+    const report = lintSeed(seed, publicDir)
     const errors = report.issues.filter((i) => i.severity === 'error')
     expect(errors).toEqual([])
     expect(report.ok).toBe(true)
+  })
+
+  // Regresión: 32 datasheets declaraban `docs/…`, fuera del bundle, así que la
+  // pestaña Documentación los mostraba como texto plano (F2).
+  it('todo recurso local existe dentro del bundle de la app', () => {
+    const recursos = recursosLocalesDe(seed.devices)
+    expect(recursos.length).toBeGreaterThan(0)
+    expect(validarRecursosLocales(recursos, publicDir)).toEqual([])
+  })
+
+  it('rechaza un localPath fuera del bundle aunque el archivo no exista', () => {
+    const issues = validarRecursosLocales(
+      [{ deviceSlug: 'sw-1', clase: 'datasheet', ruta: 'docs/Doc A.pdf' }],
+      join(here, '..', 'fixtures-inexistentes'),
+    )
+    expect(issues.map((i) => i.rule)).toEqual(['local-path-fuera-bundle'])
+    expect(issues[0]?.message).toContain('sw-1')
   })
 
   it('toda categoría referenciada por dispositivos existe en el árbol', () => {
@@ -43,6 +63,42 @@ describe('data:lint — dataset seed', () => {
     expect(criticos.length).toBeGreaterThan(0)
     const conFuente = criticos.filter((a) => a.sourceSlug?.trim().length).length
     expect(conFuente / criticos.length).toBeGreaterThanOrEqual(0.8)
+  })
+
+  // Regresión: 42 assertions de 18 dispositivos citaban el criterio editorial del
+  // hub 3Com (el documento de OTRO dispositivo) para justificar protocolos que
+  // ese documento no cubre.
+  it('rechaza que un dispositivo cite el documento declarado por otro (fuente ajena)', () => {
+    const base = {
+      categories: [{ code: 'CAT-SWT', nameEs: 'Switching' }],
+      manufacturers: [{ slug: 'acme', name: 'Acme' }],
+      sources: [
+        { slug: 'doc-a', kind: 'datasheet', title: 'Doc A', authorityLevel: 1 },
+        { slug: 'doc-b', kind: 'datasheet', title: 'Doc B', authorityLevel: 1 },
+        { slug: 'criterio-general', kind: 'editorial', title: 'Criterio', authorityLevel: 3 },
+      ],
+      protocols: [{ code: 'ospf', name: 'OSPF', family: 'internet', osiLayer: 3 }],
+      standards: [],
+      media: [],
+    }
+    const device = (slug: string, sourceSlug: string, declara = 'doc-a') => ({
+      slug,
+      name: slug,
+      manufacturerSlug: 'acme',
+      categoryCode: 'CAT-SWT',
+      lifecycleStatus: 'current',
+      assertions: [{ predicate: 'supports-protocol', value: 'ospf', sourceSlug, confidence: 'third-party' }],
+      datasheets: [{ title: 'Doc', sourceSlug: declara }],
+    })
+    // criterio-general no lo declara ningún dispositivo → fuente compartida.
+    const propios = lintSeed({ ...base, devices: [device('sw-1', 'doc-a'), device('sw-2', 'criterio-general', 'doc-b')] })
+    expect(propios.issues.filter((i) => i.rule === 'assertion-source-ajena')).toEqual([])
+
+    // sw-2 declara doc-b pero cita doc-a, que es de sw-1.
+    const ajenos = lintSeed({ ...base, devices: [device('sw-1', 'doc-a'), device('sw-2', 'doc-a', 'doc-b')] })
+    const problema = ajenos.issues.find((i) => i.rule === 'assertion-source-ajena')
+    expect(problema?.severity).toBe('error')
+    expect(problema?.message).toContain('sw-2')
   })
 
   it('todo protocolo de assertion supports-protocol existe en el catálogo (8.6-1)', () => {

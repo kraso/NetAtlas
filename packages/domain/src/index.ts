@@ -276,7 +276,7 @@ export type {
 export type { Clock, IdGen, Logger } from './ports/clock.js'
 
 // Calidad del dataset (F2 / NET-HW-047): métricas puras de cobertura
-export { calcularCoberturaCritica, PASIVAS } from './quality/index.js'
+export { calcularCoberturaCritica, esFuenteSintetica, FUENTE_ASISTIDA, FUENTES_SINTETICAS, PASIVAS } from './quality/index.js'
 export type {
   DatoCritico,
   DispositivoCriticoInput,

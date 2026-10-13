@@ -1,6 +1,6 @@
 import type { SqliteDriver } from '../driver.js'
-import { calcularCoberturaCritica } from '@netatlas/domain'
-import type { CoberturaCriticaResultado } from '@netatlas/domain'
+import { calcularCoberturaCritica, FUENTES_SINTETICAS } from '@netatlas/domain'
+import type { CoberturaCriticaResultado, DispositivoCriticoInput } from '@netatlas/domain'
 
 /**
  * Dashboard de calidad del dataset (NET-HW-047, §19.3): cobertura de fuentes
@@ -72,8 +72,10 @@ export class SqliteQualityRepository {
       this.db.prepare("SELECT COUNT(*) AS c FROM reconciliation WHERE status = 'pending'").get()?.c ?? 0,
     )
 
-    // Cobertura de datos críticos (F2): por dispositivo, predicados de
-    // assertion y relaciones → métrica pura del dominio.
+    // Cobertura de datos críticos (F2): solo datos CURADOS. El contrato de
+    // calcularCoberturaCritica exige que el adaptador excluya las fuentes
+    // sintéticas; sin este filtro, las 299 fichas asistidas contaban como
+    // curadas por su supports-protocol y la métrica marcaba 59% en vez de 10%.
     const criticoRows = this.db
       .prepare(
         `SELECT d.slug, c.code AS categoria
@@ -81,15 +83,7 @@ export class SqliteQualityRepository {
          WHERE c.code NOT IN ('CAT-PAS')`,
       )
       .all() as { slug: string; categoria: string }[]
-    const porDispositivo = criticoRows.map((r) => {
-      const assertionPredicates = (this.db
-        .prepare('SELECT DISTINCT predicate FROM assertion WHERE subject_type = ? AND subject_id = (SELECT id FROM device WHERE slug = ?)')
-        .all('device', r.slug) as { predicate: string }[]).map((x) => x.predicate)
-      const relationshipPredicates = (this.db
-        .prepare('SELECT DISTINCT predicate FROM relationship WHERE (subject_type = ? AND subject_id = (SELECT id FROM device WHERE slug = ?)) OR (object_type = ? AND object_id = (SELECT id FROM device WHERE slug = ?))')
-        .all('device', r.slug, 'device', r.slug) as { predicate: string }[]).map((x) => x.predicate)
-      return { slug: r.slug, categoryCode: r.categoria, assertionPredicates, relationshipPredicates }
-    })
+    const porDispositivo = criticoRows.map((r) => this.predicadosCurados(r.slug, r.categoria))
     const coberturaCritica = calcularCoberturaCritica(porDispositivo)
 
     return {
@@ -104,5 +98,40 @@ export class SqliteQualityRepository {
       reconciliacionesPendientes,
       porCategoria,
     }
+  }
+
+  /**
+   * Predicados de datos críticos de un dispositivo EXCLUYENDO fuentes
+   * sintéticas: una assertion generada por herramienta no es un dato curado.
+   * Las aristas asistidas se reconocen por `assertion_id` (build.ts las crea a
+   * partir de la assertion con fuente netatlas-assist); las aristas curadas
+   * del seed no llevan `assertion_id`.
+   */
+  private predicadosCurados(slug: string, categoria: string): DispositivoCriticoInput {
+    const marcas = FUENTES_SINTETICAS.map(() => '?').join(', ')
+    const assertionPredicates = (
+      this.db
+        .prepare(
+          `SELECT DISTINCT predicate FROM assertion
+           WHERE subject_type = 'device'
+             AND subject_id = (SELECT id FROM device WHERE slug = ?)
+             AND source_id NOT IN (SELECT id FROM source WHERE slug IN (${marcas}))`,
+        )
+        .all(slug, ...FUENTES_SINTETICAS) as { predicate: string }[]
+    ).map((x) => String(x.predicate))
+    const relationshipPredicates = (
+      this.db
+        .prepare(
+          `SELECT DISTINCT predicate FROM relationship
+           WHERE ((subject_type = 'device' AND subject_id = (SELECT id FROM device WHERE slug = ?))
+               OR (object_type = 'device' AND object_id = (SELECT id FROM device WHERE slug = ?)))
+             AND (assertion_id IS NULL
+                  OR assertion_id NOT IN (SELECT a.id FROM assertion a
+                                          JOIN source s ON s.id = a.source_id
+                                          WHERE s.slug IN (${marcas})))`,
+        )
+        .all(slug, slug, ...FUENTES_SINTETICAS) as { predicate: string }[]
+    ).map((x) => String(x.predicate))
+    return { slug, categoryCode: categoria, assertionPredicates, relationshipPredicates }
   }
 }

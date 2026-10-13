@@ -139,7 +139,7 @@
     "manufacturerSlug": "aruba",
     "familySlug": "aruba-2930f",
     "categoryCode": "CAT-SWT-L2",
-    "model": "JL260A",
+    "model": "JL256A",
     "sku": "JL260A",
     "aliases": [
       "2930F",
@@ -241,7 +241,8 @@
         "title": "Aruba 2930F Switch Series Data Sheet",
         "language": "en",
         "url": "https://www.arubanetworks.com/assets/ds/DS_2930F.pdf",
-        "sourceSlug": "aruba-2930f-datasheet"
+        "sourceSlug": "aruba-2930f-datasheet",
+        "localPath": "assets/docs/Aruba 2930F Switch Series - data sheet.pdf"
       }
     ],
     "images": [
@@ -358,7 +359,7 @@
         "title": "Aruba 2920 Switch Series data sheet (J9729A)",
         "language": "en",
         "sourceSlug": "aruba-2920-datasheet",
-        "localPath": "docs/Aruba 2920 Switch Series.pdf"
+        "localPath": "assets/docs/Aruba 2920 Switch Series.pdf"
       }
     ],
     "images": [
@@ -481,7 +482,8 @@
         "title": "Cisco 4000 Series ISR Data Sheet",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/routers/4000-series-integrated-services-routers-isr/datasheet-c78-732543.html",
-        "sourceSlug": "cisco-isr4321-datasheet"
+        "sourceSlug": "cisco-isr4321-datasheet",
+        "localPath": "assets/docs/Cisco ISR4321 datasheet.pdf"
       }
     ],
     "images": [
@@ -548,7 +550,7 @@
       {
         "predicate": "routing_throughput_mbps",
         "value": 1000,
-        "sourceSlug": "wi-fi-6-alliance",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party",
         "note": "Rendimiento medido por comunidad, no oficial"
       },
@@ -573,19 +575,19 @@
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lldp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-hex-s-spec",
         "confidence": "third-party"
       }
     ],
@@ -681,7 +683,7 @@
           },
           "summary": "Punto de acceso empresarial Wi-Fi 6: el SoC integra el procesamiento de las radios 4x4:4 (2.4/5 GHz), la agilidad de RF y los servicios de red; los detalles de CPU/RAM no se publican en el datasheet."
         },
-        "sourceSlug": "aruba-2930f-datasheet",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "experimental",
         "note": "SoC no publicado por Aruba; la arquitectura Wi-Fi 6 4x4:4 es oficial pero la electrónica interna no."
       },
@@ -694,19 +696,19 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ac",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "capwap",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "wpa3",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "aruba-ap515-datasheet",
         "confidence": "third-party"
       }
     ],
@@ -727,7 +729,7 @@
         "title": "HPE Aruba Networking 510 Series Campus Access Points data sheet (PSN1011028705WWEN)",
         "language": "en",
         "sourceSlug": "aruba-ap515-datasheet",
-        "localPath": "docs/HPE Aruba Networking 510 Series Campus Access Points data sheet-PSN1011028705WWEN.pdf"
+        "localPath": "assets/docs/HPE Aruba Networking 510 Series Campus Access Points data sheet-PSN1011028705WWEN.pdf"
       }
     ],
     "images": [
@@ -820,13 +822,13 @@
       {
         "predicate": "supports-protocol",
         "value": "tr069",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "huawei-hg8245h-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "huawei-hg8245h-datasheet",
         "confidence": "third-party"
       },
       {
@@ -863,7 +865,7 @@
         "title": "Huawei EchoLife HG8245H GPON Terminal (brochure + data sheet)",
         "language": "en",
         "sourceSlug": "huawei-hg8245h-datasheet",
-        "localPath": "docs/huawei-echolife-hg8245h-brochure-datasheet.pdf"
+        "localPath": "assets/docs/huawei-echolife-hg8245h-brochure-datasheet.pdf"
       }
     ],
     "images": [
@@ -922,7 +924,7 @@
       {
         "predicate": "docsis_version",
         "value": "3.0",
-        "sourceSlug": "usrobotics-56k-manual",
+        "sourceSlug": "motorola-sb6121-datasheet",
         "confidence": "third-party"
       },
       {
@@ -942,13 +944,13 @@
       {
         "predicate": "supports-protocol",
         "value": "docsis",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "motorola-sb6121-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "motorola-sb6121-datasheet",
         "confidence": "third-party"
       }
     ],
@@ -965,7 +967,7 @@
         "language": "en",
         "url": "https://gditechnology.com/manuals/Motorola-SB6121_Data_Sheet.pdf",
         "sourceSlug": "motorola-sb6121-datasheet",
-        "localPath": "docs/Motorola-SB6121-datasheet.pdf"
+        "localPath": "assets/docs/Motorola SB6121 Modem.pdf"
       }
     ],
     "images": [
@@ -1043,7 +1045,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ppp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "usrobotics-56k-manual",
         "confidence": "third-party"
       },
       {
@@ -1083,7 +1085,13 @@
         "title": "Sportster 56K Faxmodem User Manual (Model 5630G)",
         "language": "en",
         "sourceSlug": "usrobotics-56k-manual",
-        "localPath": "docs/USR Model 5630G 56K.pdf"
+        "localPath": "assets/docs/USR Model 5630G 56K.pdf"
+      },
+      {
+        "title": "Sportster 56K Voice Faxmodem — arquitectura módem (DSP + controlador)",
+        "language": "es",
+        "url": null,
+        "sourceSlug": "usrobotics-56k-historical"
       }
     ],
     "images": [
@@ -1142,14 +1150,14 @@
       {
         "predicate": "firewall_throughput_gbps",
         "value": 20,
-        "sourceSlug": "aruba-2930f-datasheet",
+        "sourceSlug": "fortinet-fg100f-docs",
         "confidence": "third-party",
         "note": "Dato pendiente de fuente oficial"
       },
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "aruba-2930f-datasheet",
+        "sourceSlug": "fortinet-fg100f-docs",
         "confidence": "third-party"
       },
       {
@@ -1249,7 +1257,7 @@
           },
           "summary": "Hub Ethernet de capa 1: funciona como repetidor multipuerto que retransmite las tramas a todos los puertos (CSMA/CD, un único dominio de colisión); no hay conmutación ni CPU de plano de datos."
         },
-        "sourceSlug": "kalpana-eifo-historical",
+        "sourceSlug": "3com-hub-editorial",
         "confidence": "historical",
         "note": "Arquitectura de hub 10BASE-T estándar de la época (IEEE 802.3); el repetidor no requiere CPU de reenvío."
       },
@@ -1272,7 +1280,13 @@
         "title": "3Com OfficeConnect Hubs data sheet (3C16700A)",
         "language": "en",
         "sourceSlug": "3com-hub8-datasheet",
-        "localPath": "docs/3Com Model 3C16700A Ethernet Hub.pdf"
+        "localPath": "assets/docs/3Com Model 3C16700A Ethernet Hub.pdf"
+      },
+      {
+        "title": "Criterio editorial: hubs y dominios de colisión",
+        "language": "es",
+        "url": null,
+        "sourceSlug": "3com-hub-editorial"
       }
     ],
     "images": [
@@ -1314,13 +1328,13 @@
       {
         "predicate": "reach_m",
         "value": 300,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet",
         "confidence": "official"
       },
       {
         "predicate": "wavelength_nm",
         "value": 850,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "cisco-sfp-10g-sr-datasheet",
         "confidence": "official"
       },
       {
@@ -1362,7 +1376,7 @@
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/interfaces-modules/transceiver-modules/datasheet-c78-455693.html",
         "sourceSlug": "cisco-sfp-10g-sr-datasheet",
-        "localPath": "docs/Cisco-10GBASE-SFP-Modules-datasheet.pdf"
+        "localPath": "assets/docs/Cisco 10GBASE SFP+ Modules.pdf"
       }
     ],
     "images": [
@@ -1403,13 +1417,13 @@
       {
         "predicate": "reach_m",
         "value": 10000,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "fs-sfp-10g-lr-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "wavelength_nm",
         "value": 1310,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "fs-sfp-10g-lr-datasheet",
         "confidence": "third-party"
       },
       {
@@ -1451,7 +1465,7 @@
         "language": "en",
         "url": "https://www.fs.com/products/100032.html",
         "sourceSlug": "fs-sfp-10g-lr-datasheet",
-        "localPath": "docs/Cisco-10GBASE-SFP-Modules-datasheet.pdf"
+        "localPath": "assets/docs/Cisco 10GBASE SFP+ Modules.pdf"
       }
     ],
     "images": [
@@ -1592,7 +1606,7 @@
       {
         "predicate": "throughput_gbps",
         "value": 2560,
-        "sourceSlug": "cisco-cat2960x-datasheet",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "historical"
       },
       {
@@ -1615,25 +1629,25 @@
       {
         "predicate": "supports-protocol",
         "value": "mpls",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lldp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat6500-datasheet",
         "confidence": "third-party"
       }
     ],
@@ -1654,7 +1668,8 @@
         "title": "Cisco Catalyst 6500 Series Switches Data Sheet (Supervisor Engine)",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-6500-series-switches/product_data_sheet0900aecd804a85b4.html",
-        "sourceSlug": "cisco-cat6500-datasheet"
+        "sourceSlug": "cisco-cat6500-datasheet",
+        "localPath": "assets/docs/Catalyst 6500-E Serie Chassis.pdf"
       }
     ],
     "images": [
@@ -1710,19 +1725,19 @@
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat4000-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat4000-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lldp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat4000-datasheet",
         "confidence": "third-party"
       },
       {
@@ -1787,7 +1802,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ethernet",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "kalpana-eifo-historical",
         "confidence": "historical"
       },
       {
@@ -1824,6 +1839,14 @@
         "kind": "frontal",
         "caption": "Kalpana EtherSwitch EPS-1500 (primer switch Ethernet comercial)",
         "localPath": "assets/img/kalpana-eps-1500-frontal.jpg",
+        "sourceSlug": "kalpana-eifo-historical"
+      }
+    ],
+    "datasheets": [
+      {
+        "title": "Kalpana EtherSwitch EIFO-8+ — primer switch Ethernet (1990), arquitectura del conmutador",
+        "language": "es",
+        "url": "https://en.wikipedia.org/wiki/Ethernet_switch",
         "sourceSlug": "kalpana-eifo-historical"
       }
     ]
@@ -1876,20 +1899,20 @@
       {
         "predicate": "routing_throughput_mbps",
         "value": 1000000,
-        "sourceSlug": "cisco-isr4321-datasheet",
+        "sourceSlug": "cisco-ncs5500-datasheet",
         "confidence": "third-party",
         "note": "Throughput agregado; pendiente datasheet oficial"
       },
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "cisco-isr4321-datasheet",
+        "sourceSlug": "cisco-ncs5500-datasheet",
         "confidence": "official"
       },
       {
         "predicate": "supports-protocol",
         "value": "mpls",
-        "sourceSlug": "cisco-isr4321-datasheet",
+        "sourceSlug": "cisco-ncs5500-datasheet",
         "confidence": "official"
       },
       {
@@ -1927,7 +1950,8 @@
         "title": "Cisco NCS 5500 Series Data Sheet (Silicon One / Jericho)",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/routers/network-convergence-system-5500-series/datasheet-c78-737226.html",
-        "sourceSlug": "cisco-ncs5500-datasheet"
+        "sourceSlug": "cisco-ncs5500-datasheet",
+        "localPath": "assets/docs/Cisco Network Convergence System 5500 Series.pdf"
       }
     ],
     "images": [
@@ -2028,7 +2052,7 @@
         "title": "NVIDIA ConnectX-6 Dx Product Brief (200GbE, IPsec/TLS inline)",
         "language": "en",
         "sourceSlug": "nvidia-connectx6dx-brief",
-        "localPath": "docs/NVIDIA Model ConnectX-6 DX.pdf"
+        "localPath": "assets/docs/NVIDIA Model ConnectX-6 DX.pdf"
       }
     ],
     "images": [
@@ -2091,20 +2115,20 @@
       {
         "predicate": "throughput_gbps",
         "value": 256,
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat9300-datasheet",
         "confidence": "third-party",
         "note": "Switching capacity aprox.; validar con datasheet oficial en F2"
       },
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat9300-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "vxlan-evpn",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "cisco-cat9300-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2144,7 +2168,8 @@
         "title": "Cisco Catalyst 9300 Series Switches Data Sheet (UADP 2.0 ASIC)",
         "language": "en",
         "url": "https://www.cisco.com/c/en/us/products/collateral/switches/catalyst-9300-series-switches/datasheet-c78-742519.html",
-        "sourceSlug": "cisco-cat9300-datasheet"
+        "sourceSlug": "cisco-cat9300-datasheet",
+        "localPath": "assets/docs/Catalyst 9300 Series Switches Data Sheet.pdf"
       }
     ],
     "images": [
@@ -2204,13 +2229,13 @@
       {
         "predicate": "supports-protocol",
         "value": "bgp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "arista-7050sx-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "vxlan-evpn",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "arista-7050sx-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2253,7 +2278,8 @@
         "title": "Arista 7050SX Series Datasheet (7050SX-64)",
         "language": "en",
         "url": "https://www.arista.com/assets/data/pdf/Datasheets/7050SX-128_64_Datasheet.pdf",
-        "sourceSlug": "arista-7050sx-datasheet"
+        "sourceSlug": "arista-7050sx-datasheet",
+        "localPath": "assets/docs/7050 Series 1RU (Gen 3) - Overview - Arista.pdf"
       }
     ],
     "images": [
@@ -2312,14 +2338,14 @@
       {
         "predicate": "firewall_throughput_gbps",
         "value": 18,
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "fortinet-fg200f-datasheet",
         "confidence": "third-party",
         "note": "Validar con datasheet oficial en F2"
       },
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "fortinet-fg200f-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2360,7 +2386,8 @@
         "title": "FortiGate 200F Series Data Sheet + Hardware acceleration (FortiOS 7.6.2)",
         "language": "en",
         "url": "https://docs.fortinet.com/document/fortigate/7.6.2/hardware-acceleration/336140/fortigate-200f-and-201f-fast-path-architecture",
-        "sourceSlug": "fortinet-fg200f-datasheet"
+        "sourceSlug": "fortinet-fg200f-datasheet",
+        "localPath": "assets/docs/FortiGate 200F Series Data Sheet.pdf"
       }
     ],
     "images": [
@@ -2420,13 +2447,13 @@
       {
         "predicate": "supports-protocol",
         "value": "ipsec",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubiquiti-techspecs",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubiquiti-techspecs",
         "confidence": "third-party"
       },
       {
@@ -2526,7 +2553,7 @@
       {
         "predicate": "terminates-medium",
         "value": "wifi-6",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2540,7 +2567,7 @@
           },
           "summary": "Punto de acceso Wi-Fi 6 de largo alcance: el SoC Qualcomm integra las radios 4x4 (2.4/5 GHz AX) y la CPU ARM procesa el plano de control Wi-Fi; 512 MB de RAM según especificación de plataforma."
         },
-        "sourceSlug": "ubiquiti-techspecs",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "experimental",
         "note": "SoC de la plataforma UniFi 6 documentado por la comunidad (techspecs.ui.com); Ubiquiti no publica el modelo exacto del SoC."
       },
@@ -2553,13 +2580,13 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ac",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "wpa3",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "ubnt-u6lr-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2589,7 +2616,7 @@
         "title": "Ubiquiti Access Point U6 Long-Range (datasheet + tech specs)",
         "language": "en",
         "sourceSlug": "ubnt-u6lr-datasheet",
-        "localPath": "docs/Ubiquiti Access Point U6 Long-Range.pdf"
+        "localPath": "assets/docs/Ubiquiti Access Point U6 Long-Range.pdf"
       }
     ],
     "images": [
@@ -2662,7 +2689,7 @@
       {
         "predicate": "supports-protocol",
         "value": "802.1q",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "mikrotik-crs328-spec",
         "confidence": "third-party"
       },
       {
@@ -2764,7 +2791,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ospf",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "juniper-ex2300-datasheet",
         "confidence": "third-party"
       },
       {
@@ -2932,7 +2959,7 @@
         "title": "HPE Aruba Networking 6300M 48-Port 1GbE + 4 SFP56 (JL663A) data sheet",
         "language": "en",
         "sourceSlug": "aruba-6300m-datasheet",
-        "localPath": "docs/HPE Aruba Networking 6300M 48-Port.pdf"
+        "localPath": "assets/docs/HPE Aruba Networking 6300M 48-Port.pdf"
       }
     ],
     "images": [
@@ -2992,7 +3019,7 @@
       {
         "predicate": "wifi_standard",
         "value": "802.11ax",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
@@ -3013,19 +3040,19 @@
       {
         "predicate": "supports-protocol",
         "value": "802.11ax",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "nat",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "dhcp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "tplink-archer-ax55-spec",
         "confidence": "third-party"
       },
       {
@@ -3128,25 +3155,25 @@
       {
         "predicate": "supports-protocol",
         "value": "stp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "mstp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "lacp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
         "predicate": "supports-protocol",
         "value": "snmp",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "netgear-gs324tp-spec",
         "confidence": "third-party"
       },
       {
@@ -3169,7 +3196,8 @@
         "title": "Netgear GS324TP — Soporte, manuales y firmware",
         "language": "en",
         "url": "https://www.netgear.com/support/product/gs324tp",
-        "sourceSlug": "netgear-gs324tp-spec"
+        "sourceSlug": "netgear-gs324tp-spec",
+        "localPath": "assets/docs/NetGear GS324TP - S350 Smart Switch Series.pdf"
       }
     ],
     "images": [
@@ -3229,7 +3257,7 @@
       {
         "predicate": "supports-protocol",
         "value": "profinet",
-        "sourceSlug": "3com-hub-editorial",
+        "sourceSlug": "siemens-scalance-xc206-2-datasheet",
         "confidence": "third-party"
       },
       {
@@ -3356,7 +3384,7 @@
         "title": "NVIDIA ConnectX-5 EN Adapter Cards Product Brief",
         "language": "en",
         "sourceSlug": "nvidia-connectx5-brief",
-        "localPath": "docs/NVIDIA Model ConnectX-5.pdf"
+        "localPath": "assets/docs/NVIDIA Model ConnectX-5.pdf"
       }
     ],
     "images": [
@@ -3451,7 +3479,7 @@
         "title": "NVIDIA ConnectX-7 400G Adapters Datasheet",
         "language": "en",
         "sourceSlug": "nvidia-connectx7-datasheet",
-        "localPath": "docs/NVIDIA Model ConnectX-7.pdf"
+        "localPath": "assets/docs/NVIDIA Model ConnectX-7.pdf"
       }
     ],
     "images": [
@@ -3490,7 +3518,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ethernet",
-        "sourceSlug": "kalpana-eifo-historical",
+        "sourceSlug": "cisco-catalyst-3000-overview",
         "confidence": "historical",
         "note": "Ficha histórica documental; no hay datasheet digital conservado."
       },
@@ -3553,7 +3581,7 @@
         "title": "Catalyst 3000 Series Product Overview (página escaneada)",
         "language": "en",
         "sourceSlug": "cisco-catalyst-3000-overview",
-        "localPath": "docs/Cisco 3000 Series kalpana.jpg"
+        "localPath": "assets/docs/Cisco 3000 Series kalpana.jpg"
       }
     ],
     "images": [
@@ -3630,7 +3658,7 @@
         "title": "Cisco Industrial Ethernet 3000 Series Switches Data Sheet (2018)",
         "language": "en",
         "sourceSlug": "cisco-ie3000-datasheet",
-        "localPath": "docs/Cisco 3000 Serie Switches.pdf"
+        "localPath": "assets/docs/Cisco 3000 Serie Switches.pdf"
       }
     ],
     "images": [
@@ -3726,7 +3754,7 @@
         "title": "U.S. Robotics 5686G 56K Serial Controller Faxmodem datasheet",
         "language": "en",
         "sourceSlug": "usrobotics-5686g-datasheet",
-        "localPath": "docs/USR datasheet-56k-faxmodem-5686g.pdf"
+        "localPath": "assets/docs/USR datasheet-56k-faxmodem-5686g.pdf"
       }
     ],
     "images": [
@@ -3822,7 +3850,7 @@
         "title": "U.S. Robotics Courier Lite 5686G-PRO 56K Business Modem datasheet",
         "language": "en",
         "sourceSlug": "usrobotics-5686g-pro-datasheet",
-        "localPath": "docs/USR datasheet-courier-lite-56k-business-modem-5686g-pro.pdf"
+        "localPath": "assets/docs/USR datasheet-courier-lite-56k-business-modem-5686g-pro.pdf"
       }
     ],
     "images": [
@@ -3916,7 +3944,7 @@
         "title": "NVIDIA ConnectX-8 SuperNIC Datasheet (800G IA)",
         "language": "en",
         "sourceSlug": "nvidia-connectx8-datasheet",
-        "localPath": "docs/NVIDIA Model ConnectX-8 SuperNIC.pdf"
+        "localPath": "assets/docs/NVIDIA Model ConnectX-8 SuperNIC.pdf"
       }
     ],
     "images": [
@@ -4010,7 +4038,7 @@
         "title": "NVIDIA ConnectX-9 SuperNIC Datasheet (800G por puerto)",
         "language": "en",
         "sourceSlug": "nvidia-connectx9-datasheet",
-        "localPath": "docs/NVIDIA Model ConnectX-9 SuperNIC.pdf"
+        "localPath": "assets/docs/NVIDIA Model ConnectX-9 SuperNIC.pdf"
       }
     ],
     "images": [
@@ -4098,7 +4126,7 @@
         "title": "Panduit TX6A 10Gig UTP Copper Cabling (PUP6AM04BU-UG)",
         "language": "en",
         "sourceSlug": "panduit-tx6a-datasheet",
-        "localPath": "docs/Panduit Model TX6A UTP 10Gig.pdf"
+        "localPath": "assets/docs/Panduit Model TX6A UTP 10Gig.pdf"
       }
     ],
     "images": [
@@ -4198,7 +4226,7 @@
         "title": "Belden 10GXE01 Cat6A F/FTP (Eca)",
         "language": "en",
         "sourceSlug": "belden-10gxe01-datasheet",
-        "localPath": "docs/Belden Model 10GXE01.pdf"
+        "localPath": "assets/docs/Belden Model 10GXE01.pdf"
       }
     ],
     "images": [
@@ -4298,7 +4326,7 @@
         "title": "Belden 10GXE02 Cat6A S/FTP (Eca)",
         "language": "en",
         "sourceSlug": "belden-10gxe02-datasheet",
-        "localPath": "docs/Belden Model 10GXE02.pdf"
+        "localPath": "assets/docs/Belden Model 10GXE02.pdf"
       }
     ],
     "images": [
@@ -4385,7 +4413,7 @@
         "title": "Cisco Industrial Ethernet 4000 Series Switches Data Sheet",
         "language": "en",
         "sourceSlug": "cisco-ie4000-datasheet",
-        "localPath": "docs/Cisco Industrial Ethernet 4000 Series Switches.pdf"
+        "localPath": "assets/docs/Cisco Industrial Ethernet 4000 Series Switches.pdf"
       }
     ],
     "images": [
@@ -4447,7 +4475,7 @@
         "title": "USR 5638 V.92 PCIe Faxmodem Datasheet",
         "language": "es",
         "sourceSlug": "usr5638-datasheet",
-        "localPath": "docs/USR5638-es-datasheet.pdf"
+        "localPath": "assets/docs/USR5638-es-datasheet.pdf"
       }
     ],
     "images": [
@@ -4509,7 +4537,7 @@
         "title": "USR 2980-OEM V.92 Low Profile PCI Modem Datasheet",
         "language": "en",
         "sourceSlug": "usr2980-datasheet",
-        "localPath": "docs/USR2980-OEM & USR802981-OEM Datasheet.pdf"
+        "localPath": "assets/docs/USR2980-OEM & USR802981-OEM Datasheet.pdf"
       }
     ],
     "images": [
@@ -4568,7 +4596,7 @@
       {
         "predicate": "supports-protocol",
         "value": "ethernet",
-        "sourceSlug": "kalpana-eifo-historical",
+        "sourceSlug": "kalpana-eps2115-datasheet",
         "confidence": "historical"
       }
     ],
