@@ -91,9 +91,13 @@ jobs:
   e2e:
     name: E2E Playwright — flujo crítico + offline
     runs-on: ubuntu-latest
-    # La suite son 80 ejecuciones (40 tests × chromium/firefox) con 1 worker por
-    # defecto y reintentos en CI, y no cabía en los 15 minutos anteriores: el job
-    # moría antes, en la instalación, así que el presupuesto nunca se midió.
+    # La suite son 80 ejecuciones (40 tests × chromium/firefox). Este presupuesto
+    # es la última red, no el límite que decide: el tope real va dentro de la
+    # corrida (`--global-timeout`), para que un cuelgue acabe en FAILED con su
+    # informe en vez de en una cancelación sin diagnóstico. Medido en #11–#16: una
+    # suite que falla entera tarda ~10m30s por intento y, con retries=2, los tres
+    # intentos (~31m30s) se pasaban de estos 30 minutos — el runner cancelaba el
+    # job y nadie supo nunca qué había fallado.
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -116,6 +120,40 @@ jobs:
       - name: 'Build app (el webServer sirve dist/ con vite preview)'
         run: pnpm --filter @netatlas/app build
 
+      # El navegador no sabe resolver un import desnudo. Si un módulo de la app
+      # alcanza un paquete `external` del build (caso real: el barrel de
+      # @netatlas/application → importar-lote → @netatlas/importers → @netatlas/data),
+      # el chunk se queda con `import"@netatlas/data"` y la app arranca en blanco:
+      # se caen todos los E2E que necesitan la UI (medido en #11–#16: de las
+      # primeras 136 marcas del informe solo 10 pasan, las de los 5 tests que no
+      # tocan la app) y el job muere sin decir por qué. Mirar el build cuesta
+      # segundos; mirar cómo se caen 80 tests, media hora.
+      - name: 'El bundle del navegador no deja imports desnudos (@netatlas/*, node:*)'
+        run: |
+          if [ ! -d apps/app/dist/assets ]; then
+            echo "::error::no existe apps/app/dist/assets: el build no produjo el bundle"
+            exit 1
+          fi
+          # Formas que deja Rollup con el specifier sin resolver: `import"@netatlas/data"`
+          # (solo efecto), `from"@netatlas/data"` (nombrado) e `import("@netatlas/data")`
+          # (dinámico). La primera es la que se vio en la cadena y no lleva `from`.
+          set +e
+          hallazgos="$(grep -rnoE "(import|from|require)[[:space:]]*\(?[[:space:]]*[\"'](node:|@netatlas/)" apps/app/dist/assets)"
+          codigo=$?
+          set -e
+          # 1 = "no hay coincidencias" (lo bueno). Cualquier otro código es que la
+          # comprobación no llegó a correr: eso es un fallo, no un verde silencioso.
+          if [ "$codigo" -gt 1 ]; then
+            echo "::error::no se pudo inspeccionar apps/app/dist/assets (grep salió con $codigo)"
+            exit 1
+          fi
+          if [ -n "$hallazgos" ]; then
+            echo "::error::el bundle deja imports que el navegador no puede resolver: la app arrancaría en blanco"
+            echo "$hallazgos"
+            exit 1
+          fi
+          echo "sin imports desnudos en apps/app/dist/assets"
+
       # El filtro va por ruta aunque el nombre ya sea único en el workspace: la
       # app se selecciona explícitamente y no depende de cómo se llame ningún
       # otro paquete (antes ambos se llamaban @netatlas/app y el job de Tauri
@@ -126,8 +164,17 @@ jobs:
       # --workers=2: el config fija workers=1 por la memoria del entorno local y
       # deja a CI subirlo. Se invoca por `exec` porque `pnpm <script> -- args`
       # reenvía el `--` literal a Playwright (medido: `playwright test "--" ...`).
+      #
+      # --max-failures=1: en cuanto un test falla de verdad (agotados sus
+      # reintentos) la corrida se para y sale en FAILED. Una suite rota se sabe en
+      # un minuto en vez de en treinta.
+      #
+      # --global-timeout=900000 (15 min): tope de la corrida entera, por dentro del
+      # `timeout-minutes` del job. Un cuelgue (webServer que no levanta, un test que
+      # no resuelve nunca) termina en FAILED con el informe de Playwright, en vez de
+      # en una cancelación del runner sin logs de fallo.
       - name: E2E (flujo crítico 28.1.6#3 + 404 + offline PWA)
-        run: pnpm --filter ./apps/app exec playwright test --workers=2
+        run: pnpm --filter ./apps/app exec playwright test --workers=2 --max-failures=1 --global-timeout=900000
 
   tauri:
     name: Tauri — build binario escritorio
