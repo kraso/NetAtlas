@@ -7,9 +7,19 @@ aunque el código esté bien.
 
 - El veredicto va **en su propia línea**, con el prefijo exacto `STATUS: ` y el
   valor `PASSED` o `FAILED`.
+- Se escribe **una sola vez**, como primera línea del review. No hay borradores
+  de veredicto, ni un segundo veredicto al final, ni la palabra `STATUS` en
+  ninguna otra línea del texto (tampoco citando este contrato): dos líneas con
+  veredictos distintos dejan el review ambiguo y bloquean el commit.
+- El review juzga **el contenido entregado**, sin ejecutar los comandos del
+  proyecto ni inspeccionar el repositorio: `pnpm lint`, `pnpm typecheck` y
+  `pnpm test` los corre quien commitea, no el reviewer. No poder ejecutarlos no
+  es motivo de `FAILED`; solo lo es una violación confirmada de los estándares.
 - Sin veredicto posible → `STATUS: FAILED`, y el motivo después.
 - Los hallazgos van después del veredicto, con archivo, línea, regla violada y
-  evidencia.
+  evidencia. Solo son hallazgos las **violaciones confirmadas**: una observación
+  que el propio review califique como «no violación», «arguable» o «aunque
+  cumple» no cuenta. Sin violaciones confirmadas → `STATUS: PASSED`.
 - GGA escanea el transcript completo, tool calls incluidos, así que el veredicto
   puede ir al final del análisis. Lo que no puede es faltar, ni aparecer dos
   veces con valores distintos.
@@ -37,12 +47,23 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   límite: su tamaño es la superficie pública del paquete, no lógica, y partirlos
   agrega indirección sin beneficio. Un barrel al que se le agregue cualquier
   cosa que no sea `export` deja de estar exento.
-- **Funciones de menos de 30 líneas, una sola responsabilidad.**
+- **Funciones de menos de 30 líneas, una sola responsabilidad.** Aplica a la
+  lógica: hooks (`use*`), manejadores de eventos, carga de datos y
+  transformaciones. El cuerpo JSX de un componente no se mide con esta regla
+  —los componentes se juzgan por el límite de módulo—, pero su lógica debe
+  vivir en hooks o utilidades que sí la cumplen.
 - **Nomenclatura**: `camelCase` para variables y funciones, `PascalCase` para
   tipos y clases, `snake_case` para columnas SQL.
-- **Imports**: si un archivo supera 5 imports, reestructurar dependencias.
+- **Imports**: se cuentan las declaraciones `import`, no los símbolos que
+  traen. Si un archivo supera 5 declaraciones, reestructurar dependencias
+  (barrel `*-piezas.ts` cuando el barrel simplifique el grafo).
 - **Error handling explícito, nunca silencioso.** Un dato inválido rompe fuerte
   y temprano (es el criterio de los constructores de VOs del dominio).
+  «Explícito» significa: propagar el fallo **o** registrarlo (`console.warn`/
+  `console.error` con contexto) y, si es operación de cara al usuario,
+  comunicarlo en la UI. Registrar una operación secundaria declarada
+  best-effort —auditoría, persistencia de layout— es cumplimiento suficiente:
+  no hay que convertir ese fallo en un estado de error del llamador.
 - **Comentarios de dominio en español**, convención del repositorio.
 
 <!-- CODEGRAPH_START -->
