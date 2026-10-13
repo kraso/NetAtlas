@@ -75,9 +75,12 @@ function descargarBlob(blob: Blob, nombre: string): void {
   URL.revokeObjectURL(url)
 }
 
+/** Resultado de una exportación: si falla, lleva el motivo para la vista. */
+export type ResultadoExportacion = { readonly ok: true } | { readonly ok: false; readonly motivo: string }
+
 /** Exporta el canvas listo a SVG/PNG con nombre fechado (NET-HW-037). */
-export function exportarDiagrama(cy: Core | undefined, slug: string, formato: 'svg' | 'png'): void {
-  if (!cy) return
+export function exportarDiagrama(cy: Core | undefined, slug: string, formato: 'svg' | 'png'): ResultadoExportacion {
+  if (!cy) return { ok: false, motivo: 'el lienzo todavía no está listo' }
   try {
     const nombre = `${slug}-${new Date().toISOString().slice(0, 10)}.${formato}`
     if (formato === 'png') {
@@ -87,9 +90,12 @@ export function exportarDiagrama(cy: Core | undefined, slug: string, formato: 's
       const svg = cy.svg({ scale: 1, full: true })
       descargarBlob(new Blob([svg], { type: 'image/svg+xml' }), nombre)
     }
+    return { ok: true }
   } catch (err) {
-    // Sin soporte del navegador (p. ej. jsdom): no silenciar el error.
+    // Sin soporte del navegador (p. ej. jsdom): se registra Y se devuelve el
+    // motivo, que la vista muestra al usuario (estándar de errores explícitos).
     console.error(`exportarDiagrama: no se pudo exportar ${formato} de ${slug}:`, err)
+    return { ok: false, motivo: err instanceof Error ? err.message : String(err) }
   }
 }
 

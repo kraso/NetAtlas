@@ -6,6 +6,10 @@ import type { Device } from '@netatlas/domain'
  * Efectos de carga del Explorador (§10.4 / F3): resultados, facetas dinámicas
  * y filtro por facetas. Cada efecto registra el fallo con contexto y deja la
  * vista en un estado consistente (lista vacía) en vez de fallar en silencio.
+ *
+ * Los tres efectos observan el objeto de servicios, no solo lo leen al vuelo:
+ * cuando el dataset cambia (el remoto sustituye al demo) vuelven a cargar en vez
+ * de dejar en pantalla los resultados del dataset anterior.
  */
 
 /** Resultados de la categoría seleccionada o de la consulta DSL. */
@@ -15,12 +19,12 @@ export function useResultados(
   setResultados: (d: readonly Device[]) => void,
   setLoading: (v: boolean) => void,
 ): void {
+  const services = useServices((s) => s.services)
   React.useEffect(() => {
     void (async () => {
       setLoading(true)
       try {
-        const svc = useServices.getState().services
-        setResultados(await cargarResultados(svc, selectedCat, query))
+        setResultados(await cargarResultados(services, selectedCat, query))
       } catch (error) {
         // Best-effort explícito: sin resultados la vista muestra el estado vacío.
         console.error('[ERROR] no se pudieron cargar los resultados del explorador', { selectedCat, query, error })
@@ -29,8 +33,7 @@ export function useResultados(
         setLoading(false)
       }
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCat, query])
+  }, [selectedCat, query, services])
 }
 
 /** Facetas dinámicas de la categoría (F3); sin categoría no hay facetas. */
@@ -39,6 +42,7 @@ export function useFacetasDeCategoria(
   setFacetas: (f: readonly FacetaUI[]) => void,
   setSeleccion: (s: Record<string, readonly string[]>) => void,
 ): void {
+  const services = useServices((s) => s.services)
   React.useEffect(() => {
     setSeleccion({})
     if (!selectedCat) {
@@ -47,16 +51,14 @@ export function useFacetasDeCategoria(
     }
     void (async () => {
       try {
-        const svc = useServices.getState().services
-        setFacetas(await cargarFacetas(svc, selectedCat))
+        setFacetas(await cargarFacetas(services, selectedCat))
       } catch (error) {
         // Best-effort explícito: sin facetas la categoría sigue navegable.
         console.warn('[WARN] facetas del explorador no disponibles', { selectedCat, error })
         setFacetas([])
       }
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCat])
+  }, [selectedCat, services])
 }
 
 /** Aplica el filtro de facetas activas sobre los resultados de la categoría. */
@@ -66,6 +68,7 @@ export function useFiltroDeFacetas(
   facetasActivas: number,
   setSlugsFiltrados: (s: ReadonlySet<string>) => void,
 ): void {
+  const services = useServices((s) => s.services)
   React.useEffect(() => {
     if (!selectedCat || facetasActivas === 0) {
       setSlugsFiltrados(new Set())
@@ -73,14 +76,12 @@ export function useFiltroDeFacetas(
     }
     void (async () => {
       try {
-        const svc = useServices.getState().services
-        setSlugsFiltrados(await filtrarPorFacetas(svc, selectedCat, seleccion))
+        setSlugsFiltrados(await filtrarPorFacetas(services, selectedCat, seleccion))
       } catch (error) {
         // Best-effort explícito: sin filtro se muestran los resultados completos.
         console.warn('[WARN] filtro por facetas no disponible', { selectedCat, error })
         setSlugsFiltrados(new Set())
       }
     })()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedCat, seleccion, facetasActivas])
+  }, [selectedCat, seleccion, facetasActivas, services])
 }

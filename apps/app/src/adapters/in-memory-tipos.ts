@@ -11,6 +11,11 @@ export interface InMemoryDataset {
   readonly manufacturers: readonly Manufacturer[]
   readonly categories: readonly Category[]
   readonly relationships: readonly Relationship[]
+  /**
+   * Claves (`claveArista`) de relaciones que SOLO constan por fuente sintética
+   * (importación asistida). La cobertura crítica las ignora: no son curadas.
+   */
+  readonly relacionesSinteticas?: ReadonlySet<string>
   readonly assertions: readonly Assertion[]
   readonly sources: readonly Source[]
   readonly protocols?: readonly { code: string; name: string; family: string; osiLayer: number }[]

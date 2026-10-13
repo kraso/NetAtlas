@@ -88,15 +88,20 @@ async function ejecutarPull(
   }
 }
 
-/** 2) Push de la cola outbox (nunca se borra sin confirmación del servidor). */
+/**
+ * 2) Push de la cola outbox (nunca se borra sin confirmación del servidor).
+ * `ok` exige que TODO lo enviado venga confirmado: si el servidor no responde
+ * nada —o descarta revisiones viejas y confirma solo algunas— el ciclo queda
+ * incompleto y lo no confirmado sigue pendiente para el siguiente intento.
+ */
 async function ejecutarPush(outbox: OutboxRepository, servidor: SyncServer): Promise<{ enviadas: number; ok: boolean }> {
   const pendientes = await outbox.pendientes()
   if (pendientes.length === 0) return { enviadas: 0, ok: true }
   try {
     const confirmadas = await servidor.pushContribuciones(pendientes)
-    if (confirmadas.length === 0) return { enviadas: 0, ok: true }
+    if (confirmadas.length === 0) return { enviadas: 0, ok: false }
     await outbox.marcarEnviadas(confirmadas)
-    return { enviadas: confirmadas.length, ok: true }
+    return { enviadas: confirmadas.length, ok: pendientes.every((e) => confirmadas.includes(e.id)) }
   } catch (error) {
     // Best-effort explícito: sin red / servidor caído la cola queda para el
     // siguiente ciclo (nunca se borra sin confirmación).

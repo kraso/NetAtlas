@@ -103,4 +103,43 @@ describe('Sincronización en la UI (F8A, NET-HW-063)', () => {
     // La cola NO se pierde con la red caída.
     expect(screen.getAllByTestId('cola-item').length).toBe(1)
   })
+
+  it('sin red y sin cola: la réplica conserva su versión (no se declara actualizada)', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => { throw new Error('red no disponible') }))
+    renderSync()
+
+    // Cola vacía: el push no tiene nada que confirmar, pero el pull sí falló.
+    fireEvent.click(screen.getByTestId('sync-ahora'))
+    const parcial = await screen.findByTestId('sync-parcial')
+    expect(parcial.textContent).toContain('pull de catálogo sin red')
+    expect(parcial.textContent).toContain('conserva su versión anterior')
+    expect(parcial.textContent).not.toContain('quedó actualizada')
+  })
+
+  it('con cola sin confirmar avisa cuántos aportes siguen pendientes', async () => {
+    // El servidor acepta el pull pero no confirma ninguna contribución.
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: RequestInfo | URL) => {
+        const url = String(input)
+        if (url.includes('/api/snapshot')) {
+          return new Response(JSON.stringify({ version: 1, dispositivos: [] }), { status: 200 })
+        }
+        return new Response(JSON.stringify({ aceptadas: [] }), { status: 200 })
+      }),
+    )
+    renderSync()
+
+    fireEvent.change(screen.getByTestId('entidad-nota'), { target: { value: 'device:cisco-c9300-48p' } })
+    fireEvent.click(screen.getByTestId('encolar-nota'))
+    await waitFor(() => expect(screen.getAllByTestId('cola-item').length).toBe(1))
+
+    fireEvent.click(screen.getByTestId('sync-ahora'))
+    const parcial = await screen.findByTestId('sync-parcial')
+    expect(parcial.textContent).toContain('push de cola sin confirmación')
+    expect(parcial.textContent).toContain('quedó actualizada')
+    expect(parcial.textContent).toContain('siguen pendientes (1)')
+    // La contribución no confirmada sigue en la cola.
+    expect(screen.getAllByTestId('cola-item').length).toBe(1)
+  })
 })

@@ -61,7 +61,11 @@ describe('API REST del servidor (F8A, NET-HW-062) — HTTP real', () => {
     expect(r.status).toBe(200)
     const body = (await r.json()) as {
       detalle: {
-        devices: { slug: string; ports: { label: string }[]; relations: { predicate: string; objectType: string; objectCode: string }[] }[]
+        devices: {
+          slug: string
+          ports: { label: string }[]
+          relations: { predicate: string; objectType: string; objectCode: string; sourceSlug?: string }[]
+        }[]
         catalogs: { protocols: unknown[]; standards: unknown[]; media: unknown[]; layers: unknown[] }
         sources: unknown[]
         attributeDefinitions: unknown[]
@@ -75,6 +79,11 @@ describe('API REST del servidor (F8A, NET-HW-062) — HTTP real', () => {
     expect(arista).toBeDefined()
     expect(arista!.ports.length).toBeGreaterThan(0)
     expect(arista!.relations.some((x) => x.predicate === 'supports-protocol' && x.objectType === 'protocol')).toBe(true)
+    // La procedencia viaja con la arista: las del seed asistido declaran
+    // `netatlas-assist` y las curadas del seed no llevan fuente (sin assertion).
+    expect(arista!.relations.some((x) => x.sourceSlug === 'netatlas-assist')).toBe(true)
+    const curada = arista!.relations.find((x) => x.predicate === 'operates-at-layer')
+    expect(curada?.sourceSlug).toBeUndefined()
   })
 
   it('POST /api/contributions sin auth → 401', async () => {

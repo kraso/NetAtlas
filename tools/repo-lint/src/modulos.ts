@@ -30,18 +30,36 @@ export function contarLineas(contenido: string): number {
   return lineas[lineas.length - 1] === '' ? lineas.length - 1 : lineas.length
 }
 
-/** Un barrel es un `index.ts` cuyas líneas solo re-exportan otros módulos. */
+/** Una re-exportación completa: `export [type] (*|{…}) [as X] from '…'` ya cerrada. */
+const RE_EXPORTACION = /^export\s+(?:type\s+)?(?:\*|\{[^}]*\})(?:\s+as\s+[A-Za-z_$][\w$]*)?\s+from\s*(?:'[^']*'|"[^"]*")\s*;?/
+
+/**
+ * Un barrel es un `index.ts` cuyas sentencias son todas re-exportaciones. Se
+ * consumen una a una y cualquier resto que no sea espacios o `;` lo desmiente:
+ * así `export { a } from './a.js'; sideEffect()` NO pasa por barrel, y sí lo son
+ * `export * from`, `export type * from` y `export { … } from`.
+ */
 export function esBarrel(ruta: string, contenido: string): boolean {
   if (!/^index\.tsx?$/.test(ruta.split(/[\\/]/).pop() ?? '')) return false
-  let llaves = 0
-  for (const linea of contenido.split('\n')) {
-    const t = linea.trim()
-    if (t === '' || t.startsWith('//') || t.startsWith('*') || t.startsWith('/*')) continue
-    if (llaves === 0 && !/^export\s+(\*|type\s*\{|\{)/.test(t)) return false
-    llaves += (t.match(/\{/g)?.length ?? 0) - (t.match(/\}/g)?.length ?? 0)
-    if (llaves < 0) return false
+  let resto = contenidoSinComentarios(contenido)
+  let exportaciones = 0
+  while (resto !== '') {
+    const coincidencia = RE_EXPORTACION.exec(resto)
+    if (!coincidencia) return false
+    exportaciones++
+    resto = resto.slice(coincidencia[0].length).trim()
   }
-  return llaves === 0
+  // Un `index.ts` sin ninguna re-exportación no es la superficie de nada.
+  return exportaciones > 0
+}
+
+/** Texto sin comentarios ni espacios repetidos, para analizar por sentencias. */
+function contenidoSinComentarios(contenido: string): string {
+  return contenido
+    .replace(/\/\*[\s\S]*?\*\//g, ' ')
+    .replace(/(^|\s)\/\/[^\n]*/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
 }
 
 /** Solo módulos fuente: se omiten tests, declaraciones y ficheros de config. */
