@@ -1,4 +1,8 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './baseline-demo.js'
+import { anadirDispositivo, anadirYVerNodo, conectarNodos, sembrarTopologiaEscala } from './apoyo-topologias.js'
+
+/** Botón que resume la vista completa de una topología agregada de 1.600 nodos. */
+const vistaCompleta = /Vista completa \(1\.?600 nodos/
 
 /**
  * F4 — NET-HW-033/034/036/037: flujo de topologías en el build de producción.
@@ -33,24 +37,15 @@ test.describe('Topologías (F4)', () => {
     await page.goto('/topology/nueva')
     await expect(page.getByText(/Topología vacía/)).toBeVisible()
 
-    const buscador = page.getByTestId('buscador-topo')
-    await buscador.fill('cisco-c9300-48p')
-    await page.getByRole('button', { name: 'Añadir dispositivo' }).click()
-    await expect(page.getByRole('listitem').filter({ hasText: 'device:cisco-c9300-48p' })).toBeVisible()
-
-    await buscador.fill('aruba-6300m-48g')
-    await page.getByRole('button', { name: 'Añadir dispositivo' }).click()
-    await expect(page.getByRole('listitem').filter({ hasText: 'device:aruba-6300m-48g' })).toBeVisible()
+    await anadirYVerNodo(page, 'cisco-c9300-48p')
+    await anadirYVerNodo(page, 'aruba-6300m-48g')
 
     // Conectar: interfaz común (1000/10000 Mbps) → enlace válido
-    await page.getByLabel('Nodo origen').selectOption('device:cisco-c9300-48p')
-    await page.getByLabel('Nodo destino').selectOption('device:aruba-6300m-48g')
-    await page.getByRole('button', { name: 'Validar y conectar' }).click()
+    await conectarNodos(page, 'device:cisco-c9300-48p', 'device:aruba-6300m-48g')
     await expect(page.getByText(/device:cisco-c9300-48p → device:aruba-6300m-48g/)).toBeVisible()
 
     // Slug inexistente → mensaje de validación
-    await buscador.fill('no-existe')
-    await page.getByRole('button', { name: 'Añadir dispositivo' }).click()
+    await anadirDispositivo(page, 'no-existe')
     await expect(page.getByText(/no existe en el catálogo/)).toBeVisible()
 
     // Guardar → navega a la ficha y persiste en localStorage (recarga)
@@ -64,9 +59,7 @@ test.describe('Topologías (F4)', () => {
 
   test('laboratorio: la validación rechaza la selección incompleta', async ({ page }) => {
     await page.goto('/topology/nueva')
-    await page.getByTestId('buscador-topo').fill('cisco-c9300-48p')
-    await page.getByRole('button', { name: 'Añadir dispositivo' }).click()
-    await expect(page.getByRole('listitem').filter({ hasText: 'device:cisco-c9300-48p' })).toBeVisible()
+    await anadirYVerNodo(page, 'cisco-c9300-48p')
     await page.getByRole('button', { name: 'Validar y conectar' }).click()
     await expect(page.getByText(/Selecciona dos nodos distintos/)).toBeVisible()
   })
@@ -81,44 +74,16 @@ test.describe('Topologías (F4)', () => {
   })
 
   test('refinamiento F4: topología >1.500 nodos activa el modo agregado (ADR-03)', async ({ page }) => {
-    // Se siembra una topología de usuario con 1.600 nodos en localStorage
-    // (mismo mecanismo que el resto del demo). EntitySlug sintéticos únicos:
-    // el umbral de agregación (≥1.500) se activa y el visor cambia su modo.
-    await page.addInitScript(() => {
-      const nodos = Array.from({ length: 1600 }, (_, i) => ({
-        entityType: 'device' as const,
-        entitySlug: `virt-${String(i).padStart(4, '0')}`,
-        x: (i % 40) * 30,
-        y: Math.floor(i / 40) * 30,
-        layerHint: 2,
-      }))
-      const topologia = {
-        slug: { value: 'escala-1600' },
-        name: 'Escala — 1600 nodos',
-        kind: 'user' as const,
-        nodes: nodos,
-        edges: nodos.slice(1).map((_, i) => ({
-          from: `device:virt-${String(i).padStart(4, '0')}`,
-          to: `device:virt-${String(i + 1).padStart(4, '0')}`,
-        })),
-        metadata: { semillaF4: true },
-      }
-      const previas = localStorage.getItem('netatlas.topologies.user.v1')
-      const lista = previas ? JSON.parse(previas) : []
-      localStorage.setItem('netatlas.topologies.user.v1', JSON.stringify([...lista, topologia]))
-    })
-
+    // 1.600 nodos ≥ umbral de agregación (1.500): el visor entra en modo agregado
+    // por defecto y el lienzo se mantiene ligero.
+    await sembrarTopologiaEscala(page, 1600)
     await page.goto('/topology/escala-1600')
-    // Por defecto entra en modo AGREGADO (1.600 ≥ umbral de 1.500): el botón
-    // muestra el resumen «Vista completa (1600 nodos → …)» (acción para
-    // volver a la vista normal) y el lienzo se mantiene ligero.
-    await expect(page.getByRole('button', { name: /Vista completa \(1\.?600 nodos/ })).toBeVisible()
-    await expect(page.getByRole('button', { name: /Vista completa \(1\.?600 nodos/ })).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByRole('button', { name: vistaCompleta })).toBeVisible()
+    await expect(page.getByRole('button', { name: vistaCompleta })).toHaveAttribute('aria-pressed', 'true')
 
     // Alternar a la vista completa explícita y volver a la agregada.
-    await page.getByRole('button', { name: /Vista completa \(1\.?600 nodos/ }).click()
+    await page.getByRole('button', { name: vistaCompleta }).click()
     await expect(page.getByRole('button', { name: /Vista agregada \(1\.?600 nodos →/ })).toBeVisible()
-    // El lienzo Cytoscape sigue presente (render ligero).
     await expect(page.getByRole('img', { name: /Escala — 1600 nodos/ })).toBeVisible()
   })
 })

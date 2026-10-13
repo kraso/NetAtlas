@@ -17,6 +17,14 @@ import { test, expect } from '@playwright/test'
 test.describe('Dataset E2E — NetAtlas real via API F8B (341 dispositivos)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
+    // El dashboard refresca su línea de dataset cuando el warmezo F8B termina.
+    // Esperarlo aquí evita que los tests naveguen todavía con el demo de 6 en el
+    // store: en esa ventana el árbol de categorías deriva sus nombres del
+    // snapshot (códigos como `CAT-SWT`), y las búsquedas por nombre fallan o se
+    // eternizan aunque el backend esté perfectamente vivo.
+    await expect(
+      page.locator('.guia-tecnica', { hasText: /Dataset de demostración/ }),
+    ).toContainText('345 dispositivos', { timeout: 20_000 })
   })
 
   test('dashboard muestra el dataset real (345 dispositivos · 26 categorías)', async ({ page }) => {
@@ -67,15 +75,19 @@ test.describe('Dataset E2E — NetAtlas real via API F8B (341 dispositivos)', ()
   test('el mapa global (Arquitectura) muestra el grafo de categorías conectadas', async ({ page }) => {
     // Navega al mapa global deducido de las relaciones device-device del snapshot F8B.
     await page.goto('/mapa-global')
-    // El aria-label del lienzo incluye counts: "Mapa global: N categorías y M relaciones".
+    // El aria-label del lienzo incluye counts: "Mapa global: N categorías y M
+    // relaciones entre categorías".
     const canvas = page.locator('[aria-label^="Mapa global"]')
     await expect(canvas).toBeVisible({ timeout: 15000 })
-    // Con 321 aristas device-device cruzando categorías, el mapa global
-    // agrega ≥1 arista entre categorías (no empty).
+    // Con 321 aristas device-device cruzando categorías, el mapa global agrega
+    // ≥1 arista entre categorías. Si el aria-label falta o viene mal formado, la
+    // primera aserción rompe; el número no se degrada a 0 en silencio.
     const label = await canvas.getAttribute('aria-label')
-    expect(label).toMatch(/categorías y (\d+) relaciones/)
-    const match = label?.match(/relaciones/) ? Number(label.match(/categorías y (\d+)/)?.[1]) : 0
-    expect(label).not.toMatch(/categorías y 0 relaciones/)
+    expect(label, 'el lienzo declara categorías y relaciones en su aria-label').toMatch(
+      /^Mapa global: \d+ categorías y \d+ relaciones entre categorías$/,
+    )
+    const relaciones = Number(label?.match(/y (\d+) relaciones/)?.[1] ?? Number.NaN)
+    expect(relaciones, `aristas entre categorías: ${relaciones}`).toBeGreaterThan(0)
   })
 
   test('la ficha muestra la genealogía curada (Historia)', async ({ page }) => {

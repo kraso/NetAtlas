@@ -85,7 +85,10 @@ jobs:
   e2e:
     name: E2E Playwright — flujo crítico + offline
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # La suite son 80 ejecuciones (40 tests × chromium/firefox) con 1 worker por
+    # defecto y reintentos en CI, y no cabía en los 15 minutos anteriores: el job
+    # moría antes, en la instalación, así que el presupuesto nunca se midió.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
 
@@ -107,11 +110,18 @@ jobs:
       - name: 'Build app (el webServer sirve dist/ con vite preview)'
         run: pnpm --filter @netatlas/app build
 
+      # El filtro va por ruta aunque el nombre ya sea único en el workspace: la
+      # app se selecciona explícitamente y no depende de cómo se llame ningún
+      # otro paquete (antes ambos se llamaban @netatlas/app y el job de Tauri
+      # moría con «Command "tauri" not found»).
       - name: Install browsers
         run: pnpm --filter ./apps/app exec playwright install --with-deps chromium firefox
 
+      # --workers=2: el config fija workers=1 por la memoria del entorno local y
+      # deja a CI subirlo. Se invoca por `exec` porque `pnpm <script> -- args`
+      # reenvía el `--` literal a Playwright (medido: `playwright test "--" ...`).
       - name: E2E (flujo crítico 28.1.6#3 + 404 + offline PWA)
-        run: pnpm --filter @netatlas/app test:e2e
+        run: pnpm --filter ./apps/app exec playwright test --workers=2
 
   tauri:
     name: Tauri — build binario escritorio
@@ -135,6 +145,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@stable
 
       # https://github.com/tauri-apps/tauri-action — compila binario sin bundle para CI
+      # Por ruta: la app se selecciona explícitamente, sin depender del nombre.
       - name: Build Tauri (release, sin bundle NSIS/MSI)
         run: pnpm --filter ./apps/app exec tauri build --no-bundle
 

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './baseline-demo.js'
 
 /**
  * Criterio O3 / F3 — navegación relacional no lineal (§10 objetivo O3, cuadro F3):

@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './baseline-demo.js'
 import AxeBuilder from '@axe-core/playwright'
 
 /**
@@ -15,7 +15,7 @@ import AxeBuilder from '@axe-core/playwright'
  */
 
 // Pantallas núcleo de la app (mismos fixtures deterministas del demo).
-const PANTALLAS: readonly { ruta: string; nombre: string }[] = [
+const pantallas: readonly { ruta: string; nombre: string }[] = [
   { ruta: '/', nombre: 'Dashboard' },
   { ruta: '/explore', nombre: 'Explorador' },
   { ruta: '/device/cisco-c9300-48p', nombre: 'Ficha de dispositivo' },
@@ -24,7 +24,7 @@ const PANTALLAS: readonly { ruta: string; nombre: string }[] = [
 ]
 
 test.describe('Auditoría axe continua (F2, NET-HW-058)', () => {
-  for (const pantalla of PANTALLAS) {
+  for (const pantalla of pantallas) {
     test(`sin violaciones WCAG A/AA en ${pantalla.nombre}`, async ({ page }) => {
       await page.goto(pantalla.ruta)
       // Espera a que la pantalla cargue su contenido dinámico (SPA).

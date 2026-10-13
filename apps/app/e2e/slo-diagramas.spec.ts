@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test'
+import { test, expect } from './baseline-demo.js'
 
 /**
  * SLO de diagramas (§23.2 del plan maestro): "Grafo local (≤300 nodos)
