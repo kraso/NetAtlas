@@ -8,7 +8,7 @@ import { Breadcrumbs } from './breadcrumbs.js'
  * usuario, entrada al laboratorio (NET-HW-034) y al mapa global (NET-HW-036).
  */
 export function Topologias(): React.JSX.Element {
-  const { topologies, loading, load } = useTopologiesStore()
+  const { topologies, loading, error, load } = useTopologiesStore()
 
   React.useEffect(() => {
     void load()
@@ -36,6 +36,12 @@ export function Topologias(): React.JSX.Element {
           Mapa global del conocimiento
         </Link>
       </div>
+
+      {error ? (
+        <p className="empty-state" role="alert" data-testid="error-topologias">
+          {error}
+        </p>
+      ) : null}
 
       {loading ? (
         <p role="status">Cargando topologías…</p>

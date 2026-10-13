@@ -1,9 +1,7 @@
-import React from 'react'
-import { describe, expect, it, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { App } from '../src/App.js'
-import { useServices, setServices } from '../src/composition-root.js'
+import {
+  React, describe, expect, it, beforeEach, vi, render, screen, fireEvent, waitFor, cleanup,
+  MemoryRouter, App, useServices, setServices,
+} from './apoyo-ui.js'
 
 /**
  * F7 — UI del asistente (§21.2/§21.4):
@@ -75,5 +73,33 @@ describe('Asistente IA (F7)', () => {
     await activarIA()
     fireEvent.click(screen.getByRole('button', { name: 'Desactivar IA' }))
     await waitFor(() => expect(textoDesactivada()).toBeDefined())
+  })
+
+  it('si la consulta falla, el chat lo dice y el fallo queda registrado con contexto', async () => {
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    const fallo = vi
+      .spyOn(useServices.getState().services.asistente, 'ask')
+      .mockRejectedValue(new Error('sin datos locales'))
+    renderApp()
+    await activarIA()
+
+    fireEvent.change(screen.getByLabelText('Pregunta al asistente'), {
+      target: { value: '¿Qué puertos tiene el 9300?' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Preguntar' }))
+
+    // El store conserva los mensajes de los casos anteriores del fichero: se
+    // espera a la última respuesta, que es la de esta consulta.
+    await waitFor(() => {
+      const respuestas = screen.getAllByTestId('msg-asistente')
+      expect(respuestas.at(-1)?.textContent).toContain('Lo siento')
+    })
+    // El chat ya avisaba; lo que faltaba era el rastro en el log.
+    expect(log).toHaveBeenCalledWith('[ERROR] no se pudo completar la consulta del asistente', {
+      texto: '¿Qué puertos tiene el 9300?',
+      error: expect.any(Error),
+    })
+    fallo.mockRestore()
+    log.mockRestore()
   })
 })

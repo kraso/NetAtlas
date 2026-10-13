@@ -14,6 +14,8 @@ export interface ExploradorVista {
   readonly query: string
   readonly visibles: readonly Device[]
   readonly loading: boolean
+  /** Fallo de carga de los resultados; la vista lo muestra con `role="alert"`. */
+  readonly error: string | undefined
   readonly facetas: readonly FacetaUI[]
   readonly seleccion: Record<string, readonly string[]>
   readonly facetasActivas: number
@@ -30,6 +32,7 @@ export interface ExploradorVista {
 interface EstadoExplorador {
   resultados: readonly Device[]
   loading: boolean
+  error: string | undefined
   facetas: readonly FacetaUI[]
   seleccion: Record<string, readonly string[]>
   marcados: ReadonlySet<string>
@@ -53,6 +56,7 @@ export function useExplorador(): ExploradorVista {
     query,
     visibles,
     loading: estado.loading,
+    error: estado.error,
     facetas: estado.facetas,
     seleccion: estado.seleccion,
     facetasActivas,
@@ -72,21 +76,9 @@ function accionesExplorador(arg: {
 }): Pick<ExploradorVista, 'onSelectCat' | 'onBuscar' | 'onToggleValor' | 'onLimpiarFacetas' | 'onToggleMarcar' | 'onCompararSeleccionados'> {
   const { params, setParams, navegar, setQuery, estado, marcados } = arg
   return {
-    onSelectCat: (code) => {
-      const next = new URLSearchParams(params)
-      next.set('cat', code)
-      next.delete('q')
-      setParams(next)
-    },
+    onSelectCat: (code) => setParams(paramsTrasCambio(params, { cat: code })),
     onBuscar: (v) => {
-      const next = new URLSearchParams(params)
-      if (v.trim()) {
-        next.set('q', v.trim())
-        next.delete('cat')
-      } else {
-        next.delete('q')
-      }
-      setParams(next)
+      setParams(paramsTrasCambio(params, { q: v }))
       setQuery(v)
     },
     onToggleValor: (key, valor) => estado.setSeleccion(alternarValor(estado.seleccion, key, valor)),
@@ -118,17 +110,18 @@ function useNavegacion(): {
 function useEstadoExplorador(selectedCat: string | null, query: string) {
   const [resultados, setResultados] = React.useState<readonly Device[]>([])
   const [loading, setLoading] = React.useState(false)
+  const [error, setError] = React.useState<string | undefined>()
   const [facetas, setFacetas] = React.useState<readonly FacetaUI[]>([])
   const [seleccion, setSeleccion] = React.useState<Record<string, readonly string[]>>({})
   const [marcados, setMarcados] = React.useState<ReadonlySet<string>>(new Set())
   const [slugsFiltrados, setSlugsFiltrados] = React.useState<ReadonlySet<string>>(new Set())
   const facetasActivas = Object.keys(seleccion).filter((k) => (seleccion[k]?.length ?? 0) > 0).length
 
-  useResultados(selectedCat, query, setResultados, setLoading)
+  useResultados(selectedCat, query, setResultados, setLoading, setError)
   useFacetasDeCategoria(selectedCat, setFacetas, setSeleccion)
   useFiltroDeFacetas(selectedCat, seleccion, facetasActivas, setSlugsFiltrados)
 
-  return { resultados, loading, facetas, seleccion, marcados, slugsFiltrados, setSeleccion, setMarcados }
+  return { resultados, loading, error, facetas, seleccion, marcados, slugsFiltrados, setSeleccion, setMarcados }
 }
 
 /** Resultados visibles tras el filtro de facetas activas. */
@@ -139,6 +132,25 @@ function useVisibles(estado: EstadoExplorador, selectedCat: string | null): read
     return estado.resultados.filter((d) => estado.slugsFiltrados.has(d.slug.value))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [estado.resultados, selectedCat, facetasActivas, estado.slugsFiltrados])
+}
+
+/**
+ * Params del querystring tras elegir categoría o consulta: la categoría limpia
+ * la consulta y la consulta limpia la categoría — el explorador muestra una de
+ * las dos cosas, nunca las dos a la vez.
+ */
+function paramsTrasCambio(params: URLSearchParams, cambio: { cat?: string; q?: string }): URLSearchParams {
+  const next = new URLSearchParams(params)
+  if (cambio.cat !== undefined) {
+    next.set('cat', cambio.cat)
+    next.delete('q')
+  } else if (cambio.q !== undefined && cambio.q.trim()) {
+    next.set('q', cambio.q.trim())
+    next.delete('cat')
+  } else {
+    next.delete('q')
+  }
+  return next
 }
 
 /** Alterna un valor dentro del filtro de una faceta. */

@@ -1,10 +1,8 @@
-import React from 'react'
-import { describe, expect, it, beforeEach, vi } from 'vitest'
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { App } from '../src/App.js'
+import {
+  React, describe, expect, it, beforeEach, vi, render, screen, fireEvent, waitFor, cleanup,
+  MemoryRouter, App, useServices, setServices,
+} from './apoyo-ui.js'
 import { useSyncStore } from '../src/viewmodels/sync-store.js'
-import { setServices, useServices } from '../src/composition-root.js'
 
 /**
  * F8A — UI de sincronización (NET-HW-063, criterio offline+sync): la cola
@@ -53,6 +51,7 @@ beforeEach(() => {
     replicaCount: 0,
     ultimoResultado: undefined,
     error: undefined,
+    configError: undefined,
     pensando: false,
   })
   cleanup()
@@ -141,5 +140,19 @@ describe('Sincronización en la UI (F8A, NET-HW-063)', () => {
     expect(parcial.textContent).toContain('siguen pendientes (1)')
     // La contribución no confirmada sigue en la cola.
     expect(screen.getAllByTestId('cola-item').length).toBe(1)
+  })
+
+  it('si el navegador rechaza guardar la configuración, la página lo avisa', async () => {
+    // Sin escritura, la URL vive solo en memoria: el usuario no puede
+    // descubrirlo al recargar.
+    const fallo = vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
+      throw new Error('QuotaExceededError')
+    })
+    renderSync()
+
+    fireEvent.change(screen.getByTestId('server-url'), { target: { value: 'http://otro:9999' } })
+    const aviso = await screen.findByTestId('sync-config-error')
+    expect(aviso.textContent).toContain('No se pudo guardar la configuración en el navegador')
+    fallo.mockRestore()
   })
 })

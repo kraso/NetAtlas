@@ -62,7 +62,10 @@ export const useAssistantStore = create<AssistantState>((set, get) => ({
         modo: r.modo,
       }
       set((s) => ({ mensajes: [...s.mensajes, asstMsg], pensando: false }))
-    } catch {
+    } catch (error) {
+      // El chat ya le dice al usuario que no pudo responder; faltaba el rastro:
+      // el fallo se registra con contexto en vez de tragarse sin más.
+      console.error('[ERROR] no se pudo completar la consulta del asistente', { texto: limpio, error })
       set((s) => ({
         mensajes: [
           ...s.mensajes,

@@ -1,9 +1,7 @@
-import React from 'react'
-import { describe, expect, it, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { App } from '../src/App.js'
-import { setServices, buildServices } from '../src/composition-root.js'
+import {
+  React, describe, expect, it, beforeEach, vi, render, screen, fireEvent, waitFor,
+  MemoryRouter, App, setServices, buildServices,
+} from './apoyo-ui.js'
 import { useTopologiesStore } from '../src/viewmodels/topologies-store.js'
 import { cyMockState as cyMock } from './cy-mock.js'
 
@@ -101,6 +99,25 @@ describe('Visor de topologías (NET-HW-033)', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Exportar SVG' }))
     const aviso = await screen.findByTestId('error-export')
     expect(aviso.textContent).toContain('No se pudo exportar el diagrama')
+  })
+
+  it('si la lista no carga, se avisa y el estado no se queda en «Cargando…»', async () => {
+    const services = buildServices()
+    const fallo = vi.spyOn(services.topologies, 'list').mockRejectedValue(new Error('repo caído'))
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    setServices(services)
+    // `load()` no recarga si la lista ya está en el store: se parte de la primera carga.
+    useTopologiesStore.setState({ topologies: [], loading: false, error: undefined })
+
+    renderApp('/topologies')
+    const aviso = await screen.findByTestId('error-topologias')
+    expect(aviso.textContent).toContain('No se pudo cargar la lista de topologías.')
+    expect(screen.queryByText('Cargando topologías…')).toBeNull()
+    expect(log).toHaveBeenCalledWith('[ERROR] no se pudo cargar la lista de topologías', {
+      error: expect.any(Error),
+    })
+    fallo.mockRestore()
+    log.mockRestore()
   })
 
   it('reordenar con el layout determinista por capas persiste como layout de usuario', async () => {

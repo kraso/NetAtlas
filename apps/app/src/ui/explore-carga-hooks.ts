@@ -18,22 +18,26 @@ export function useResultados(
   query: string,
   setResultados: (d: readonly Device[]) => void,
   setLoading: (v: boolean) => void,
+  setError: (e: string | undefined) => void,
 ): void {
   const services = useServices((s) => s.services)
   React.useEffect(() => {
     void (async () => {
       setLoading(true)
+      setError(undefined)
       try {
         setResultados(await cargarResultados(services, selectedCat, query))
       } catch (error) {
-        // Best-effort explícito: sin resultados la vista muestra el estado vacío.
+        // El fallo se registra con contexto y se publica: sin esto la vista
+        // mostraba «Sin resultados», que es una conclusión que no le consta.
         console.error('[ERROR] no se pudieron cargar los resultados del explorador', { selectedCat, query, error })
         setResultados([])
+        setError('No se pudieron cargar los resultados. Vuelve a intentarlo.')
       } finally {
         setLoading(false)
       }
     })()
-  }, [selectedCat, query, services])
+  }, [selectedCat, query, services, setError])
 }
 
 /** Facetas dinámicas de la categoría (F3); sin categoría no hay facetas. */

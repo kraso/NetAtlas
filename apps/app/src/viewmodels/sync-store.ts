@@ -1,6 +1,5 @@
 import { create } from 'zustand'
-import { crearOutboxEntry, sincronizar } from '@netatlas/domain'
-import type { OutboxEntry } from '@netatlas/domain'
+import { crearOutboxEntry, sincronizar, type OutboxEntry } from '@netatlas/domain'
 import { HttpSyncServer } from '@netatlas/server/sync-http'
 import { OutboxLocalRepo, ReplicaLocalRepo } from './sync-repos-local.js'
 
@@ -18,13 +17,19 @@ const claveToken = 'netatlas.sync.token.v1'
 
 const servidorPorDefecto = 'http://127.0.0.1:8787'
 
-/** Escribe/borra una clave de configuración; si falla, se registra y sigue. */
-function guardarClave(clave: string, valor: string | null): void {
+/**
+ * Escribe/borra una clave de configuración. Si el navegador rechaza la
+ * escritura se registra y se devuelve el aviso: el valor queda solo en memoria
+ * y el usuario tiene que enterarse, no descubrirlo al recargar.
+ */
+function guardarClave(clave: string, valor: string | null): string | undefined {
   try {
     if (valor === null) localStorage.removeItem(clave)
     else localStorage.setItem(clave, valor)
+    return undefined
   } catch (error) {
     console.warn('[WARN] no se pudo persistir la configuración de sincronización', { clave, error })
+    return 'No se pudo guardar la configuración en el navegador: se perderá al recargar.'
   }
 }
 
@@ -46,6 +51,8 @@ interface SyncState {
   readonly replicaCount: number
   readonly ultimoResultado?: SyncEnviados
   readonly error?: string
+  /** Fallo al leer o escribir la configuración del servidor (no el ciclo de sync). */
+  readonly configError?: string
   readonly pensando: boolean
   setServerUrl(url: string): void
   setToken(token: string): void
@@ -56,16 +63,21 @@ interface SyncState {
   refrescar(): void
 }
 
-function leerEstado(): { serverUrl: string; token?: string } {
+function leerEstado(): { serverUrl: string; token?: string; configError?: string } {
   try {
     return {
       serverUrl: localStorage.getItem(claveServidor) ?? servidorPorDefecto,
       token: localStorage.getItem(claveToken) ?? undefined,
     }
   } catch (error) {
-    // Sin almacenamiento accesible: se arranca con la configuración por defecto.
+    // Sin almacenamiento accesible: se arranca con la configuración por defecto,
+    // pero la UI dice que la guardada no se pudo leer en vez de dar por bueno
+    // que el usuario nunca configuró nada.
     console.warn('[WARN] localStorage no accesible; se usa el servidor por defecto', { error })
-    return { serverUrl: servidorPorDefecto }
+    return {
+      serverUrl: servidorPorDefecto,
+      configError: 'No se pudo leer la configuración guardada: se usa el servidor por defecto.',
+    }
   }
 }
 
@@ -76,13 +88,12 @@ export const useSyncStore = create<SyncState>((set, get) => ({
   pensando: false,
 
   setServerUrl(url: string) {
-    guardarClave(claveServidor, url)
-    set({ serverUrl: url })
+    set({ serverUrl: url, configError: guardarClave(claveServidor, url) })
   },
 
   setToken(token: string) {
-    guardarClave(claveToken, token.trim() || null)
-    set({ token: token.trim() || undefined })
+    const limpio = token.trim()
+    set({ token: limpio || undefined, configError: guardarClave(claveToken, limpio || null) })
   },
 
   async encolar(tipo, entidad, payload) {

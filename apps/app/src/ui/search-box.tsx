@@ -12,7 +12,7 @@ import type { Sugerencia } from '../viewmodels/autocomplete-store.js'
 export function SearchBox(): React.JSX.Element {
   const navigate = useNavigate()
   const { query, setQuery } = useSearchStore()
-  const { sugerencias, guardadas, buscar, guardar, eliminarGuardada } = useAutocompleteStore()
+  const { sugerencias, guardadas, error, buscar, guardar, eliminarGuardada } = useAutocompleteStore()
   const [abierto, setAbierto] = React.useState(false)
   const boxRef = React.useRef<HTMLDivElement>(null)
 
@@ -80,6 +80,12 @@ export function SearchBox(): React.JSX.Element {
           Buscar
         </button>
       </form>
+
+      {error ? (
+        <p role="alert" className="guia-tecnica" style={{ margin: '8px 0 0' }} data-testid="error-busqueda">
+          {error}
+        </p>
+      ) : null}
 
       {abierto && (
         <div

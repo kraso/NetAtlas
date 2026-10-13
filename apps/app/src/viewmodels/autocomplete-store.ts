@@ -21,6 +21,8 @@ interface AutocompleteState {
   readonly sugerencias: readonly Sugerencia[]
   readonly guardadas: readonly string[]
   readonly cargando: boolean
+  /** Último fallo del autocompletado; la caja lo muestra con `role="alert"`. */
+  readonly error: string | undefined
   buscar(prefix: string): Promise<void>
   guardar(query: string): void
   eliminarGuardada(query: string): void
@@ -29,22 +31,22 @@ interface AutocompleteState {
 const STORAGE_KEY = 'netatlas.busquedas.guardadas'
 const MAX_GUARDADAS = 20
 
-function leerGuardadas(): string[] {
+function leerGuardadas(): { guardadas: string[]; error: string | undefined } {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return []
+    if (!raw) return { guardadas: [], error: undefined }
     const parsed: unknown = JSON.parse(raw)
-    // El cast no valida: una forma inesperada se descarta y se registra.
+    // El cast no valida: una forma inesperada se descarta y se avisa en la caja.
     if (!Array.isArray(parsed) || parsed.some((q) => typeof q !== 'string')) {
       console.warn('[autocomplete] historial guardado con forma inválida; se descarta')
-      return []
+      return { guardadas: [], error: 'No se pudieron leer las búsquedas guardadas.' }
     }
-    return parsed
+    return { guardadas: parsed, error: undefined }
   } catch (error) {
-    // Best-effort explícito: el historial guardado no es crítico y se parte de
-    // cero, pero el fallo se registra en lugar de tragarse (AGENTS.md).
+    // El historial no es crítico y se parte de cero, pero el fallo se registra
+    // con contexto y viaja a la UI en vez de tragarse (AGENTS.md).
     console.warn('[autocomplete] historial guardado ilegible; se ignora', { error })
-    return []
+    return { guardadas: [], error: 'No se pudieron leer las búsquedas guardadas.' }
   }
 }
 
@@ -57,12 +59,18 @@ function proyectarSugerencias(grouped: Awaited<ReturnType<typeof suggestGrouped>
   return planas
 }
 
-/** Persistencia del historial: best-effort registrado (cuota, modo privado). */
-function persistirGuardadas(guardadas: readonly string[]): void {
+/**
+ * Persiste el historial. Si el navegador rechaza la escritura (cuota, modo
+ * privado) se registra y se devuelve el mensaje, en vez de dejar la lista como
+ * si se hubiera guardado.
+ */
+function persistirGuardadas(guardadas: readonly string[]): string | undefined {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(guardadas))
+    return undefined
   } catch (error) {
     console.warn('[autocomplete] no se pudo persistir el historial', { error })
+    return 'No se pudieron guardar las búsquedas.'
   }
 }
 
@@ -90,23 +98,25 @@ function buildPorts(): { search: SearchPort; catalog: CatalogPort } {
   }
 }
 
+// La lectura inicial entra al estado por el mismo canal de error que `buscar`.
 export const useAutocompleteStore = create<AutocompleteState>((set) => ({
+  ...leerGuardadas(),
   sugerencias: [],
-  guardadas: leerGuardadas(),
   cargando: false,
   buscar: async (prefix) => {
     if (prefix.trim().length < 2) {
-      set({ sugerencias: [], cargando: false })
+      set({ sugerencias: [], cargando: false, error: undefined })
       return
     }
-    set({ cargando: true })
+    set({ cargando: true, error: undefined })
     try {
       const grouped = await suggestGrouped(buildPorts(), { prefix, limitPerGroup: 5 })
       set({ sugerencias: proyectarSugerencias(grouped), cargando: false })
     } catch (error) {
-      // El fallo se registra y el estado no se queda cargando para siempre.
+      // El fallo se registra, se comunica en la caja y el estado no se queda
+      // cargando para siempre.
       console.warn('[autocomplete] la sugerencia falló; se limpia el estado', { error })
-      set({ sugerencias: [], cargando: false })
+      set({ sugerencias: [], cargando: false, error: 'No se pudieron cargar las sugerencias.' })
     }
   },
   guardar: (query) => {
@@ -114,13 +124,15 @@ export const useAutocompleteStore = create<AutocompleteState>((set) => ({
     if (!q) return
     const actual = useAutocompleteStore.getState().guardadas
     const siguientes = [q, ...actual.filter((x) => x !== q)].slice(0, MAX_GUARDADAS)
-    persistirGuardadas(siguientes)
-    set({ guardadas: siguientes })
+    const error = persistirGuardadas(siguientes)
+    // Sin escritura no hay lista nueva: se conserva la anterior en vez de mentir.
+    set({ guardadas: error ? actual : siguientes, error })
   },
   eliminarGuardada: (query) => {
-    const siguientes = useAutocompleteStore.getState().guardadas.filter((x) => x !== query)
-    persistirGuardadas(siguientes)
-    set({ guardadas: siguientes })
+    const actual = useAutocompleteStore.getState().guardadas
+    const siguientes = actual.filter((x) => x !== query)
+    const error = persistirGuardadas(siguientes)
+    set({ guardadas: error ? actual : siguientes, error })
   },
 }))
 

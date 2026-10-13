@@ -9,7 +9,7 @@ import { Breadcrumbs } from './breadcrumbs.js'
  * reconciliación con diff (NET-HW-045/049) y manifiesto del dataset (048).
  */
 export function Calidad(): React.JSX.Element {
-  const { report, pendientes, manifiesto, cargando, cargar, resolver } = useQualityStore()
+  const { report, pendientes, manifiesto, cargando, error, cargar, resolver } = useQualityStore()
   const [autor, setAutor] = React.useState('revisora')
 
   React.useEffect(() => {
@@ -17,6 +17,14 @@ export function Calidad(): React.JSX.Element {
   }, [cargar])
 
   if (!report && cargando) return <p role="status">Calculando métricas de calidad…</p>
+  // Un fallo de carga no es «sin métricas»: sin este aviso la vista mentía.
+  if (!report && error) {
+    return (
+      <p className="empty-state" role="alert" data-testid="error-calidad">
+        {error}
+      </p>
+    )
+  }
   if (!report) return <p className="empty-state">Sin métricas disponibles.</p>
 
   const metricas = [
@@ -38,6 +46,12 @@ export function Calidad(): React.JSX.Element {
       <Breadcrumbs items={[{ label: 'Dashboard', to: '/' }, { label: 'Calidad' }]} />
       <h1 id="titulo-calidad">Calidad del dataset</h1>
       <p className="guia-tecnica">Cobertura de fuentes, confianza, atributos EAV y cola de reconciliación (sección 19.3).</p>
+
+      {error ? (
+        <p className="empty-state" role="alert" data-testid="error-calidad">
+          {error}
+        </p>
+      ) : null}
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 12 }}>
         {metricas.map((m) => (

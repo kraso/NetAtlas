@@ -10,6 +10,8 @@ import type { Device, Category } from '@netatlas/domain'
 interface CatalogState {
   categories: readonly Category[]
   loading: boolean
+  /** Último fallo al cargar el catálogo; el dashboard lo muestra con `role="alert"`. */
+  error: string | undefined
   /** Última revisión del dataset (invalida el cache cuando el warmezo HTTP reemplaza services). */
   revisionVisto: number
   load: (force?: boolean) => Promise<void>
@@ -20,14 +22,22 @@ interface CatalogState {
 export const useCatalogStore = create<CatalogState>((set, get) => ({
   categories: [],
   loading: false,
+  error: undefined,
   revisionVisto: 0,
   load: async (force = false) => {
     const revision = useServices.getState().revision
     if (!force && get().categories.length > 0 && get().revisionVisto === revision) return
-    set({ loading: true, revisionVisto: revision })
+    set({ loading: true, revisionVisto: revision, error: undefined })
     const { catalog } = useServices.getState().services
-    const categories = await catalog.listCategories()
-    set({ categories, loading: false })
+    try {
+      const categories = await catalog.listCategories()
+      set({ categories, loading: false })
+    } catch (error) {
+      // Sin catálogo no hay árbol ni macrocategorías: el fallo se registra con
+      // contexto, se publica en la UI y `loading` no se queda colgado.
+      console.error('[ERROR] no se pudo cargar el catálogo de categorías', { revision, error })
+      set({ loading: false, error: 'No se pudo cargar el catálogo de categorías.' })
+    }
   },
   deviceBySlug: async (slug) => {
     const { devices } = useServices.getState().services

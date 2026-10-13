@@ -11,6 +11,8 @@ import type { Topology } from '@netatlas/domain'
 interface TopologiesState {
   topologies: readonly Topology[]
   loading: boolean
+  /** Último fallo al cargar la lista; el visor lo muestra con `role="alert"`. */
+  error: string | undefined
   load: () => Promise<void>
   bySlug: (slug: string) => Promise<Topology | undefined>
   saveLayout: (slug: string, positions: ReadonlyArray<{ nodeId: string; x: number; y: number }>) => Promise<void>
@@ -23,13 +25,21 @@ let cache = new Map<string, Topology>()
 export const useTopologiesStore = create<TopologiesState>((set, get) => ({
   topologies: [],
   loading: false,
+  error: undefined,
   load: async () => {
     if (get().topologies.length > 0) return
-    set({ loading: true })
-    const { topologies } = useServices.getState().services
-    const lista = await topologies.list()
-    cache = new Map(lista.map((t) => [t.slug.value, t]))
-    set({ topologies: lista, loading: false })
+    set({ loading: true, error: undefined })
+    try {
+      const { topologies } = useServices.getState().services
+      const lista = await topologies.list()
+      cache = new Map(lista.map((t) => [t.slug.value, t]))
+      set({ topologies: lista, loading: false })
+    } catch (error) {
+      // La vista se quedaba en «Cargando topologías…» para siempre: el fallo se
+      // registra con contexto, se publica y `loading` cae.
+      console.error('[ERROR] no se pudo cargar la lista de topologías', { error })
+      set({ loading: false, error: 'No se pudo cargar la lista de topologías.' })
+    }
   },
   bySlug: async (slug) => {
     const cached = cache.get(slug)
