@@ -140,8 +140,11 @@ contenido.
   `pull_request`, sobre el diff del PR): el hook vive en `.git/hooks/` de cada
   clon, así que un clon sin instalarlo —o un commit con `--no-verify`— llegaba a
   main sin que nadie lo mirara. El job no instala el proyecto (no compila ni
-  testea: eso es `ci.yml`), solo clona GGA en la misma versión del hook, le da
-  el diff del PR y deja que decida. El proveedor del gate —`opencode` con el
+  testea: eso es `ci.yml`), solo clona GGA en la misma versión del hook —con el
+  mismo ajuste de la ventana del parser del `STATUS`, porque el tag de upstream
+  todavía mira solo las primeras 30 líneas de la salida y el contrato de este
+  archivo exige escanear el transcript completo—, le da el diff del PR y deja
+  que decida. El proveedor del gate —`opencode` con el
   modelo del gateway que no se factura por uso, el mismo del hook local— no pide
   credencial, así que el job no depende de que una clave tenga saldo. Si algún
   día el proveedor la exigiera, iría en un secreto y su ausencia haría **fallar**
