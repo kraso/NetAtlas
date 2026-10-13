@@ -88,6 +88,12 @@ jobs:
           test -f apps/app/dist/icons/icon-192.png
           test -f apps/app/dist/icons/icon-512.png
 
+      # Mismo build que sirve el E2E: si deja un import que el navegador no puede
+      # resolver, la app arranca en blanco. Se comprueba en el job que compila,
+      # para no esperar al E2E (regla en tools/repo-lint, `pnpm dist:lint`).
+      - name: 'dist:lint (el bundle de la app no deja imports desnudos)'
+        run: pnpm dist:lint
+
   e2e:
     name: E2E Playwright — flujo crítico + offline
     runs-on: ubuntu-latest
@@ -120,39 +126,14 @@ jobs:
       - name: 'Build app (el webServer sirve dist/ con vite preview)'
         run: pnpm --filter @netatlas/app build
 
-      # El navegador no sabe resolver un import desnudo. Si un módulo de la app
-      # alcanza un paquete `external` del build (caso real: el barrel de
-      # @netatlas/application → importar-lote → @netatlas/importers → @netatlas/data),
-      # el chunk se queda con `import"@netatlas/data"` y la app arranca en blanco:
-      # se caen todos los E2E que necesitan la UI (medido en #11–#16: de las
-      # primeras 136 marcas del informe solo 10 pasan, las de los 5 tests que no
-      # tocan la app) y el job muere sin decir por qué. Mirar el build cuesta
-      # segundos; mirar cómo se caen 80 tests, media hora.
-      - name: 'El bundle del navegador no deja imports desnudos (@netatlas/*, node:*)'
-        run: |
-          if [ ! -d apps/app/dist/assets ]; then
-            echo "::error::no existe apps/app/dist/assets: el build no produjo el bundle"
-            exit 1
-          fi
-          # Formas que deja Rollup con el specifier sin resolver: `import"@netatlas/data"`
-          # (solo efecto), `from"@netatlas/data"` (nombrado) e `import("@netatlas/data")`
-          # (dinámico). La primera es la que se vio en la cadena y no lleva `from`.
-          set +e
-          hallazgos="$(grep -rnoE "(import|from|require)[[:space:]]*\(?[[:space:]]*[\"'](node:|@netatlas/)" apps/app/dist/assets)"
-          codigo=$?
-          set -e
-          # 1 = "no hay coincidencias" (lo bueno). Cualquier otro código es que la
-          # comprobación no llegó a correr: eso es un fallo, no un verde silencioso.
-          if [ "$codigo" -gt 1 ]; then
-            echo "::error::no se pudo inspeccionar apps/app/dist/assets (grep salió con $codigo)"
-            exit 1
-          fi
-          if [ -n "$hallazgos" ]; then
-            echo "::error::el bundle deja imports que el navegador no puede resolver: la app arrancaría en blanco"
-            echo "$hallazgos"
-            exit 1
-          fi
-          echo "sin imports desnudos en apps/app/dist/assets"
+      # La regla vive en tools/repo-lint (`pnpm dist:lint`), así que corre igual
+      # aquí, en el job de UI y en local. Un import desnudo en un chunk deja la
+      # app en blanco: se caen todos los E2E que necesitan la UI (medido en
+      # #11–#16: de las primeras 136 marcas del informe solo 10 pasan, las de los
+      # 5 tests que no tocan la app) y el job moría sin decir por qué. Mirar el
+      # build cuesta segundos; mirar cómo se caen 80 tests, media hora.
+      - name: 'dist:lint (el bundle de la app no deja imports desnudos)'
+        run: pnpm dist:lint
 
       # El filtro va por ruta aunque el nombre ya sea único en el workspace: la
       # app se selecciona explícitamente y no depende de cómo se llame ningún
