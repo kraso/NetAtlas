@@ -13,6 +13,12 @@ name: Review
 
 on:
   pull_request:
+    # `edited` entra a propósito: en una pila de PRs la base se mueve (la unidad
+    # padre se fusiona y el hijo reapunta a main), y sin este tipo el veredicto
+    # quedaría congelado contra una base que ya no es la del PR. El `if` del job
+    # descarta las ediciones que no son de base —título o cuerpo—, así que editar
+    # el texto no dispara un review.
+    types: [opened, synchronize, reopened, edited]
 
 concurrency:
   # Un push nuevo al mismo PR cancela la corrida anterior: el review del commit
@@ -28,6 +34,9 @@ jobs:
   gate:
     name: Gate (GGA sobre el diff del PR)
     runs-on: ubuntu-latest
+    # Reapuntar la base llega como `edited` con `changes.base`; editar el título
+    # o el cuerpo llega como `edited` sin él y no es trabajo para el gate.
+    if: github.event.action != 'edited' || github.event.changes.base != null
     # 20 min es la última red, no el límite que decide: GGA se pone su propio
     # tope (`TIMEOUT="900"` en `.gga`, 15 min) y sale con «Provider execution
     # failed» en vez de quedarse colgado, así que el presupuesto del job solo
