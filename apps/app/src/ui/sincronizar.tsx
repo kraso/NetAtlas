@@ -55,10 +55,18 @@ export function Sincronizar(): React.JSX.Element {
           </button>
         </div>
         {ultimoResultado ? (
-          <p className="guia-tecnica" role="status" data-testid="sync-resultado">
-            Replicados: {ultimoResultado.replicados} · versión réplica {ultimoResultado.versionReplica} ·
-            enviadas {ultimoResultado.contribucionesEnviadas} · pendientes {ultimoResultado.contribucionesPendientes}
-          </p>
+          <>
+            <p className="guia-tecnica" role="status" data-testid="sync-resultado">
+              Replicados: {ultimoResultado.replicados} · versión réplica {ultimoResultado.versionReplica} ·
+              enviadas {ultimoResultado.contribucionesEnviadas} · pendientes {ultimoResultado.contribucionesPendientes}
+            </p>
+            {!ultimoResultado.pullOk || !ultimoResultado.pushOk ? (
+              <p className="empty-state" role="alert" data-testid="sync-parcial">
+                Ciclo incompleto: {!ultimoResultado.pullOk ? 'pull de catálogo sin red' : 'push de cola sin confirmación'}.
+                {ultimoResultado.pushOk ? ' La réplica quedó actualizada.' : ' La cola local queda intacta.'}
+              </p>
+            ) : null}
+          </>
         ) : null}
         {error ? (
           <p className="empty-state" role="alert" data-testid="sync-error">
