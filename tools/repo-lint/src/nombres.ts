@@ -76,17 +76,25 @@ function leerNombre(manifiesto: string, raizRepo: string): NombreProyecto {
   return { ruta, nombre: contenido.name }
 }
 
+/**
+ * Proyectos del workspace, con su ruta relativa y su nombre: la lista de los
+ * proyectos internos. La usan la regla de nombres y la de dependencias, en vez
+ * de mantener cada una su copia.
+ */
+export function listarProyectos(raizRepo: string): readonly NombreProyecto[] {
+  return listarManifiestos(raizRepo).map((manifiesto) => leerNombre(manifiesto, raizRepo))
+}
+
 /** Nombres repetidos entre los proyectos del workspace, con sus rutas. */
 export function revisarNombres(raizRepo: string): InformeNombres {
   const porNombre = new Map<string, string[]>()
-  const manifiestos = listarManifiestos(raizRepo)
-  for (const manifiesto of manifiestos) {
-    const { ruta, nombre } = leerNombre(manifiesto, raizRepo)
+  const proyectos = listarProyectos(raizRepo)
+  for (const { ruta, nombre } of proyectos) {
     porNombre.set(nombre, [...(porNombre.get(nombre) ?? []), ruta])
   }
   const duplicados = [...porNombre.entries()]
     .filter(([, rutas]) => rutas.length > 1)
     .map(([nombre, rutas]) => ({ nombre, rutas: [...rutas].sort() }))
     .sort((a, b) => a.nombre.localeCompare(b.nombre))
-  return { revisados: manifiestos.length, duplicados }
+  return { revisados: proyectos.length, duplicados }
 }
