@@ -17,9 +17,11 @@ dev-dist/
 
 # CodeGraph (índice local generado) y configuración personal del cliente opencode
 .codegraph/
-.gga
 opencode.jsonc
 .atl/
+
+# `.gga` SÍ se versiona a propósito: es la política del gate (patrones, reglas,
+# modo estricto) y cada clon tiene que heredarla. No lo vuelvas a ignorar.
 
 # Hermes session cache (no commit)
 .hermes/

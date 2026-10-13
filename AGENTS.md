@@ -31,12 +31,19 @@ Qué archivos entran al review del hook `pre-commit`.
 - El gate revisa también los **archivos de test**: `*.test.ts`, `*.test.tsx`,
   `*.spec.ts`, `*.spec.tsx` y `apps/app/e2e/*.spec.ts`. Son la red que valida
   casi todos los movimientos del repositorio y antes quedaban fuera del gate.
+- El gate revisa también los **workflows y la configuración de CI**
+  (`*.yml`, `*.yaml`, `package.json`, `tsconfig*.json`, `.npmrc`): son los
+  ficheros que deciden si el resto pasa —jobs, presupuestos, rutas, scripts— y
+  se commiteaban sin que nadie los mirara. Lo generado sigue fuera:
+  `pnpm-lock.yaml` (excluido por nombre aunque `*.yaml` esté dentro) y los JSON
+  del dataset (`datasets/**`), que son contenido, no configuración.
 - Quedan fuera los **fixtures** (`*-fixtures.ts`, `*.fixtures.ts`,
   `*-fixture.ts`, `*.fixture.ts`, `fixtures/`, `__fixtures__/`) y los
   **snapshots** (`*.snap`, `__snapshots__/`): son material de apoyo de los
   tests, no código de test. También siguen fuera los `*.d.ts` generados.
-- Se configura en el `.gga` local (`FILE_PATTERNS` / `EXCLUDE_PATTERNS`), no en
-  este archivo. Al tocarlo, ojo con el matching de GGA: un patrón que empieza
+- Se configura en el `.gga`, que **se versiona** con el repositorio
+  (`FILE_PATTERNS` / `EXCLUDE_PATTERNS`): cada clon hereda la misma cobertura
+  sin configurar nada. Al tocarlo, ojo con el matching de GGA: un patrón que empieza
   por `*` se compara como **sufijo literal** sobre la ruta completa (no como
   «contiene»), así que los directorios se cubren con un glob que empiece por
   `?` (`?*fixtures/*`) y no con `*fixtures*`.
