@@ -88,6 +88,16 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   que el build del navegador deja `external`. Los `import type` / `export type`
   no cuentan —el compilado los borra enteros—, así que la regla caza la causa
   en estático, sin compilar y sin falsos positivos.
+- El mismo `pnpm modules:lint` falla si el bundle del navegador alcanza un
+  builtin de Node (`node:sqlite`, `node:fs`…): recorre los **imports de valor**
+  desde los módulos de `apps/app/src` —los de tipo no cuentan, el compilado los
+  borra— y señala el módulo que lo importa con el camino por el que entró. El
+  caso que define la frontera: `@netatlas/server` no puede entrar al bundle (el
+  barrel reexporta `sqlite-store` → `node:sqlite`), pero la subruta
+  `@netatlas/server/sync-http` sí —es transporte sobre `fetch`—, y es la puerta
+  por la que la app cruza. Lo que la app alcanza a propósito y solo corre
+  donde hay Node se declara como puerta en `PUERTAS_NODE`, con el motivo: la
+  composición SQLite del escritorio es la de hoy.
 
 ### Workflows y configuración de CI
 
