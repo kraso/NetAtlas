@@ -1,52 +1,45 @@
 import React from 'react'
-import { useNavigate, Link } from 'react-router-dom'
-import type { Core } from 'cytoscape'
-import { useServices } from '../composition-root.js'
-import type { UiGraphSubgraph } from '../composition-root.js'
-import { CytoscapeCanvas } from './cytoscape-canvas.js'
-import { Breadcrumbs } from './breadcrumbs.js'
+import { useNavigate } from 'react-router-dom'
+import type { Core, NodeSingular } from 'cytoscape'
+import { useServices, type UiGraphSubgraph } from '../composition-root.js'
+import { Breadcrumbs, CategoriasAccesibles, CytoscapeCanvas, EnlacesAccesibles, elementsDelMapa, posicionesDeVariante } from './mapa-global-piezas.js'
 
 /**
  * Mapa global del conocimiento con agregación por categoría (NET-HW-036, §13.2):
  * nodos = categorías (con conteo de dispositivos), aristas = relaciones
  * device-device agregadas entre categorías. Click en un nodo → explorador.
+ * El cálculo de posiciones vive en `mapa-global-logica.ts` y las tablas
+ * accesibles en `mapa-global-tablas.tsx`.
  */
 export function MapaGlobal(): React.JSX.Element {
   const navegar = useNavigate()
   const [subgrafo, setSubgrafo] = React.useState<UiGraphSubgraph | undefined>()
+  const [error, setError] = React.useState<string | undefined>()
   const [cy, setCy] = React.useState<Core | null>(null)
   // `revision` cambia cuando el warmezo HTTP reemplaza el demo por el dataset real
   // (F8B: 6 devices → 330). Re-ejecuta `mapaGlobal()` con el dataset actualizado.
   const revision = useServices((s) => s.revision)
-  // Contador de variantes de ordenacion: cada clic en Reordenar gira los anillos
-  // con angulo aureo y alterna el sentido (siempre una disposicion ordenada).
+  // Contador de variantes de ordenación: cada clic en Reordenar gira los anillos.
   const [variante, setVariante] = React.useState(0)
 
   React.useEffect(() => {
     void (async () => {
-      const { graph } = useServices.getState().services
-      setSubgrafo(await graph.mapaGlobal())
+      try {
+        const { graph } = useServices.getState().services
+        setSubgrafo(await graph.mapaGlobal())
+        setError(undefined)
+      } catch (err) {
+        // Carga del mapa fallida: se registra y se comunica (nunca spinner eterno).
+        console.error('[ERROR] no se pudo cargar el mapa global', { err })
+        setError(err instanceof Error ? err.message : String(err))
+      }
     })()
   }, [revision])
 
   // Memoizado: CytoscapeCanvas recrea la instancia cuando `elements` cambia de
-  // identidad. Construirlo inline en cada render (mas setCy de onReady) destruia
-  // y recreaba el grafo en bucle: parpadeo e interaccion imposible.
-  // Declarado antes del return temprano (reglas de hooks).
-  // Posiciones iniciales ordenadas (anillos por tamano): la categoria con mas
-  // dispositivos al centro y el resto en anillos concentricos. Determinista:
-  // el mismo dataset siempre pinta el mismo mapa.
-  const elements = React.useMemo(() => {
-    const nodos = [...(subgrafo?.nodes ?? [])].sort((a, b) => conteoDe(b.label) - conteoDe(a.label))
-    const posiciones = calcularAnillos(nodos, 0)
-    return [
-      ...nodos.map((n) => ({
-        data: { id: n.id, label: n.label, tipo: n.type },
-        position: posiciones.get(n.id),
-      })),
-      ...(subgrafo?.edges.map((e) => ({ data: { id: e.id, source: e.source, target: e.target, label: e.predicate } })) ?? []),
-    ]
-  }, [subgrafo])
+  // identidad; construirlo inline en cada render destruía y recreaba el grafo.
+  const elements = React.useMemo(() => elementsDelMapa(subgrafo), [subgrafo])
+
   const alPulsarNodo = React.useCallback(
     (id: string) => {
       if (id.startsWith('category:')) navegar(`/explore?cat=${id.slice('category:'.length)}`)
@@ -54,6 +47,23 @@ export function MapaGlobal(): React.JSX.Element {
     [navegar],
   )
 
+  const reordenar = React.useCallback(() => {
+    if (!cy || !subgrafo) return
+    const siguiente = variante + 1
+    setVariante(siguiente)
+    const pos = posicionesDeVariante(subgrafo, siguiente)
+    cy.layout({
+      name: 'preset',
+      // Los typings exigen (nodeid: string) pero Cytoscape invoca con el nodo.
+      positions: (node: string | NodeSingular) => pos.get(typeof node === 'string' ? node : node.id()) ?? { x: 350, y: 230 },
+      animate: true,
+      animationDuration: 500,
+      fit: true,
+      padding: 40,
+    }).run()
+  }, [cy, subgrafo, variante])
+
+  if (error) return <p className="empty-state" role="alert">No se pudo cargar el mapa global: {error}</p>
   if (!subgrafo) return <p role="status">Calculando mapa global…</p>
 
   return (
@@ -113,21 +123,7 @@ export function MapaGlobal(): React.JSX.Element {
           title="Reordenar (variante de la disposicion inicial)"
           data-testid="layout-relayout"
           disabled={!cy}
-          onClick={() => {
-            if (!cy || !subgrafo) return
-            const v = variante + 1
-            setVariante(v)
-            const nodos = [...subgrafo.nodes].sort((a, b) => conteoDe(b.label) - conteoDe(a.label))
-            const pos = calcularAnillos(nodos, v)
-            cy.layout({
-              name: 'preset',
-              positions: (node: any) => pos.get(typeof node === 'string' ? node : node.id()) ?? { x: 350, y: 230 },
-              animate: true,
-              animationDuration: 500,
-              fit: true,
-              padding: 40,
-            }).run()
-          }}
+          onClick={reordenar}
         >
           ↻
         </button>
@@ -145,89 +141,10 @@ export function MapaGlobal(): React.JSX.Element {
       <details className="guia-tecnica">
         <summary>Alternativa accesible (categorías y enlaces como tabla)</summary>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginTop: 8 }}>
-          <table className="tabla-specs">
-            <thead>
-              <tr>
-                <th scope="col">Categoría</th>
-                <th scope="col">Dispositivos</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subgrafo.nodes.map((n) => {
-                const [label, conteo] = separarConteo(n.label)
-                return (
-                  <tr key={n.id}>
-                    <td>
-                      <Link to={`/explore?cat=${n.id.slice('category:'.length)}`}>{label}</Link>
-                    </td>
-                    <td className="mono">{conteo}</td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-          <table className="tabla-specs">
-            <thead>
-              <tr>
-                <th scope="col">Entre categorías</th>
-                <th scope="col">Enlaces</th>
-              </tr>
-            </thead>
-            <tbody>
-              {subgrafo.edges.map((e) => (
-                <tr key={e.id}>
-                  <td className="mono">
-                    {e.source.slice('category:'.length)} ↔ {e.target.slice('category:'.length)}
-                  </td>
-                  <td className="mono">{e.predicate}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <CategoriasAccesibles subgrafo={subgrafo} />
+          <EnlacesAccesibles subgrafo={subgrafo} />
         </div>
       </details>
     </section>
   )
-}
-
-/**
- * Anillos ordenados por tamano (variante N): la categoria mayor al centro y el
- * resto en dos anillos. Cada variante gira los anillos con angulo aureo y alterna
- * el sentido, asi Reordenar siempre produce una disposicion ordenada distinta.
- */
-function calcularAnillos(
-  nodos: ReadonlyArray<{ readonly id: string }>,
-  variante: number,
-): Map<string, { x: number; y: number }> {
-  const CX = 350
-  const CY = 230
-  const ANGULO_AUREO = Math.PI * (3 - Math.sqrt(5))
-  const giro = variante * ANGULO_AUREO
-  const sentido = variante % 2 === 0 ? 1 : -1
-  const posiciones = new Map<string, { x: number; y: number }>()
-  nodos.forEach((n, i) => {
-    if (i === 0) {
-      posiciones.set(n.id, { x: CX, y: CY })
-    } else {
-      const anillo = i <= 8 ? 1 : 2
-      const radio = anillo === 1 ? 150 : 265
-      const k = anillo === 1 ? i - 1 : i - 9
-      const total = anillo === 1 ? Math.min(nodos.length - 1, 8) : nodos.length - 9
-      const ang = sentido * ((2 * Math.PI * k) / Math.max(total, 1)) - Math.PI / 2 + giro
-      posiciones.set(n.id, { x: CX + radio * Math.cos(ang), y: CY + radio * Math.sin(ang) * 0.72 })
-    }
-  })
-  return posiciones
-}
-
-/** Extrae el conteo final «(42)» de la etiqueta para ordenar nodos por tamano. */
-function conteoDe(label: string): number {
-  const m = /\((\d+)\)\s*$/.exec(label)
-  return m ? Number(m[1]!) : 0
-}
-
-/** Separa «Nombre (42)» en [Nombre, 42]. */
-function separarConteo(label: string): [string, string] {
-  const m = /^(.*)\s+\((\d+)\)$/.exec(label)
-  return m ? [m[1]!, m[2]!] : [label, '—']
 }
