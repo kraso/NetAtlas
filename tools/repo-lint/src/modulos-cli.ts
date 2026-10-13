@@ -13,10 +13,12 @@ import { dirname, join } from 'node:path'
 import {
   BARREL_APLICACION,
   DIR_APP,
+  ENTRADA_APP,
   ESPECIFICADOR_INTERNO,
   MAX_LINEAS,
   revisarBarrels,
   revisarDependencias,
+  revisarFrontera,
   revisarNombres,
   revisarRepo,
 } from './index.js'
@@ -68,10 +70,27 @@ console.log(
   `modules:lint: ${barrels.violaciones.length} imports de valor del barrel en ${barrels.revisados} módulos de ${DIR_APP}.`,
 )
 
+const frontera = revisarFrontera(raiz)
+if (frontera.ausente) {
+  console.log(
+    `[ERROR] [frontera-sin-entrada] no existe ${ENTRADA_APP} bajo ${raiz}: el bundle no tiene entrada que seguir, asi que la regla no revisó nada.`,
+  )
+}
+for (const v of frontera.violaciones) {
+  console.log(
+    `[ERROR] [frontera-node] ${v.ruta}: importa «${v.specifier}», que el navegador no carga; llegó al bundle por ${v.cadena.join(' → ')}.`,
+  )
+}
+console.log(
+  `modules:lint: ${frontera.violaciones.length} builtins de Node alcanzables desde ${ENTRADA_APP} sobre ${frontera.alcanzados} módulos alcanzables (${frontera.puertas.length} puertas de Node documentadas).`,
+)
+
 if (
   informe.violaciones.length > 0 ||
   nombres.duplicados.length > 0 ||
   dependencias.violaciones.length > 0 ||
-  barrels.violaciones.length > 0
+  barrels.violaciones.length > 0 ||
+  frontera.ausente ||
+  frontera.violaciones.length > 0
 )
   process.exitCode = 1
