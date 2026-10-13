@@ -141,10 +141,12 @@ contenido.
   clon, así que un clon sin instalarlo —o un commit con `--no-verify`— llegaba a
   main sin que nadie lo mirara. El job no instala el proyecto (no compila ni
   testea: eso es `ci.yml`), solo clona GGA en la misma versión del hook, le da
-  el diff del PR y deja que decida. La credencial del proveedor va en un secreto
-  (`CODEX_API_KEY` u `OPENAI_API_KEY`): sin ella el job **falla**, no se salta el
-  review en silencio; la única excepción es un PR desde un fork, donde los
-  secretos no llegan y el job avisa y se omite.
+  el diff del PR y deja que decida. El proveedor del gate —`opencode` con el
+  modelo del gateway que no se factura por uso, el mismo del hook local— no pide
+  credencial, así que el job no depende de que una clave tenga saldo. Si algún
+  día el proveedor la exigiera, iría en un secreto y su ausencia haría **fallar**
+  el job, no saltarse el review en silencio; la única excepción sería un PR desde
+  un fork, donde los secretos no llegan y el job avisaría y se omitiría.
 - **`fail-fast: false`** en una matriz donde cada plataforma debe reportar su
   resultado: un SO que falla no puede ocultar el estado del otro.
 - **Un presupuesto o un flag no obvio se justifica al lado**, con la medición

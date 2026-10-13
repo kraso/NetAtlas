@@ -68,31 +68,14 @@ jobs:
       # GGA caería a sus valores por defecto (`*` para todo, sin exclusiones) y
       # revisaría hasta el lockfile y los JSON del dataset — un gate que juzga
       # otra cosa que la acordada, en silencio.
-      - name: Requisitos (config versionada + credencial del proveedor)
-        env:
-          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY || secrets.OPENAI_API_KEY }}
-          ES_FORK: ${{ github.event.pull_request.head.repo.fork }}
+      - name: Requisitos (config versionada)
         run: |
           if [ ! -f .gga ]; then
             echo "::error title=Falta .gga::La config del gate no está en esta base; sin ella el review no juzga lo que debe. Lleva a main la rama del gate antes de activar el job."
             exit 1
           fi
-          if [ -z "$CODEX_API_KEY" ]; then
-            # Los secretos no llegan a los PR abiertos desde un fork: ahí se
-            # avisa y se sigue, porque bloquearlos dejaría la puerta cerrada sin
-            # arreglo posible desde fuera. En cualquier otro caso, faltar la
-            # credencial es un fallo, no un pase silencioso.
-            if [ "$ES_FORK" = "true" ]; then
-              echo "::notice title=Gate omitido::PR desde un fork: los secretos no se comparten con los forks, así que el review no puede correr."
-              echo "GATE_SKIP=true" >> "$GITHUB_ENV"
-              exit 0
-            fi
-            echo "::error title=Falta la credencial::Crea el secreto CODEX_API_KEY (u OPENAI_API_KEY) en Settings → Secrets and variables → Actions."
-            exit 1
-          fi
 
       - uses: actions/setup-node@v4
-        if: env.GATE_SKIP != 'true'
         with:
           node-version: 22
 
@@ -101,27 +84,24 @@ jobs:
       # `../lib`, así que el clon basta y `install.sh` (que además copia a
       # `$HOME`) no hace falta en CI.
       - name: Instalar GGA (v2.10.1)
-        if: env.GATE_SKIP != 'true'
         run: |
           git clone --branch v2.10.1 --depth 1 \
             https://github.com/Gentleman-Programming/gentleman-guardian-angel.git /tmp/gga
           chmod +x /tmp/gga/bin/gga
           echo "/tmp/gga/bin" >> "$GITHUB_PATH"
 
-      # Proveedor del review: codex, el mismo que el `.gga` local. La versión va
-      # fijada, no flotante: un proveedor que cambia bajo los pies cambia el
-      # veredicto sin que nadie haya tocado el código.
-      - name: Instalar el proveedor (codex)
-        if: env.GATE_SKIP != 'true'
-        run: npm install -g @openai/codex@0.157.0
+      # Proveedor del review: `opencode` con el modelo del gateway que no se
+      # factura por uso, el mismo que el `.gga` local — no `opencode-go`, que es
+      # otro proveedor y sí va contra un plan. La versión va fijada, no flotante:
+      # un proveedor que cambia bajo los pies cambia el veredicto sin que nadie
+      # haya tocado el código. Con este proveedor el job no necesita credencial,
+      # así que el review tampoco depende de que una clave tenga saldo.
+      - name: Instalar el proveedor (opencode)
+        run: npm install -g opencode-ai@1.18.31
 
       # `--pr-mode` manda el contenido completo de los ficheros cambiados, igual
       # que el hook local manda el de los ficheros staged: misma vista del código
       # en los dos sitios. `--diff-only` no abarata nada — GGA añade el diff
       # *además* del contenido (`build_pr_prompt`), así que solo suma tokens.
       - name: Gate
-        if: env.GATE_SKIP != 'true'
-        env:
-          CODEX_API_KEY: ${{ secrets.CODEX_API_KEY || secrets.OPENAI_API_KEY }}
-          OPENAI_API_KEY: ${{ secrets.CODEX_API_KEY || secrets.OPENAI_API_KEY }}
         run: gga run --pr-mode

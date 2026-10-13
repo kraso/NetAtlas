@@ -31,7 +31,14 @@
 #   PROVIDER="minimax"
 #   PROVIDER="minimax:MiniMax-M3"
 # Proveedor del repo; se cambia por máquina con `GGA_PROVIDER=<proveedor>`.
-PROVIDER="codex"
+#
+# `opencode` con el modelo del gateway que no se factura por uso: el veredicto
+# no depende de que una clave de API tenga saldo, así que el mismo gate puede
+# correr en local y en CI (con `codex` la CI necesitaba crédito de OpenAI y sin
+# él el job fallaba con «Provider execution failed», sin más pista). El modelo
+# va explícito: si el CLI cambia su default, el veredicto cambiaría sin que
+# nadie haya tocado el código.
+PROVIDER="opencode:opencode/space-bunny-free"
 
 # File patterns to include in review (comma-separated)
 # Default: * (all files)
