@@ -82,6 +82,13 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   secciones del manifiesto y saca la lista de proyectos de
   `pnpm-workspace.yaml`, así que un proyecto nuevo entra en la regla por existir
   — el estándar ya no depende de un grep a mano.
+- El mismo `pnpm modules:lint` falla si un módulo de `apps/app/src` importa el
+  barrel de `@netatlas/application` **en runtime**: el barrel reexporta el caso
+  de importación por lote y arrastra `@netatlas/importers` → `@netatlas/data`,
+  que el build del navegador deja `external`. Los `import type` / `export type`
+  no cuentan —el compilado los borra enteros—, así que la regla caza la causa
+  en estático, sin compilar y sin falsos positivos.
+
 ### Convenciones
 
 - **Módulos de menos de 200 líneas.** Si excede, dividir. **Excepción:** los

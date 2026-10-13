@@ -1,7 +1,9 @@
 #!/usr/bin/env tsx
 // modules:lint — ningún módulo de src supera 200 líneas (barrels exentos),
-// ningún par de proyectos del workspace comparte nombre, y ninguna dependencia
-// interna se declara fuera de `workspace:*`.
+// ningún par de proyectos del workspace comparte nombre, ninguna dependencia
+// interna se declara fuera de `workspace:*`, y ningún módulo de la app importa
+// el barrel de @netatlas/application en runtime (arrastra @netatlas/data, que el
+// navegador no resuelve: la app arranca en blanco).
 // Uso: pnpm modules:lint [raízRepo]
 //
 // Las reglas viven en módulos aparte y se consumen por el barrel del paquete:
@@ -9,8 +11,11 @@
 import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 import {
+  BARREL_APLICACION,
+  DIR_APP,
   ESPECIFICADOR_INTERNO,
   MAX_LINEAS,
+  revisarBarrels,
   revisarDependencias,
   revisarNombres,
   revisarRepo,
@@ -53,9 +58,20 @@ console.log(
   `modules:lint: ${dependencias.violaciones.length} dependencias internas fuera de "${ESPECIFICADOR_INTERNO}" sobre ${dependencias.internas} revisadas en ${dependencias.revisados} proyectos.`,
 )
 
+const barrels = revisarBarrels(raiz)
+for (const v of barrels.violaciones) {
+  console.log(
+    `[ERROR] [barrel-aplicacion] ${v.ruta}:${v.linea} importa el barrel de ${BARREL_APLICACION} en runtime (${v.sentencia}): el barrel reexporta la importación por lote y arrastra @netatlas/importers → @netatlas/data, que el navegador no resuelve. Importa la subruta (${BARREL_APLICACION}/casos/…) o el tipo con \`import type\`.`,
+  )
+}
+console.log(
+  `modules:lint: ${barrels.violaciones.length} imports de valor del barrel en ${barrels.revisados} módulos de ${DIR_APP}.`,
+)
+
 if (
   informe.violaciones.length > 0 ||
   nombres.duplicados.length > 0 ||
-  dependencias.violaciones.length > 0
+  dependencias.violaciones.length > 0 ||
+  barrels.violaciones.length > 0
 )
   process.exitCode = 1
