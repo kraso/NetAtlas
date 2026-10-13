@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit",
     "test": "vitest run",
-    "modules:lint": "tsx src/modulos-cli.ts"
+    "modules:lint": "tsx src/modulos-cli.ts",
+    "dist:lint": "tsx src/bundle-cli.ts"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

@@ -15,6 +15,7 @@
     "test": "pnpm -r run test",
     "lint": "pnpm -r run lint",
     "modules:lint": "pnpm --filter @netatlas/repo-lint modules:lint",
+    "dist:lint": "pnpm --filter @netatlas/repo-lint dist:lint",
     "data:lint": "pnpm --filter @netatlas/dataset-tools data:lint",
     "bench": "pnpm --filter @netatlas/datagen bench",
     "migrate": "pnpm --filter @netatlas/data migrate",

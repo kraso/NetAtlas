@@ -59,6 +59,12 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
 - El límite de 200 líneas de los módulos está automatizado:
   `pnpm modules:lint` falla si algún módulo de `src` lo supera (los barrels
   exentos del punto siguiente quedan fuera del recuento).
+- `pnpm dist:lint` recorre los `.js` del build de la app (`apps/app/dist`) y
+  falla si alguno deja un import que el navegador no pueda resolver
+  (`import"@netatlas/data"`, `from"node:sqlite"`…): un specifier desnudo deja la
+  app en blanco y los E2E caen por timeout hasta agotar el presupuesto del job.
+  Necesita el build hecho, así que no entra en el trío obligatorio: lo corren
+  los jobs de CI que compilan la app.
 - El mismo `pnpm modules:lint` recorre los proyectos que declara
   `pnpm-workspace.yaml` (más la raíz) y falla si dos comparten `name`: un nombre
   duplicado deja `pnpm --filter <nombre>` ambiguo y la tarea se ejecuta en el
