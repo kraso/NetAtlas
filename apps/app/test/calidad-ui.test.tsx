@@ -1,9 +1,7 @@
-import React from 'react'
-import { describe, expect, it, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { App } from '../src/App.js'
-import { setServices, buildServices } from '../src/composition-root.js'
+import {
+  React, describe, expect, it, beforeEach, vi, render, screen, fireEvent, waitFor,
+  MemoryRouter, App, setServices, buildServices,
+} from './apoyo-ui.js'
 import { useQualityStore } from '../src/viewmodels/quality-store.js'
 import type { InMemoryQualityRepository } from '../src/adapters/in-memory.js'
 
@@ -74,5 +72,44 @@ describe('Dashboard de calidad (F6)', () => {
     renderApp('/calidad')
     await screen.findByText('Calidad del dataset')
     expect(await screen.findByText(/manifiesto no disponible en el modo demo/i)).toBeDefined()
+  })
+
+  it('avisa cuando las métricas no cargan, en vez de decir «sin métricas»', async () => {
+    const services = buildServices()
+    const fallo = vi.spyOn(services.quality, 'report').mockRejectedValue(new Error('repo caído'))
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    setServices(services)
+
+    renderApp('/calidad')
+    const aviso = await screen.findByTestId('error-calidad')
+    expect(aviso.textContent).toContain('No se pudieron cargar las métricas de calidad.')
+    expect(screen.queryByText('Sin métricas disponibles.')).toBeNull()
+    expect(log).toHaveBeenCalledWith('[ERROR] no se pudieron cargar las métricas de calidad', {
+      error: expect.any(Error),
+    })
+    fallo.mockRestore()
+    log.mockRestore()
+  })
+
+  it('avisa cuando resolver un candidato de la cola falla', async () => {
+    const services = buildServices()
+    await (services.quality as InMemoryQualityRepository).crearCandidatoDemo('sw-nuevo', 'cisco-c9300-48p', 0.81, [
+      { campo: 'name', entrante: 'Switch nuevo', existente: 'Cisco Catalyst 9300-48P' },
+    ])
+    const fallo = vi.spyOn(services.quality, 'resolverReconciliacion').mockRejectedValue(new Error('caído'))
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    setServices(services)
+
+    renderApp('/calidad')
+    fireEvent.click(await screen.findByRole('button', { name: /Aceptar/ }))
+    const aviso = await screen.findByTestId('error-calidad')
+    expect(aviso.textContent).toContain('No se pudo resolver el candidato de la cola')
+    expect(log).toHaveBeenCalledWith('[ERROR] no se pudo resolver el candidato de la cola', {
+      id: 1,
+      decision: 'accepted',
+      error: expect.any(Error),
+    })
+    fallo.mockRestore()
+    log.mockRestore()
   })
 })

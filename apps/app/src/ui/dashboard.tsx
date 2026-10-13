@@ -12,14 +12,24 @@ import { SearchBox } from './search-box.js'
  */
 export function Dashboard(): React.JSX.Element {
   const categories = useCatalogStore((s) => s.categories)
+  const errorCatalogo = useCatalogStore((s) => s.error)
   const { dslPreview } = useSearchStore()
   const revision = useServices((s) => s.revision)
   const [deviceCount, setDeviceCount] = React.useState(0)
+  const [errorConteo, setErrorConteo] = React.useState<string | undefined>()
 
   React.useEffect(() => {
     void (async () => {
-      const count = await useServices.getState().services.devices.count()
-      setDeviceCount(count)
+      try {
+        const count = await useServices.getState().services.devices.count()
+        setDeviceCount(count)
+        setErrorConteo(undefined)
+      } catch (error) {
+        // El pie tampoco puede quedarse en «0 dispositivos» como si el dataset
+        // estuviera vacío: se registra con contexto y se avisa en la página.
+        console.error('[ERROR] no se pudo contar los dispositivos del dataset', { error })
+        setErrorConteo('No se pudo contar los dispositivos del dataset.')
+      }
     })()
   }, [revision])
 
@@ -32,6 +42,16 @@ export function Dashboard(): React.JSX.Element {
       </h1>
 
       <SearchBox />
+      {errorCatalogo ? (
+        <p className="empty-state" role="alert" data-testid="error-catalogo">
+          {errorCatalogo}
+        </p>
+      ) : null}
+      {errorConteo ? (
+        <p className="empty-state" role="alert" data-testid="error-conteo">
+          {errorConteo}
+        </p>
+      ) : null}
       {dslPreview.length > 0 ? (
         <p className="mono guia-tecnica" role="status">
           Consulta detectada: {dslPreview.join(' ')}

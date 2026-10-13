@@ -11,7 +11,7 @@ import { estadoCola, estadoReplica, motivosCiclo } from './sincronizar-mensajes.
  * con el mismo contrato del dominio que el modo SQLite real.
  */
 export function Sincronizar(): React.JSX.Element {
-  const { serverUrl, token, outbox, replicaCount, ultimoResultado, error, pensando, setServerUrl, setToken, encolar, sincronizarAhora, refrescar } = useSyncStore()
+  const { serverUrl, token, outbox, replicaCount, ultimoResultado, error, configError, pensando, setServerUrl, setToken, encolar, sincronizarAhora, refrescar } = useSyncStore()
   const [entidad, setEntidad] = React.useState('device:cisco-c9300-48p')
 
   React.useEffect(() => {
@@ -55,6 +55,11 @@ export function Sincronizar(): React.JSX.Element {
             {pensando ? 'Sincronizando…' : 'Sincronizar ahora'}
           </button>
         </div>
+        {configError ? (
+          <p className="empty-state" role="alert" data-testid="sync-config-error">
+            {configError}
+          </p>
+        ) : null}
         {ultimoResultado ? (
           <>
             <p className="guia-tecnica" role="status" data-testid="sync-resultado">

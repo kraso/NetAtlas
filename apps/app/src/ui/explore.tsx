@@ -40,7 +40,12 @@ export function Explore(): React.JSX.Element {
               </p>
             )}
             {e.loading ? <p role="status">Cargando…</p> : null}
-            {e.visibles.length === 0 && !e.loading ? (
+            {e.error ? (
+              <p className="empty-state" role="alert" data-testid="error-explorador">
+                {e.error}
+              </p>
+            ) : null}
+            {e.visibles.length === 0 && !e.loading && !e.error ? (
               <div className="empty-state">Sin resultados. Elige una categoría o escribe una consulta (desde el ciclo 28.1.6#1, el DSL resuelve las 7 canónicas).</div>
             ) : (
               <TablaResultados visibles={e.visibles} marcados={e.marcados} onToggleMarcar={e.onToggleMarcar} />

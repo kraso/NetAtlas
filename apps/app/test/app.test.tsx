@@ -1,9 +1,7 @@
-import React from 'react'
-import { describe, expect, it, beforeEach } from 'vitest'
-import { render, screen, within, fireEvent, act, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
-import { App } from '../src/App.js'
-import { setServices, buildServices } from '../src/composition-root.js'
+import {
+  React, describe, expect, it, beforeEach, vi, render, screen, within, fireEvent, act, waitFor,
+  MemoryRouter, App, setServices, buildServices,
+} from './apoyo-ui.js'
 import { buildDemoDataset } from '../src/adapters/in-memory.js'
 
 function renderApp(initialRoute = '/'): void {
@@ -98,5 +96,64 @@ describe('Panel OSI + consulta inversa (NET-HW-021)', () => {
     expect(await screen.findByText(/Misma categoría que termina/i)).toBeDefined()
     // El 6300M (multilayer de la misma categoría) termina la capa 2 → aparece
     expect(screen.getByText('Aruba 6300M 48G')).toBeDefined()
+  })
+})
+
+/**
+ * Un fallo de carga no puede quedarse en la consola: el estado del store lo
+ * publica y la vista lo muestra con `role="alert"` (AGENTS.md).
+ */
+describe('Fallos de carga visibles', () => {
+  it('el catálogo caído se avisa en el dashboard en vez de contarse como 0 categorías', async () => {
+    const services = buildServices()
+    const fallo = vi.spyOn(services.catalog, 'listCategories').mockRejectedValue(new Error('catálogo caído'))
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    setServices(services)
+
+    renderApp('/')
+    const aviso = await screen.findByTestId('error-catalogo')
+    expect(aviso.textContent).toContain('No se pudo cargar el catálogo de categorías.')
+    expect(log).toHaveBeenCalledWith('[ERROR] no se pudo cargar el catálogo de categorías', {
+      revision: expect.any(Number),
+      error: expect.any(Error),
+    })
+    fallo.mockRestore()
+    log.mockRestore()
+  })
+
+  it('el fallo de carga del explorador no se disfraza de «sin resultados»', async () => {
+    const services = buildServices()
+    const fallo = vi.spyOn(services.devices, 'listByCategory').mockRejectedValue(new Error('sin red'))
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    setServices(services)
+
+    renderApp('/explore?cat=CAT-SWT')
+    const aviso = await screen.findByTestId('error-explorador')
+    expect(aviso.textContent).toContain('No se pudieron cargar los resultados')
+    // La vista no puede concluir «sin resultados» de una carga que falló.
+    expect(screen.queryByText(/Sin resultados/)).toBeNull()
+    expect(log).toHaveBeenCalledWith('[ERROR] no se pudieron cargar los resultados del explorador', {
+      selectedCat: 'CAT-SWT',
+      query: '',
+      error: expect.any(Error),
+    })
+    fallo.mockRestore()
+    log.mockRestore()
+  })
+
+  it('el contador del dataset no se queda en «0 dispositivos» cuando falla', async () => {
+    const services = buildServices()
+    const fallo = vi.spyOn(services.devices, 'count').mockRejectedValue(new Error('sin dataset'))
+    const log = vi.spyOn(console, 'error').mockImplementation(() => {})
+    setServices(services)
+
+    renderApp('/')
+    const aviso = await screen.findByTestId('error-conteo')
+    expect(aviso.textContent).toContain('No se pudo contar los dispositivos del dataset.')
+    expect(log).toHaveBeenCalledWith('[ERROR] no se pudo contar los dispositivos del dataset', {
+      error: expect.any(Error),
+    })
+    fallo.mockRestore()
+    log.mockRestore()
   })
 })
