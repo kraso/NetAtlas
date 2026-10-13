@@ -1,4 +1,4 @@
-export { MAX_LINEAS, contarLineas, esBarrel, listarModulos, revisarRepo } from './modulos.js'
+export { MAX_LINEAS, contarLineas, esBarrel, listarFuentes, listarModulos, revisarRepo } from './modulos.js'
 export type { InformeModulos, ViolacionModulo } from './modulos.js'
 export { leerGlobsWorkspace, listarManifiestos, listarProyectos, revisarNombres } from './nombres.js'
 export { DIR_DIST, importsDesnudos, resolublePorElNavegador, revisarBundle } from './bundle.js'
@@ -10,3 +10,4 @@ export {
   revisarDependencias,
 } from './dependencias.js'
 export type { InformeDependencias, SeccionDependencias, ViolacionDependencia } from './dependencias.js'
+export { BARREL_APLICACION, DIR_APP, importsDeValor, revisarBarrels } from './barrels.js'

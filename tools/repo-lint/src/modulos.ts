@@ -81,12 +81,24 @@ function recorrer(dir: string, out: string[]): void {
   }
 }
 
+/**
+ * Rutas absolutas de los módulos fuente bajo un directorio, con sus
+ * subcarpetas. Filtra tests, declaraciones y carpetas generadas; sirve tanto
+ * para el árbol entero del workspace como para una carpeta concreta (la app).
+ */
+export function listarFuentes(dir: string): readonly string[] {
+  const out: string[] = []
+  if (existsSync(dir)) recorrer(dir, out)
+  return out.sort()
+}
+
 /** Rutas absolutas de los módulos de `src` de packages, apps y tools. */
 export function listarModulos(raizRepo: string): readonly string[] {
   const out: string[] = []
   for (const base of ['packages', 'apps', 'tools']) {
-    const dir = join(raizRepo, base)
-    if (existsSync(dir)) recorrer(dir, out)
+    for (const ruta of listarFuentes(join(raizRepo, base))) {
+      if (ruta.split(sep).includes('src')) out.push(ruta)
+    }
   }
   return out.sort()
 }
