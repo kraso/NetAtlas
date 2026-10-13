@@ -1,5 +1,6 @@
-import React from 'react'
-import { describe, expect, it, beforeEach } from 'vitest'
+// Sin `import React`: el tsconfig usa el runtime JSX automático (`react-jsx`) y
+// el límite de 5 declaraciones de import del repo no admite una más.
+import { describe, expect, it, beforeEach, vi } from 'vitest'
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { App } from '../src/App.js'
@@ -43,13 +44,28 @@ describe('Favoritos de usuario (F8B, NET-HW-064)', () => {
   })
 
   it('el favorito sobrevive a una recarga (persistencia local)', async () => {
+    // Formato real del escritor (localStorageAdapter.add): los tres campos del
+    // Favorito; la lectura valida la forma antes de aceptarla.
     localStorage.setItem(
       'netatlas.favorites.v1',
-      JSON.stringify([{ entidad: 'device:cisco-c9300-48p', createdAt: '2025-01-01T00:00:00.000Z' }]),
+      JSON.stringify([
+        { perfilId: 'local', entidad: 'device:cisco-c9300-48p', createdAt: '2025-01-01T00:00:00.000Z' },
+      ]),
     )
     renderFicha()
     const btn = await screen.findByTestId('favorito-cisco-c9300-48p')
     expect(btn.textContent).toContain('★')
     expect(btn.getAttribute('aria-pressed')).toBe('true')
+  })
+
+  it('una entrada con forma inválida se descarta y se registra', async () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    localStorage.setItem('netatlas.favorites.v1', JSON.stringify([{ entidad: 'device:cisco-c9300-48p' }]))
+
+    renderFicha()
+    const btn = await screen.findByTestId('favorito-cisco-c9300-48p')
+    expect(btn.textContent).toContain('☆')
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('forma inválida'))
+    warn.mockRestore()
   })
 })

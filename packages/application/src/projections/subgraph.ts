@@ -2,7 +2,7 @@
  * Proyección de relaciones del dominio → formato UI (nodos, aristas, predicados).
  *
  * Extráida de apps/app/src/adapters/in-memory.ts (buildSubgraph).
- * Se vive en packages/app porque ambos casos de uso (local/global) lo comparten,
+ * Se vive en packages/application porque ambos casos de uso (local/global) lo comparten,
  * sin acoplar el dominio ni la infraestructura a esta proyección de vista.
  */
 import type { Relationship } from '@netatlas/domain'

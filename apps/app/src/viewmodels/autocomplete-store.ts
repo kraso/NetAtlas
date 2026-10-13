@@ -1,13 +1,13 @@
 import { create } from 'zustand'
-import { suggestGrouped } from '@netatlas/app/casos/suggest-grouped'
-import type { SearchPort, CatalogPort } from '@netatlas/app'
+import { suggestGrouped } from '@netatlas/application/casos/suggest-grouped'
+import type { SearchPort, CatalogPort } from '@netatlas/application'
 import { useServices } from '../composition-root.js'
 
 /**
  * Autocompletado agrupado + búsquedas guardadas (NET-HW-014).
  *
  * LA LÓGICA DE ORQUESTACIÓN (suggestGrouped + filtrado/slice) se extrajo al
- * caso de uso `suggestGrouped` en @netatlas/app (ADR-047). Este store SOLO
+ * caso de uso `suggestGrouped` en @netatlas/application (ADR-047). Este store SOLO
  * mantiene el estado local (zustand) y proyecta a Sugerencia[] planas.
  */
 
@@ -32,9 +32,37 @@ const MAX_GUARDADAS = 20
 function leerGuardadas(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? (JSON.parse(raw) as string[]) : []
-  } catch {
+    if (!raw) return []
+    const parsed: unknown = JSON.parse(raw)
+    // El cast no valida: una forma inesperada se descarta y se registra.
+    if (!Array.isArray(parsed) || parsed.some((q) => typeof q !== 'string')) {
+      console.warn('[autocomplete] historial guardado con forma inválida; se descarta')
+      return []
+    }
+    return parsed
+  } catch (error) {
+    // Best-effort explícito: el historial guardado no es crítico y se parte de
+    // cero, pero el fallo se registra en lugar de tragarse (AGENTS.md).
+    console.warn('[autocomplete] historial guardado ilegible; se ignora', { error })
     return []
+  }
+}
+
+/** Aplana las sugerencias agrupadas a la lista que consume la UI. */
+function proyectarSugerencias(grouped: Awaited<ReturnType<typeof suggestGrouped>>): Sugerencia[] {
+  const planas: Sugerencia[] = []
+  for (const [tipo, items] of Object.entries(grouped)) {
+    for (const item of items) planas.push({ tipo, slug: item.slug, label: item.label })
+  }
+  return planas
+}
+
+/** Persistencia del historial: best-effort registrado (cuota, modo privado). */
+function persistirGuardadas(guardadas: readonly string[]): void {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(guardadas))
+  } catch (error) {
+    console.warn('[autocomplete] no se pudo persistir el historial', { error })
   }
 }
 
@@ -72,24 +100,26 @@ export const useAutocompleteStore = create<AutocompleteState>((set) => ({
       return
     }
     set({ cargando: true })
-    const grouped = await suggestGrouped(buildPorts(), { prefix, limitPerGroup: 5 })
-    const planas: Sugerencia[] = []
-    for (const [tipo, items] of Object.entries(grouped)) {
-      for (const item of items) planas.push({ tipo, slug: item.slug, label: item.label })
+    try {
+      const grouped = await suggestGrouped(buildPorts(), { prefix, limitPerGroup: 5 })
+      set({ sugerencias: proyectarSugerencias(grouped), cargando: false })
+    } catch (error) {
+      // El fallo se registra y el estado no se queda cargando para siempre.
+      console.warn('[autocomplete] la sugerencia falló; se limpia el estado', { error })
+      set({ sugerencias: [], cargando: false })
     }
-    set({ sugerencias: planas, cargando: false })
   },
   guardar: (query) => {
     const q = query.trim()
     if (!q) return
     const actual = useAutocompleteStore.getState().guardadas
     const siguientes = [q, ...actual.filter((x) => x !== q)].slice(0, MAX_GUARDADAS)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(siguientes))
+    persistirGuardadas(siguientes)
     set({ guardadas: siguientes })
   },
   eliminarGuardada: (query) => {
     const siguientes = useAutocompleteStore.getState().guardadas.filter((x) => x !== query)
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(siguientes))
+    persistirGuardadas(siguientes)
     set({ guardadas: siguientes })
   },
 }))
@@ -102,7 +132,7 @@ export function rutaDeSugerencia(tipo: string, slug: string): string {
     case 'Protocolos':
       return `/protocolo/${slug}`
     case 'Estándares':
-      return `/estandar/${slug.replace('/', '/')}`
+      return `/estandar/${slug}`
     case 'Medios':
       return `/medio/${slug}`
     case 'Categorías':

@@ -14,9 +14,9 @@ importers:
 
   apps/app:
     dependencies:
-      '@netatlas/app':
+      '@netatlas/application':
         specifier: workspace:*
-        version: link:../../packages/app
+        version: link:../../packages/application
       '@netatlas/data':
         specifier: workspace:*
         version: link:../../packages/data
@@ -109,7 +109,7 @@ importers:
         specifier: ^2.1.8
         version: 2.1.9(@types/node@22.20.1)(jsdom@25.0.1)(terser@5.51.2)
 
-  packages/app:
+  packages/application:
     dependencies:
       '@netatlas/domain':
         specifier: workspace:*

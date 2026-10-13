@@ -8,7 +8,7 @@
 
 - **Dominio** (`packages/domain`): TypeScript puro sin dependencias de framework. Entidades, value objects y servicios puros.
 - **Puertos** (interfaces del dominio): `DeviceRepository`, `CatalogRepository`, `GraphRepository`, `SearchIndex`, `AssetStore`, `Clock`, `IdGen`, `Logger`.
-- **Aplicación** (`packages/app`, F1+): casos de uso orquestadores.
+- **Aplicación** (`packages/application`, F1+): casos de uso orquestadores. El paquete se llama `@netatlas/application`; `@netatlas/app` es la app (`apps/app`).
 - **Infraestructura** (`packages/data`, `packages/search`, F1+): adaptadores SQLite/FTS5/archivos.
 - **Presentación** (`apps/app`, F1+): React + ViewModels (hooks + stores Zustand).
 
