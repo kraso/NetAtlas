@@ -105,3 +105,8 @@ TIMEOUT="900"
 # Base branch for --pr-mode (auto-detects main/master/develop if empty)
 # Default: auto-detect
 # PR_BASE_BRANCH="main"
+#
+# Aquí se deja vacío a propósito: en local autodetecta (main/master/develop) y en
+# CI lo rellena `review.yml` en el config global con la base real del PR. Fijarlo
+# en este fichero lo impondría a todos los PRs, y en una pila la base es la rama
+# de la unidad padre, no `main`.
