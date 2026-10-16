@@ -1,7 +1,7 @@
 {
   "format": "netatlas-dataset",
   "name": "netatlas-seed",
-  "version": "netatlas-seed-2026-10-09-r1",
+  "version": "netatlas-seed-2026-10-09-r2",
   "schemaVersion": 3,
   "publishedOn": "2026-10-09",
   "counts": {
@@ -12,8 +12,9 @@
     "categorias": 26,
     "topologias": 3
   },
-  "sha256": "56397265be3fd0d2194d1fd5770566e3adf74ee5f1eabea74c5b30ae76baefd9",
+  "sha256": "1cfd218a9892c0da19b7a7e2c5d6211d8c920cbcbb69aeacd1e1ff0907e08aee",
   "changelog": [
-    "dataset:build regenerado (2026-10-09)"
+    "dataset:build regenerado (2026-10-09)",
+    "dataset:build regenerado (2026-10-09, r2)"
   ]
 }

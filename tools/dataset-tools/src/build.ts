@@ -3,10 +3,13 @@ import {
   NodeSqliteDriver,
   applyMigrations,
   dirname,
+  exigirFechaPublicacion,
+  fechaDePublicacion,
   fileURLToPath,
   join,
   loadMigrations,
   loadSeed,
+  relojFijo,
   rmSync,
   escribirManifiesto,
   seedAristasExplicitas,
@@ -18,8 +21,16 @@ import {
   seedPredicadosYCapas,
   seedTopologies,
 } from './build-piezas.js'
+import {
+  contarCatalogos,
+  contarFilas,
+  versionDeEsquema,
+  type ConteosCatalogos,
+  type ConteosDataset,
+} from './build-conteos.js'
 import type { ConteosSiembra } from './build-piezas.js'
 import type { Seed } from './build-tipos.js'
+import type { Clock } from '@netatlas/domain'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const MIGRATIONS_DIR = join(here, '..', '..', '..', 'packages', 'data', 'migrations')
@@ -29,8 +40,14 @@ export interface ResultadoBuild {
   deviceCount: number
   relationshipCount: number
   assertionCount: number
-  catalogCounts: { protocols: number; standards: number; media: number; manufacturers: number; categories: number }
+  catalogCounts: ConteosCatalogos
   schemaVersion: number
+}
+
+/** Opciones del build. La fecha de publicación es lo único que se puede fijar. */
+export interface OpcionesBuild {
+  /** Fecha de publicación (ISO 8601). Por defecto: env, manifiesto previo o hoy. */
+  readonly publishedOn?: string
 }
 
 /**
@@ -39,15 +56,24 @@ export interface ResultadoBuild {
  * fichas + assertions + aristas), base del MVP (F1). Cada pasada vive en un módulo
  * `build-*.ts` (catálogos, dispositivos, atributos, estándares, topologías,
  * manifiesto) y aquí solo se orquesta el orden.
+ *
+ * El build es reproducible: todas las marcas de tiempo del archivo salen de un
+ * reloj fijo anclado a la fecha de publicación del dataset, así que dos
+ * construcciones de las mismas fuentes dan bytes idénticos y el `sha256` del
+ * manifiesto describe el contenido, no el día en que se construyó.
+ *
+ * La fecha se valida antes de tocar el destino: una fecha inválida no puede
+ * borrar el artefacto previo para luego fallar al escribir el manifiesto.
  */
-export function buildSeedDatabase(seedDir: string, outPath: string): ResultadoBuild {
+export function buildSeedDatabase(seedDir: string, outPath: string, opciones: OpcionesBuild = {}): ResultadoBuild {
   const seed = loadSeed(seedDir)
-  const driver = abrirDriverLimpio(outPath)
-  const dao = new CatalogDao(driver)
-  const siembra = sembrarTodo(dao, driver, seed)
-  const conteos = recolectarConteos(driver, siembra, seed)
-  driver.close()
-  escribirCierre(outPath, conteos)
+  const publishedOn = opciones.publishedOn
+    ? exigirFechaPublicacion(opciones.publishedOn, 'publishedOn')
+    : fechaDePublicacion(outPath)
+  const reloj = relojFijo(`${publishedOn}T00:00:00.000Z`)
+  const driver = abrirDriverLimpio(outPath, reloj)
+  const conteos = sembrarYContar(driver, new CatalogDao(driver, reloj), seed)
+  escribirCierre(outPath, conteos, publishedOn)
   return {
     deviceCount: conteos.deviceCount,
     relationshipCount: conteos.relationshipCount,
@@ -57,14 +83,18 @@ export function buildSeedDatabase(seedDir: string, outPath: string): ResultadoBu
   }
 }
 
-/** Conteos que describen el dataset recién sembrado. */
-interface ConteosDataset {
-  readonly deviceCount: number
-  readonly relationshipCount: number
-  readonly assertionCount: number
-  readonly catalogCounts: ResultadoBuild['catalogCounts']
-  readonly topologiasCount: number
-  readonly schemaVersion: number
+/**
+ * Siembra y cuenta, cerrando el driver siempre: si la siembra revienta, el
+ * fallo se propaga con el archivo SQLite ya cerrado en vez de dejar el handle
+ * abierto. El WAL se cierra después, en `escribirCierre`.
+ */
+function sembrarYContar(driver: NodeSqliteDriver, dao: CatalogDao, seed: Seed): ConteosDataset {
+  try {
+    const siembra = sembrarTodo(dao, driver, seed)
+    return recolectarConteos(driver, siembra, seed)
+  } finally {
+    driver.close()
+  }
 }
 
 /** Pasadas de siembra en orden: catálogos → dispositivos → EAV → derivados → topologías. */
@@ -95,10 +125,11 @@ function recolectarConteos(driver: NodeSqliteDriver, siembra: ConteosSiembra, se
 }
 
 /** Cierra el WAL y escribe el manifiesto firmable (deja un archivo portable). */
-function escribirCierre(outPath: string, conteos: ConteosDataset): void {
+function escribirCierre(outPath: string, conteos: ConteosDataset, publishedOn: string): void {
   cerrarWal(outPath)
-  escribirManifiesto({
+  const escrito = escribirManifiesto({
     outPath,
+    publishedOn,
     schemaVersion: conteos.schemaVersion,
     devices: conteos.deviceCount,
     relationshipCount: conteos.relationshipCount,
@@ -106,6 +137,7 @@ function escribirCierre(outPath: string, conteos: ConteosDataset): void {
     catalogCounts: conteos.catalogCounts,
     topologiasCount: conteos.topologiasCount,
   })
+  if (!escrito) console.info(`[dataset:build] manifiesto sin cambios: se conserva el de ${publishedOn}.`)
   cerrarWal(outPath)
 }
 
@@ -113,15 +145,17 @@ function escribirCierre(outPath: string, conteos: ConteosDataset): void {
  * Prepara una base limpia: elimina el artefacto previo (es inmutable por
  * release) y aplica las migraciones, cerrando el driver si alguna falla.
  */
-function abrirDriverLimpio(outPath: string): NodeSqliteDriver {
+function abrirDriverLimpio(outPath: string, reloj: Clock): NodeSqliteDriver {
   rmSync(outPath, { force: true })
   cerrarWal(outPath)
   const driver = new NodeSqliteDriver(outPath)
   try {
-    applyMigrations(driver, loadMigrations(MIGRATIONS_DIR))
+    applyMigrations(driver, loadMigrations(MIGRATIONS_DIR), reloj)
   } catch (err) {
     driver.close()
-    throw new Error(`dataset:build — fallo al aplicar migraciones: ${(err as Error).message}`)
+    // Un `throw` no siempre es un `Error`: se conserva el contexto del fallo
+    // sin asumir que existe `.message`.
+    throw new Error(`dataset:build — fallo al aplicar migraciones: ${err instanceof Error ? err.message : String(err)}`)
   }
   return driver
 }
@@ -135,29 +169,10 @@ function sembrarDispositivos(dao: CatalogDao, seed: Seed): { assertionCount: num
   }
 }
 
-/** Conteos de catálogos cerrados leídos de la base ya sembrada. */
-function contarCatalogos(driver: NodeSqliteDriver): ResultadoBuild['catalogCounts'] {
-  return {
-    protocols: contarFilas(driver, 'protocol'),
-    standards: contarFilas(driver, 'standard'),
-    media: contarFilas(driver, 'medium'),
-    manufacturers: contarFilas(driver, 'manufacturer'),
-    categories: contarFilas(driver, 'category'),
-  }
-}
-
-/** Cuenta las filas de una tabla del dataset. */
-function contarFilas(driver: NodeSqliteDriver, tabla: string): number {
-  return Number(driver.prepare(`SELECT COUNT(*) AS c FROM ${tabla}`).get()?.c ?? 0)
-}
-
-/** Última versión de esquema aplicada. */
-function versionDeEsquema(driver: NodeSqliteDriver): number {
-  return Number(driver.prepare('SELECT MAX(version) AS v FROM schema_version').get()?.v ?? 0)
-}
-
 /** Cierra el WAL dejando un único archivo SQLite portable (checkpoint + delete). */
 function cerrarWal(outPath: string): void {
+  // El WAL puede no existir (el journal se crea al escribir): borrarlo es
+  // idempotente, no un fallo que haya que reportar.
   rmSync(`${outPath}-wal`, { force: true })
   rmSync(`${outPath}-shm`, { force: true })
 }
