@@ -26,7 +26,7 @@ aunque el código esté bien.
 
 ## Alcance del gate
 
-Qué archivos entran al review del hook `pre-commit`.
+Qué archivos entran al review del gate (el hook `pre-commit` local y el job `review` de CI).
 
 - El gate revisa también los **archivos de test**: `*.test.ts`, `*.test.tsx`,
   `*.spec.ts`, `*.spec.tsx` y `apps/app/e2e/*.spec.ts`. Son la red que valida
@@ -88,6 +88,119 @@ Lo que un review de este repositorio debe juzgar. Es la lista aplicable hoy.
   que el build del navegador deja `external`. Los `import type` / `export type`
   no cuentan —el compilado los borra enteros—, así que la regla caza la causa
   en estático, sin compilar y sin falsos positivos.
+
+### Workflows y configuración de CI
+
+Los ficheros que deciden si el resto pasa —`.github/workflows/*.yml`,
+`package.json`, `tsconfig*.json`, `.npmrc`— se juzgan como código, no como
+trámite. Lo generado sigue fuera: `pnpm-lock.yaml` y los JSON del dataset son
+contenido.
+
+**Workflows**
+
+- **Todo job lleva `timeout-minutes`.** Sin presupuesto, un cuelgue se lleva
+  el runner hasta su tope y muere cancelado sin decir qué fallaba. Hoy: 20 en
+  `verify`, 15 en `ui`, 20 en `review`, 30 en `e2e`, 40 en `tauri`, 45 en
+  `release`.
+- **El límite que decide va dentro de la corrida, no solo en el job.** El
+  `timeout-minutes` es la última red; el tope real lo pone el runner de
+  pruebas (`--global-timeout=900000` y `--max-failures=1` en Playwright), para
+  que un cuelgue acabe en FAILED con informe y en un minuto, no en media hora.
+- **Instalación canónica, siempre la misma**: `actions/checkout@v4` →
+  `pnpm/action-setup@v4` con la versión de `packageManager` →
+  `actions/setup-node@v4` (Node 22, `cache: pnpm`) → `pnpm install
+  --frozen-lockfile`. En CI el lockfile no se actualiza: un `pnpm install` sin
+  `--frozen-lockfile` es un hallazgo.
+- **Las actions se referencian por versión, no por rama** (`@v4`, `@v0`): una
+  action apuntada a `main` cambia bajo los pies del build.
+- **Los pasos que invocan un binario del paquete (`exec`) seleccionan por
+  ruta** (`pnpm --filter ./apps/app exec playwright test`); los que corren un
+  script van por nombre (`pnpm --filter @netatlas/app typecheck`). La ruta no
+  depende de cómo se llame el paquete: cuando dos compartían nombre,
+  `--filter` resolvía en ambos y el job de Tauri moría con «Command "tauri"
+  not found».
+- **El workflow invoca la receta, no la reescribe**: `pnpm typecheck`, `pnpm
+  test`, `pnpm modules:lint`, `pnpm dist:lint`, `pnpm data:lint` y `pnpm
+  bench` salen de los scripts de la raíz (los `--filter` por paquete y los
+  `exec` con flags son la excepción). Un comando nuevo se define ahí una vez.
+- **Lo barato primero, y donde se ve**: los lints de segundos van antes que
+  los tests de minutos en el mismo job, y la comprobación del bundle corre
+  también en el job que compila, no solo en el de E2E.
+- **Un job que compila comprueba el artefacto** con un paso explícito (`test
+  -f apps/app/dist/sw.js`, `Test-Path …netatlas-desktop.exe`): el exit 0 del
+  build no prueba que el fichero exista.
+- **Los jobs no comparten workspace**: si un test necesita un artefacto
+  generado (`netatlas-seed.sqlite`), el job lo construye antes
+  (`dataset:build`). No se asume lo que hizo otro job.
+- **Publicar es un workflow aparte** (`release.yml`), con `permissions`
+  explícito y mínimo (`contents: write`) y `releaseDraft: true`: la release se
+  revisa antes de publicarse. Un workflow que solo verifica no pide permisos
+  de escritura.
+- **El gate de review corre también en CI** (`review.yml`, solo en
+  `pull_request`, sobre el diff del PR): el hook vive en `.git/hooks/` de cada
+  clon, así que un clon sin instalarlo —o un commit con `--no-verify`— llegaba a
+  main sin que nadie lo mirara. El job no instala el proyecto (no compila ni
+  testea: eso es `ci.yml`), solo clona GGA en la misma versión del hook —con el
+  mismo ajuste de la ventana del parser del `STATUS`, porque el tag de upstream
+  todavía mira solo las primeras 30 líneas de la salida y el contrato de este
+  archivo exige escanear el transcript completo—, le da el diff del PR y deja
+  que decida. El proveedor del gate —`opencode` con el
+  modelo del gateway que no se factura por uso, el mismo del hook local— no pide
+  credencial, así que el job no depende de que una clave tenga saldo. Si algún
+  día el proveedor la exigiera, iría en un secreto y su ausencia haría **fallar**
+  el job, no saltarse el review en silencio; la única excepción sería un PR desde
+  un fork, donde los secretos no llegan y el job avisaría y se omitiría.
+- **`fail-fast: false`** en una matriz donde cada plataforma debe reportar su
+  resultado: un SO que falla no puede ocultar el estado del otro.
+- **Un presupuesto o un flag no obvio se justifica al lado**, con la medición
+  que lo respalda («medido en #11–#16: ~10m30s por intento»). El workflow es
+  donde el siguiente lee el porqué.
+
+**`package.json`**
+
+- **Todo proyecto del workspace es privado y de la casa**: `private: true`,
+  `type: module`, `version: 0.0.0` y nombre `@netatlas/<kebab>` (la raíz,
+  `netatlas`).
+- **Las dependencias internas se declaran `workspace:*`**, nunca con un rango
+  escrito a mano.
+- **Los scripts de la casa se llaman igual en todos los proyectos**:
+  `typecheck` (`tsc --noEmit`) no falta en ninguno; `lint`, cuando existe, es
+  exactamente `tsc --noEmit` —no hay ESLint ni Prettier—; `test` es `vitest
+  run`; un paquete que emite declara `build`. Un `lint` que haga otra cosa es
+  un hallazgo.
+- **En la raíz esos mismos nombres delegan** (`typecheck`, `lint`, `test` y
+  `build` son `pnpm -r run …`), y los comandos de la casa se exponen ahí
+  (`modules:lint`, `dist:lint`, `data:lint`, `bench`, `migrate`, `import`)
+  delegando con `pnpm --filter`: el workflow y quien commitea llaman al mismo
+  nombre.
+- **`engines.node` y `packageManager` viven en la raíz** y fijan la versión de
+  CI y de local: el workflow no elige Node ni pnpm por su cuenta.
+- **Un script no depende del cwd**: si necesita la raíz del repo, la deriva de
+  su propia ruta (`tools/repo-lint` lo hace), no de `process.cwd()`.
+
+**`tsconfig*.json`**
+
+- **Todo tsconfig de proyecto extiende `tsconfig.base.json`.** Los flags de
+  strictness viven ahí y **no se re-declaran ni se relajan** en el paquete:
+  re-declararlos es cómo se pierde uno sin que nadie lo note.
+- **Lo propio del paquete es lo suyo**, no la rigurosidad: `lib`, `jsx`,
+  `types`, `outDir` (y `moduleResolution`, que el base ya trae en `Bundler`).
+- **`tsconfig.build.json` para lo que se emite**: extiende el `tsconfig.json`
+  del paquete y añade `noEmit: false`, `declaration`, `declarationMap`,
+  `sourceMap`, `outDir: dist` e `include: ["src"]` —los tests no se emiten.
+- **`include` declara lo que el lint revisa** (`src`, más `test` y
+  `vitest.config.ts` cuando existen).
+
+**`.npmrc` y `pnpm-workspace.yaml`**
+
+- **`.npmrc` es política, no preferencia**: `auto-install-peers=true`,
+  `strict-peer-dependencies=false` e `ignore-scripts=true`. Con los scripts de
+  instalación apagados, un `postinstall` que hiciera falta tendría que
+  declararse a la vista.
+- **`pnpm-workspace.yaml` es la lista canónica de proyectos** (`packages/*`,
+  `apps/*`, `tools/*`, `datasets/*`). Las reglas que enumeran proyectos la
+  leen de ahí en vez de mantener una copia; un directorio nuevo de primer
+  nivel se añade aquí y lo ven todas.
 
 ### Convenciones
 

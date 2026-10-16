@@ -1,0 +1,140 @@
+name: Review
+
+# El gate de review corre aquí ADEMÁS de en el hook `pre-commit`: el hook vive en
+# `.git/hooks/` de cada clon, así que un clon sin `gga install` —o un commit con
+# `--no-verify`— llegaba a main sin que nadie lo mirara. Este job usa el mismo
+# GGA, el mismo `.gga` y las mismas reglas (`AGENTS.md`); lo único que cambia es
+# el disparador y el alcance: revisa el diff del PR entero, no lo que cada quien
+# tenga staged.
+#
+# No es el workflow que verifica el proyecto (eso es `ci.yml`): aquí no se
+# instalan dependencias ni se compila nada, solo se lee el texto del PR y se
+# juzga. Por eso tiene su propio archivo: solo tiene sentido en un PR.
+
+on:
+  pull_request:
+    # `edited` entra a propósito: en una pila de PRs la base se mueve (la unidad
+    # padre se fusiona y el hijo reapunta a main), y sin este tipo el veredicto
+    # quedaría congelado contra una base que ya no es la del PR. El `if` del job
+    # descarta las ediciones que no son de base —título o cuerpo—, así que editar
+    # el texto no dispara un review.
+    types: [opened, synchronize, reopened, edited]
+
+concurrency:
+  # Un push nuevo al mismo PR cancela la corrida anterior: el review del commit
+  # viejo ya no le sirve a nadie (mismo criterio que `ci.yml`).
+  group: review-${{ github.ref }}
+  cancel-in-progress: true
+
+# Solo lee: ni comentarios, ni checks, ni escritura al repo.
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Gate (GGA sobre el diff del PR)
+    runs-on: ubuntu-latest
+    # Reapuntar la base llega como `edited` con `changes.base`; editar el título
+    # o el cuerpo llega como `edited` sin él y no es trabajo para el gate.
+    if: github.event.action != 'edited' || github.event.changes.base != null
+    # 20 min es la última red, no el límite que decide: GGA se pone su propio
+    # tope (`TIMEOUT="900"` en `.gga`, 15 min) y sale con «Provider execution
+    # failed» en vez de quedarse colgado, así que el presupuesto del job solo
+    # tiene que ser mayor que ese. Medido con el GGA clonado y el proveedor real:
+    # el PR del gate (3 ficheros, 122 líneas) resuelve en 14s; un diff de 329
+    # ficheros tardó 316s. Los 20 min cubren eso con margen para la instalación.
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # El diff del PR (`main...HEAD`) necesita el merge-base: con el clon
+          # superficial que trae el action por defecto (1 commit) el rango no
+          # resuelve.
+          fetch-depth: 0
+
+      # La base del PR se le dice a GGA en vez de dejar que la adivine. GGA
+      # autodetecta mirando las ramas LOCALES (`main` > `master` > `develop`), y
+      # eso falla de dos maneras en este repo: el checkout de un PR deja
+      # `origin/<base>` pero ninguna rama local, y en una pila de PRs la base no
+      # es main sino la rama de la unidad padre — un PR apilado moría con «Could
+      # not detect base branch» (medido en los runs de #28 y #29). Se hace la
+      # rama local de verdad, con el nombre real de la base, y se declara en el
+      # config global de GGA (`$HOME/.config/gga/config`, que el propio `.gga`
+      # versionado no pisa porque se carga después): el rango del diff queda
+      # siempre el del PR, contra main o contra la rama padre, sin adivinar.
+      - name: Base del PR (rama local + config del gate)
+        env:
+          # El contexto de GitHub no se interpola dentro del script: entra por
+          # variable de entorno y se cita, que es lo que corta la inyección.
+          RAMA_BASE: ${{ github.base_ref }}
+        run: |
+          # Un nombre de rama legal para git no basta: esto se escribe como
+          # fragmento de shell en un fichero que GGA hace `source`, así que solo
+          # pasa si son caracteres de ref sin comillas ni separadores.
+          case "$RAMA_BASE" in
+            *[!A-Za-z0-9._/-]* | '')
+              echo "::error title=Base del PR no soportada::La base '$RAMA_BASE' no es un nombre de rama esperado; el gate no puede construir el rango del diff."
+              exit 1
+              ;;
+          esac
+          git fetch --no-tags origin "+refs/heads/$RAMA_BASE:refs/heads/$RAMA_BASE"
+          mkdir -p "$HOME/.config/gga"
+          printf 'PR_BASE_BRANCH="%s"\n' "$RAMA_BASE" > "$HOME/.config/gga/config"
+          echo "Base del PR: $RAMA_BASE"
+
+      # Falla pronto y en claro, antes de instalar nada: sin `.gga` versionado,
+      # GGA caería a sus valores por defecto (`*` para todo, sin exclusiones) y
+      # revisaría hasta el lockfile y los JSON del dataset — un gate que juzga
+      # otra cosa que la acordada, en silencio.
+      - name: Requisitos (config versionada)
+        run: |
+          if [ ! -f .gga ]; then
+            echo "::error title=Falta .gga::La config del gate no está en esta base; sin ella el review no juzga lo que debe. Lleva a main la rama del gate antes de activar el job."
+            exit 1
+          fi
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # Misma versión de GGA que el hook local (v2.10.1): el veredicto no puede
+      # depender de qué clon tenga cada máquina. El binario busca sus libs en
+      # `../lib`, así que el clon basta y `install.sh` (que además copia a
+      # `$HOME`) no hace falta en CI.
+      #
+      # La única diferencia con el clon es la ventana del parser del `STATUS`, y
+      # es a propósito: v2.10.1 lo busca en las primeras 30 líneas de la salida
+      # del proveedor, mientras que el contrato del repo (`AGENTS.md`) dice que se
+      # escanea el transcript completo «así que el veredicto puede ir al final del
+      # análisis». Con `--pr-mode` el prompt lleva los ficheros enteros y el
+      # proveedor contesta tras un eco largo: en CI el veredicto cayó fuera de la
+      # ventana y el job murió con «ambiguous response» pese a que el review decía
+      # PASSED (medido en el run del PR #27). El hook local ya lleva ese mismo
+      # ajuste, así que se replica aquí en vez de dejar dos gates que juzgan
+      # distinto. El `grep -q` corta el job si el sed deja de enganchar: un parche
+      # que no aplica dejaría la ventana de 30 en silencio, que es justo el fallo
+      # que se está evitando.
+      - name: Instalar GGA (v2.10.1, con la ventana del contrato)
+        run: |
+          git clone --branch v2.10.1 --depth 1 \
+            https://github.com/Gentleman-Programming/gentleman-guardian-angel.git /tmp/gga
+          sed -i 's/parse_review_status "$RESULT" 30)/parse_review_status "$RESULT" 100000)/' /tmp/gga/bin/gga
+          grep -q 'parse_review_status "$RESULT" 100000)' /tmp/gga/bin/gga
+          chmod +x /tmp/gga/bin/gga
+          echo "/tmp/gga/bin" >> "$GITHUB_PATH"
+
+      # Proveedor del review: `opencode` con el modelo del gateway que no se
+      # factura por uso, el mismo que el `.gga` local — no `opencode-go`, que es
+      # otro proveedor y sí va contra un plan. La versión va fijada, no flotante:
+      # un proveedor que cambia bajo los pies cambia el veredicto sin que nadie
+      # haya tocado el código. Con este proveedor el job no necesita credencial,
+      # así que el review tampoco depende de que una clave tenga saldo.
+      - name: Instalar el proveedor (opencode)
+        run: npm install -g opencode-ai@1.18.31
+
+      # `--pr-mode` manda el contenido completo de los ficheros cambiados, igual
+      # que el hook local manda el de los ficheros staged: misma vista del código
+      # en los dos sitios. `--diff-only` no abarata nada — GGA añade el diff
+      # *además* del contenido (`build_pr_prompt`), así que solo suma tokens.
+      - name: Gate
+        run: gga run --pr-mode
