@@ -11,7 +11,7 @@ concurrency:
 
 jobs:
   verify:
-    name: typecheck + test + data:lint + bench
+    name: typecheck + test + data:lint + bench + manifiesto reproducible
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -37,6 +37,17 @@ jobs:
 
       - name: 'dataset:build (seed → SQLite): los tests copian netatlas-seed.sqlite'
         run: pnpm --filter @netatlas/dataset-tools run dataset:build
+
+      # El manifiesto versionado es la identidad del dataset: su sha256 es el del
+      # SQLite que se publica y su fecha se hereda del fichero previo, no del
+      # reloj. Reconstruir desde las fuentes tiene que dejarlo intacto. Si
+      # `git diff` lo acusa, o el build dejó de ser reproducible (una marca de
+      # tiempo del sistema se coló en el archivo) o las fuentes cambiaron sin
+      # rehacer el dataset en el mismo commit. `data:manifiesto` verifica el hash
+      # contra el SQLite de al lado; esto verifica lo otro: que el fichero
+      # versionado siga describiendo lo que producen las fuentes de hoy.
+      - name: 'Manifiesto reproducible (reconstruir no cambia el fichero versionado)'
+        run: git diff --exit-code -- datasets/netatlas-seed.sqlite.manifest.json
 
       - name: Unit + integration tests
         run: pnpm test
