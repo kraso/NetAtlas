@@ -1,4 +1,6 @@
+import type { Clock } from '@netatlas/domain'
 import type { SqliteDriver } from '../driver.js'
+import { relojDelSistema } from '../reloj.js'
 import type {
   AssertionRow,
   AttributeDefRow,
@@ -59,7 +61,20 @@ export type {
 } from './catalog-tipos.js'
 
 export class CatalogDao {
-  constructor(private readonly db: SqliteDriver) {}
+  /**
+   * El reloj es el sello de tiempo de las filas que van al dataset
+   * (`created_at`/`updated_at`). Por defecto es el del sistema; `dataset:build`
+   * inyecta uno fijo para que el archivo sea reproducible.
+   */
+  constructor(
+    private readonly db: SqliteDriver,
+    private readonly clock: Clock = relojDelSistema,
+  ) {}
+
+  /** Instante actual en ISO 8601, para las filas que entran al dataset. */
+  private ahora(): string {
+    return this.clock.now().toISOString()
+  }
 
   // ── Fabricantes y categorías ─────────────────────────────────────
   upsertManufacturer(row: ManufacturerRow): number {
@@ -80,7 +95,7 @@ export class CatalogDao {
 
   // ── Dispositivos e inventario ────────────────────────────────────
   upsertDevice(row: DeviceRow): number {
-    return upsertDevice(this.db, row)
+    return upsertDevice(this.db, row, this.ahora())
   }
 
   deviceId(slug: string): number | undefined {
@@ -92,7 +107,7 @@ export class CatalogDao {
   }
 
   bulkInsertDevices(rows: readonly DeviceRow[]): void {
-    bulkInsertDevices(this.db, rows)
+    bulkInsertDevices(this.db, rows, this.ahora())
   }
 
   clearPorts(deviceSlug: string): void {
@@ -125,7 +140,7 @@ export class CatalogDao {
   }
 
   addRelationship(row: RelationshipRow): void {
-    addRelationship(this.db, row)
+    addRelationship(this.db, row, this.ahora())
   }
 
   seedPredicates(rows: readonly PredicateSeedRow[]): void {

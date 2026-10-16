@@ -5,6 +5,10 @@ import type { AssertionRow, PredicateSeedRow, RelationshipRow } from './catalog-
 /**
  * Assertions y aristas (grafo materializado): funciones libres sobre el
  * driver que `CatalogDao` delega sin cambiar su API.
+ *
+ * `ahora` (ISO 8601) entra por parámetro por el mismo motivo que en los
+ * dispositivos: `created_at` es parte del archivo del dataset y el build lo
+ * sella con un reloj fijo.
  */
 
 export function seedPredicates(db: SqliteDriver, rows: readonly PredicateSeedRow[]): void {
@@ -47,10 +51,10 @@ export function existingStandardRefs(db: SqliteDriver, deviceId: number): string
   return rows.map((r) => String(r.ref))
 }
 
-export function addRelationship(db: SqliteDriver, row: RelationshipRow): void {
+export function addRelationship(db: SqliteDriver, row: RelationshipRow, ahora: string = new Date().toISOString()): void {
   db.prepare(
     `INSERT INTO relationship (subject_type, subject_id, predicate, object_type, object_id,
                                weight, assertion_id, valid_from, created_at)
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-  ).run(row.subjectType, row.subjectId, row.predicate, row.objectType, row.objectId, null, row.assertionId ?? null, row.validFrom ?? '1970-01-01', new Date().toISOString())
+  ).run(row.subjectType, row.subjectId, row.predicate, row.objectType, row.objectId, null, row.assertionId ?? null, row.validFrom ?? '1970-01-01', ahora)
 }

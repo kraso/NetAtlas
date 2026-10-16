@@ -2,6 +2,7 @@ export { NodeSqliteDriver } from './driver.js'
 export type { SqliteDriver, SqlValue, SqlRow, PreparedStatement } from './driver.js'
 export { loadMigrations, applyMigrations } from './migrator.js'
 export type { Migration, MigrationResult } from './migrator.js'
+export { relojDelSistema, relojFijo } from './reloj.js'
 export { CatalogDao } from './daos/catalog-dao.js'
 export type {
   ManufacturerRow,

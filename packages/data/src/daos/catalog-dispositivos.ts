@@ -5,9 +5,13 @@ import type { DatasheetSeedRow, DeviceRow, ImageSeedRow, PortRow } from './catal
 /**
  * Dispositivos y su inventario (puertos, datasheets, imágenes): funciones
  * libres sobre el driver que `CatalogDao` delega sin cambiar su API.
+ *
+ * `ahora` (ISO 8601) entra por parámetro y no se lee del reloj interno: es el
+ * `updated_at` que viaja al archivo del dataset, y el build lo sella con un
+ * reloj fijo para que dos construcciones de las mismas fuentes coincidan.
  */
 
-export function upsertDevice(db: SqliteDriver, row: DeviceRow): number {
+export function upsertDevice(db: SqliteDriver, row: DeviceRow, ahora: string = new Date().toISOString()): number {
   const mfrId = manufacturerId(db, row.manufacturerSlug)
   if (mfrId === undefined) {
     throw new Error(`Device "${row.slug}": fabricante desconocido "${row.manufacturerSlug}".`)
@@ -22,17 +26,16 @@ export function upsertDevice(db: SqliteDriver, row: DeviceRow): number {
     db.prepare(
       `UPDATE device SET name = ?, manufacturer_id = ?, category_id = ?, lifecycle_status = ?,
                osi_profile_json = ?, summary = ?, model = ?, sku = ?, updated_at = ? WHERE id = ?`,
-    ).run(row.name, mfrId, catId, row.lifecycleStatus, row.osiProfileJson ?? null, row.summary ?? null, row.model ?? null, row.sku ?? null, new Date().toISOString(), Number(existing.id))
+    ).run(row.name, mfrId, catId, row.lifecycleStatus, row.osiProfileJson ?? null, row.summary ?? null, row.model ?? null, row.sku ?? null, ahora, Number(existing.id))
     return Number(existing.id)
   }
-  const now = new Date().toISOString()
   const res = db
     .prepare(
       `INSERT INTO device (slug, name, manufacturer_id, category_id, lifecycle_status,
                            osi_profile_json, summary, model, sku, created_at, updated_at)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
-    .run(row.slug, row.name, mfrId, catId, row.lifecycleStatus, row.osiProfileJson ?? null, row.summary ?? null, row.model ?? null, row.sku ?? null, now, now)
+    .run(row.slug, row.name, mfrId, catId, row.lifecycleStatus, row.osiProfileJson ?? null, row.summary ?? null, row.model ?? null, row.sku ?? null, ahora, ahora)
   return Number(res.lastInsertRowid)
 }
 
@@ -54,9 +57,9 @@ export function eliminarDeviceCompleto(db: SqliteDriver, slug: string): boolean 
 }
 
 /** Convierte una lista de dispositivos en masa (p. ej. sintéticos). */
-export function bulkInsertDevices(db: SqliteDriver, rows: readonly DeviceRow[]): void {
+export function bulkInsertDevices(db: SqliteDriver, rows: readonly DeviceRow[], ahora: string = new Date().toISOString()): void {
   db.transaction(() => {
-    for (const row of rows) upsertDevice(db, row)
+    for (const row of rows) upsertDevice(db, row, ahora)
   })
 }
 

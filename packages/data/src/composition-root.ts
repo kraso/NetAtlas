@@ -1,8 +1,18 @@
-import { NodeSqliteDriver, applyMigrations, loadMigrations, CatalogDao } from './index.js'
+// Los adaptadores entran por el barrel del paquete: con las tres declaraciones
+// de repositorios por separado este módulo pasaba de las cinco que admite la
+// convención de imports del repositorio.
+import {
+  NodeSqliteDriver,
+  applyMigrations,
+  loadMigrations,
+  CatalogDao,
+  relojDelSistema,
+  SqliteDeviceRepository,
+  SqliteCatalogRepository,
+  SqliteGraphRepository,
+  SqliteSourcingRepository,
+} from './index.js'
 import type { SqliteDriver } from './driver.js'
-import { SqliteDeviceRepository, SqliteCatalogRepository } from './repositories/device-repository.js'
-import { SqliteGraphRepository } from './repositories/graph-repository.js'
-import { SqliteSourcingRepository } from './repositories/sourcing-repository.js'
 import type { Clock, DeviceRepository, CatalogRepository, GraphRepository, SourcingRepository, Logger, IdGen } from '@netatlas/domain'
 
 /**
@@ -36,12 +46,6 @@ export interface CompositionOptions {
    */
   readonly driver?: SqliteDriver
   readonly applyMigrationsFirst?: boolean
-}
-
-class SystemClock implements Clock {
-  now(): Date {
-    return new Date()
-  }
 }
 
 class IncrementalIdGen implements IdGen {
@@ -79,7 +83,7 @@ export function composeRuntime(opts: CompositionOptions): RuntimeContext {
       sourcing: new SqliteSourcingRepository(driver),
     },
     dao,
-    clock: new SystemClock(),
+    clock: relojDelSistema,
     idGen: new IncrementalIdGen(),
     logger: new ConsoleLogger(),
   }
