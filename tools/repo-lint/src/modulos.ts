@@ -9,6 +9,9 @@ import { join, relative, sep } from 'node:path'
 
 export const MAX_LINEAS = 200
 
+/** Módulos de la app que entran en el bundle del navegador. */
+export const DIR_APP = join('apps', 'app', 'src')
+
 /** Carpetas que nunca contienen módulos fuente que revisar. */
 const DIRECTORIOS_IGNORADOS = new Set(['node_modules', 'dist', 'coverage', 'target', '.git'])
 
